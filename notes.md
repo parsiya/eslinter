@@ -67,6 +67,12 @@ def isScript(self, requestResponse):
         1. Read those and learn.
         2. Make a blog post about it.
 
+## Embedding JS in Python?
+
+* https://github.com/sqreen/PyMiniRacer
+* Related blog: https://blog.sqreen.com/embedding-javascript-into-python/
+* 
+
 ## Hurdles
 
 1. Handling large files?
