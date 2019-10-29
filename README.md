@@ -6,6 +6,7 @@ A talk in the series `Manual (Application) Security is a Bug` or just `Manual Se
 ## Files
 
 * [Research Notes](notes.md)
+* [Creating Burp Extension UIs in Python](python-burp-ui.md)
 
 ## TODO
 Add and update as we go on.
@@ -48,4 +49,3 @@ Add and update as we go on.
 * [ ] Create our own ESLint rules?
 * [ ] ScanJS UI like system?
     * [ ] Or just reuse ScanJS?
-* [ ] 
