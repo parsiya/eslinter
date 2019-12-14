@@ -6,7 +6,8 @@ A talk in the series `Manual (Application) Security is a Bug` or just `Manual Se
 ## Files
 
 * [Research Notes](notes.md)
-* [Creating Burp Extension UIs in Python](python-burp-ui.md)
+* ~~[Creating Burp Extension UIs in Python](python-burp-ui.md)~~
+    * Not needed anymore, switching to Java.
 
 ## TODO
 Add and update as we go on.
@@ -19,13 +20,21 @@ Add and update as we go on.
 
 1. Research how to detect scripts. See [Research Notes](notes.md).
 2. Write something that detects scripts.
-3. Beautify JS files.
-    1. Preferably in Python or a native binary in any language.
-4. Run ESLint via the command line for a few high impact rules.
+3. Add metadata to JS files.
+    1. Something like a JSON object (commented out) that contains information
+       about where this file came from (e.g., URL, referer etc).
+4. Beautify JS files.
+    1. Preferably in ~~Python~~ Java.
+    2. Need to do some error handling here, our extracted JS might not have the
+       correct syntax.
+5. Run ESLint via the command line for a few high impact rules.
     1. Decide on the high impact rules.
-    2. https://github.com/parsiya/burputils will have a `runExternal` module to help?
-    3. Or not use Burputils and have an extension specific utils file.
-5. Create Burp issues from the results.
+    2. ~~https://github.com/parsiya/burputils will have a `runExternal` module to help?~~
+    3. ~~Or not use Burputils and have an extension specific utils file.~~
+6. Create Burp issues from the results.
+
+## TODO
+* [ ] 1. Filter based on `toolFlag`.
 
 ## Future Enhancements
 Add and update as we go on.

@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "BurpExtension",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 8000 // Change this if you had set a different debug port.
+        }
+    ]
+}

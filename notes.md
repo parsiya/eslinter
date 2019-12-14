@@ -51,12 +51,13 @@ def isScript(self, requestResponse):
         1. Angular
         2. React
         3. Add more
+    5. [guessContentTypeFromName(string)](https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-)
 2. How can we extract jsmaps and get the JS files?
     1. What are jsmaps?
     2. What is their structure?
-3. By MIME Type.
+3. By MIME Type of the response.
     1. IResponseInfo.getStatedMimeType: https://portswigger.net/burp/extender/api/burp/IResponseInfo.html#getStatedMimeType()
-    2. IResponseInfo.getInferredMimeType: https://portswigger.net/burp/extender/api/burp/IResponseInfo.html#getStatedMimeType()
+    2. IResponseInfo.getInferredMimeType: https://portswigger.net/burp/extender/api/burp/IResponseInfo.html#getInferredMimeType()
     3. Anything else?
 4. What about scripts inside response (similar to what Burp does)
     1. Regex for `<script.*</script>`?
