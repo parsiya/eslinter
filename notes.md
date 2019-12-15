@@ -43,11 +43,11 @@ def isScript(self, requestResponse):
 ```
 
 1. By extension, check for `js` and `json`.
-    1. Why JSON? for maps? 
+    1. Why JSON? for maps?
     2. What about jsmaps? What are their extensions?
         1. `.js.map` or `.map`?
     3. Any other extensions? `pack`?
-    4. Framework specific extension
+    4. Framework specific extensions?
         1. Angular
         2. React
         3. Add more

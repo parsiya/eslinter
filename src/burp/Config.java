@@ -16,8 +16,9 @@ public class Config {
      * Search for "text/javascript" here
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
      * Only "text/javascript" is supposedly supported but who knows.
+     * Should be entered as lowercase here.
      */
-    public static String[] JSMIMETypes = new String[] {
+    public static String[] JSTypes = new String[] {
         "application/javascript",
         "application/ecmascript",
         "application/x-ecmascript",
@@ -33,7 +34,8 @@ public class Config {
         "text/jscript",
         "text/livescript",
         "text/x-ecmascript",
-        "text/x-javascript"
+        "text/x-javascript",
+        "script" // This is what Burp returns as the MIMEType if it detects js.
     };
 
     // File extensions.
@@ -42,10 +44,19 @@ public class Config {
         "javascript"
     };
 
-    // Removable headers.
-    // These headers will be removed from the requests. The change will not
-    // appear in Burp history but the outgoing request will not have these
-    // headers.
+    // Content-Types that might contain scripts.
+    // Should be entered as lowercase here.
+    public static String[] ContainsScriptTypes = new String[] {
+        "text/html",
+        "application/xhtml+xml" // XHTML, be sure to remove the CDATA tags.
+    };
+
+    /**
+     * Removable headers.
+     * These headers will be removed from the requests. The change will not
+     * appear in Burp history but the outgoing request will not have these
+     * headers.
+     */
     public static String[] RemovedHeaders = new String[] {
         "If-Modified-Since",
         "If-None-Match"
