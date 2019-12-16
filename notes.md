@@ -60,8 +60,9 @@ def isScript(self, requestResponse):
     2. IResponseInfo.getInferredMimeType: https://portswigger.net/burp/extender/api/burp/IResponseInfo.html#getInferredMimeType()
     3. Anything else?
 4. What about scripts inside response (similar to what Burp does)
-    1. Regex for `<script.*</script>`?
+    1. Regex for `<script.*>(.*)</script>`?
     2. Where else can we have embedded scripts?
+    3. Note on XHTML files, we might see stuff in CDATA tags.
 5. How to create Burp extension UI in Python.
     1. Lots of examples for Burp extensions in Java
     2. Only a few in Python.

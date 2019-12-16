@@ -28,8 +28,6 @@ public class ReqResp {
 
     public static byte[] getResponseBody(IHttpRequestResponse requestResponse) {
         byte[] responseBytes = requestResponse.getResponse();
-        String nem = helpers.bytesToString(responseBytes);
-        callbacks.printOutput(nem);
         IResponseInfo respInfo = helpers.analyzeResponse(responseBytes);
         int bodyOffset = respInfo.getBodyOffset();
         int responseSize = responseBytes.length;

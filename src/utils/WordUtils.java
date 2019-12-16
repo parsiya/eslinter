@@ -1,5 +1,7 @@
 package utils;
 
+import static utils.StringUtils.isEmpty;
+
 /**
  * WordUtils contains copied and modified utilities from the
  * Apache commons-text.WordUtils package.
@@ -30,15 +32,17 @@ import java.util.Set;
 public class WordUtils {
 
     /**
-     * <p>Capitalizes all the whitespace separated words in a String.
-     * Only the first character of each word is changed. To convert the
-     * rest of each word to lowercase at the same time,
-     * use {@link #capitalizeFully(String)}.</p>
+     * <p>
+     * Capitalizes all the whitespace separated words in a String. Only the first
+     * character of each word is changed. To convert the rest of each word to
+     * lowercase at the same time, use {@link #capitalizeFully(String)}.
+     * </p>
      *
-     * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
-     * A {@code null} input String returns {@code null}.
-     * Capitalization uses the Unicode title case, normally equivalent to
-     * upper case.</p>
+     * <p>
+     * Whitespace is defined by {@link Character#isWhitespace(char)}. A {@code null}
+     * input String returns {@code null}. Capitalization uses the Unicode title
+     * case, normally equivalent to upper case.
+     * </p>
      *
      * <pre>
      * WordUtils.capitalize(null)        = null
@@ -46,7 +50,7 @@ public class WordUtils {
      * WordUtils.capitalize("i am FINE") = "I Am FINE"
      * </pre>
      *
-     * @param str  the String to capitalize, may be null
+     * @param str the String to capitalize, may be null
      * @return capitalized String, {@code null} if null String input
      * @see #uncapitalize(String)
      * @see #capitalizeFully(String)
@@ -56,18 +60,22 @@ public class WordUtils {
     }
 
     /**
-     * <p>Capitalizes all the delimiter separated words in a String.
-     * Only the first character of each word is changed. To convert the
-     * rest of each word to lowercase at the same time,
-     * use {@link #capitalizeFully(String, char[])}.</p>
+     * <p>
+     * Capitalizes all the delimiter separated words in a String. Only the first
+     * character of each word is changed. To convert the rest of each word to
+     * lowercase at the same time, use {@link #capitalizeFully(String, char[])}.
+     * </p>
      *
-     * <p>The delimiters represent a set of characters understood to separate words.
+     * <p>
+     * The delimiters represent a set of characters understood to separate words.
      * The first string character and the first non-delimiter character after a
-     * delimiter will be capitalized. </p>
+     * delimiter will be capitalized.
+     * </p>
      *
-     * <p>A {@code null} input String returns {@code null}.
-     * Capitalization uses the Unicode title case, normally equivalent to
-     * upper case.</p>
+     * <p>
+     * A {@code null} input String returns {@code null}. Capitalization uses the
+     * Unicode title case, normally equivalent to upper case.
+     * </p>
      *
      * <pre>
      * WordUtils.capitalize(null, *)            = null
@@ -78,8 +86,9 @@ public class WordUtils {
      * WordUtils.capitalize("i am fine", new char[]{}) = "I am fine"
      * </pre>
      *
-     * @param str  the String to capitalize, may be null
-     * @param delimiters  set of characters to determine capitalization, null means whitespace
+     * @param str        the String to capitalize, may be null
+     * @param delimiters set of characters to determine capitalization, null means
+     *                   whitespace
      * @return capitalized String, {@code null} if null String input
      * @see #uncapitalize(String)
      * @see #capitalizeFully(String)
@@ -194,34 +203,5 @@ public class WordUtils {
             delimiterHashSet.add(Character.codePointAt(delimiters, index));
         }
         return delimiterHashSet;
-    }
-
-    /**
-     * isEmpty was copied from Apache commons-lang.StringUtils.
-     * It's used in the capilize methods.
-     * https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
-     */
-
-    /**
-     * <p>Checks if a CharSequence is empty ("") or null.</p>
-     *
-     * <pre>
-     * StringUtils.isEmpty(null)      = true
-     * StringUtils.isEmpty("")        = true
-     * StringUtils.isEmpty(" ")       = false
-     * StringUtils.isEmpty("bob")     = false
-     * StringUtils.isEmpty("  bob  ") = false
-     * </pre>
-     *
-     * <p>NOTE: This method changed in Lang version 2.0.
-     * It no longer trims the CharSequence.
-     * That functionality is available in isBlank().</p>
-     *
-     * @param cs  the CharSequence to check, may be null
-     * @return {@code true} if the CharSequence is empty or null
-     * @since 3.0 Changed signature from isEmpty(String) to isEmpty(CharSequence)
-     */
-    public static boolean isEmpty(final CharSequence cs) {
-        return cs == null || cs.length() == 0;
     }
  }

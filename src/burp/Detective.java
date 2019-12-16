@@ -1,19 +1,11 @@
-package detective;
-
-import burp.IHttpRequestResponse;
-import burp.IRequestInfo;
-import burp.IResponseInfo;
-import burp.Config;
-import static burp.BurpExtender.helpers;
+package burp;
 
 import utils.FilenameUtils;
-import utils.Header;
 import utils.ReqResp;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
+
 
 /**
  * Detective contains the JavaScript detection functions.
@@ -40,7 +32,7 @@ public class Detective {
     
     public static String getMIMEType(IHttpRequestResponse requestResponse) {
         // 0. Process the response.
-        IResponseInfo respInfo = helpers.analyzeResponse(requestResponse.getResponse());
+        IResponseInfo respInfo = BurpExtender.helpers.analyzeResponse(requestResponse.getResponse());
         
         // 1. Try to get the MIME type from the response using Burp.
         String mimeType = respInfo.getStatedMimeType();
@@ -132,7 +124,7 @@ public class Detective {
     }
 
     private static URL getRequestURL(IHttpRequestResponse requestResponse) {
-        IRequestInfo reqInfo = helpers.analyzeRequest(requestResponse);
+        IRequestInfo reqInfo = BurpExtender.helpers.analyzeRequest(requestResponse);
         return reqInfo.getUrl();
     }
 

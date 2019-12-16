@@ -1,20 +1,15 @@
 package burp;
 
 import java.awt.Component;
-import java.util.ArrayList;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
-import detective.Detective;
-import utils.Header;
 import utils.ReqResp;
 
 public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
     public static IBurpExtenderCallbacks callbacks;
     public static IExtensionHelpers helpers;
-
-    private static final String EMPTY_STRING = "";
 
     //
     // implement IBurpExtender
@@ -52,7 +47,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Process requests and get their extension.
         // If their extension matches what we want, get the response.
         if (isRequest) {
-            callbacks.printOutput("Got a request - removing headers");
             // Remove cache headers from the request. We do not want 304s.
             for (String rhdr : Config.RemovedHeaders) {
                 requestResponse = ReqResp.removeHeader(isRequest, requestResponse, rhdr);
@@ -74,6 +68,10 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         if (Detective.containsScript(requestResponse)) {
             containsScriptHeader = "true";
             requestResponse.setHighlight("red");
+            callbacks.printOutput("-------------------------");
+            callbacks.printOutput(String.format("Extracted JS from: %s", requestResponse.getHttpService().toString()));
+            callbacks.printOutput(Extractor.getJS(requestResponse.getResponse()));
+            callbacks.printOutput("-------------------------");
         }
         requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Contains-Script", containsScriptHeader);
 
