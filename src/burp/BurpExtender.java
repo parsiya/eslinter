@@ -1,10 +1,18 @@
 package burp;
 
 import java.awt.Component;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
+import lint.Metadata;
 import utils.ReqResp;
+import utils.StringUtils;
 
 public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
@@ -43,7 +51,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
     @Override
     public void processHttpMessage(int toolFlag, boolean isRequest, IHttpRequestResponse requestResponse) {
-        
+
         // Process requests and get their extension.
         // If their extension matches what we want, get the response.
         if (isRequest) {
@@ -54,15 +62,49 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             return;
         }
 
+        // Remember to do stuff inside swing dispatching threads?
+
         // Here we have responses.
         IResponseInfo respInfo = helpers.analyzeResponse(requestResponse.getResponse());
         String scriptHeader = "false";
         if (Detective.isScript(requestResponse)) {
             scriptHeader = "true";
             requestResponse.setHighlight("cyan");
+            // We need to get this file and store it.
+
+            // Create the MetaData.
+            Metadata metadata = new Metadata();
+            try {
+                metadata = ReqResp.getMetadata(requestResponse);
+            } catch (NoSuchAlgorithmException e) {
+                // TODO Auto-generated catch block
+
+                // This should not happen because we are passing "MD5" to the
+                // digest manually. If we do not have the algorithm in Burp then
+                // we have bigger problems.
+                e.printStackTrace();
+            }
+
+            // Get the request body.
+            byte[] bodyBytes = ReqResp.getResponseBody(requestResponse);
+
+            String metadataString = metadata.toString();
+            String filePath = "C:\\Users\\IEUser\\Desktop\\eslint\\".concat(metadata.getHash().concat(".js"));
+             try {
+                PrintWriter pOut = new PrintWriter(filePath);
+                pOut.write("\n/*\n");
+                pOut.write(metadataString);
+                pOut.write("\n*/\n\n");
+                pOut.write(helpers.bytesToString(bodyBytes));
+                pOut.close();
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
         }
         requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Is-Script", scriptHeader);
-        // We need to get this file and store it.
+        
 
         String containsScriptHeader = "false";
         if (Detective.containsScript(requestResponse)) {

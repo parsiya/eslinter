@@ -3,12 +3,15 @@ package utils;
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
+import lint.Metadata;
+import utils.StringUtils;
 
 import static burp.BurpExtender.helpers;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-import static burp.BurpExtender.callbacks;
 
 /**
  * ReqResp
@@ -87,4 +90,22 @@ public class ReqResp {
         Header hdr = new Header(isRequest, requestResponse);
         return hdr.get(header);
     }
+
+    // Returns the java.net.URL for the IHttpRequestResponse's request.
+    public static java.net.URL getURL(IHttpRequestResponse requestResponse) {
+        IRequestInfo reqInfo = helpers.analyzeRequest(requestResponse);
+        return reqInfo.getUrl();
+    }
+
+    // Creates and returns the metadat for the IHttpRequestResponse.
+    public static Metadata getMetadata(IHttpRequestResponse requestResponse) throws NoSuchAlgorithmException {
+
+        String url = ReqResp.getURL(requestResponse).toString();
+        String referer = ReqResp.getHeader("Referer", true, requestResponse).get(0);
+        byte[] bodyBytes = ReqResp.getResponseBody(requestResponse);
+        byte[] hashBytes = MessageDigest.getInstance("MD5").digest(bodyBytes);
+        String hashString = StringUtils.encodeHexString(hashBytes);
+        return new Metadata(url, referer, hashString);
+    }
+
 }
