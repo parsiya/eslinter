@@ -60,26 +60,23 @@ def isScript(self, requestResponse):
     2. IResponseInfo.getInferredMimeType: https://portswigger.net/burp/extender/api/burp/IResponseInfo.html#getInferredMimeType()
     3. Anything else?
 4. What about scripts inside response (similar to what Burp does)
-    1. Regex for `<script.*>(.*)</script>`?
+    1. ~~Regex for `<script.*>(.*)</script>`?~~
     2. Where else can we have embedded scripts?
     3. Note on XHTML files, we might see stuff in CDATA tags.
-5. How to create Burp extension UI in Python.
-    1. Lots of examples for Burp extensions in Java
-    2. Only a few in Python.
-        1. Read those and learn.
-        2. Make a blog post about it.
-
-## Embedding JS in Python?
-
-* https://github.com/sqreen/PyMiniRacer
-* Related blog: https://blog.sqreen.com/embedding-javascript-into-python/
-* 
+5. ~~How to create Burp extension UI in Python.~~ Switched to Java, not needed
+   anymore.
+    1. ~~Lots of examples for Burp extensions in Java~~
+    2. ~~Only a few in Python.~~
+        1. ~~Read those and learn.~~
+        2. ~~Make a blog post about it.~~
 
 ## Hurdles
 
 1. Handling large files?
     1. Beautifying and linting them will consume a lot of RAM. Let's assume we will run node with 4GBs of RAM.
+        1. Add the node RAM option in the extension.
     2. Do we have a size limit? Works for the POC but not in action.
+        1. Add a size limit in the extension.
     3. Split the files into chunks?
         1. Works if we are using a map that has separate JS files?
         2. For big files, use a parser and make chunks and the end of self-contained blocks?
@@ -87,3 +84,28 @@ def isScript(self, requestResponse):
         3. Drop standard stuff that we can recognize as 3rd party.
 2. Performance issues
     1. Both ESLint and the beautifier are slow on large files and use a lot of RAM.
+        1. Find a beautifier in Java at least.
+
+----------
+
+# JS beautifier in Java
+
+Options in order of preference:
+
+1. Run a pure Java JavaScript beautifier.
+2. Run a Node app.
+3. Run a JavaScript app on JVM (is it really faster than 1?).
+
+
+## Option 1
+
+* https://gerrit.googlesource.com/java-prettify/
+    * Old?
+* https://alvinalexander.com/java/jwarehouse/jext-src-5.0/src/plugins/Java/JSBeautifier.java.shtml
+    * Is this some random code or does it work?
+
+## Options 2
+
+* https://github.com/beautify-web/js-beautify
+    * Appears to the most popular option.
+    * Has a Python package which would have worked if the extension was still in Python.
