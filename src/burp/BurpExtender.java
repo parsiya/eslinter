@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +14,7 @@ import javax.swing.JPanel;
 import lint.Metadata;
 import utils.ReqResp;
 import utils.StringUtils;
+import utils.Exec;
 
 public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
@@ -92,15 +94,23 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             String filePath = "C:\\Users\\IEUser\\Desktop\\eslint\\".concat(metadata.getHash().concat(".js"));
              try {
                 PrintWriter pOut = new PrintWriter(filePath);
-                pOut.write("\n/*\n");
+                pOut.write("/*\n");
                 pOut.write(metadataString);
                 pOut.write("\n*/\n\n");
                 pOut.write(helpers.bytesToString(bodyBytes));
                 pOut.close();
+                callbacks.printOutput("whatever");
+                // Now beautify the file.
+                String output = Exec.execute("C:\\Users\\IEUser\\Desktop\\eslint", "js-beautify.exe", "-f", filePath, "-r");
+                callbacks.printOutput(output);
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                // e.printStackTrace();
+                callbacks.printOutput(e.getStackTrace().toString());
+            } catch (IOException e) { 
+                callbacks.printOutput(e.getStackTrace().toString());
             }
+            
 
         }
         requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Is-Script", scriptHeader);
@@ -110,10 +120,10 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         if (Detective.containsScript(requestResponse)) {
             containsScriptHeader = "true";
             requestResponse.setHighlight("red");
-            callbacks.printOutput("-------------------------");
-            callbacks.printOutput(String.format("Extracted JS from: %s", requestResponse.getHttpService().toString()));
-            callbacks.printOutput(Extractor.getJS(requestResponse.getResponse()));
-            callbacks.printOutput("-------------------------");
+            // callbacks.printOutput("-------------------------");
+            // callbacks.printOutput(String.format("Extracted JS from: %s", requestResponse.getHttpService().toString()));
+            // callbacks.printOutput(Extractor.getJS(requestResponse.getResponse()));
+            // callbacks.printOutput("-------------------------");
         }
         requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Contains-Script", containsScriptHeader);
 

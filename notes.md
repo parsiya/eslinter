@@ -63,6 +63,8 @@ def isScript(self, requestResponse):
     1. ~~Regex for `<script.*>(.*)</script>`?~~
     2. Where else can we have embedded scripts?
     3. Note on XHTML files, we might see stuff in CDATA tags.
+        1. `private final static Pattern patternCDATA = Pattern.compile("(?i)^[\\s\\/\\*]*\\<\\!\\[CDATA\\["); // Fix Possible <![CDATA[ bugs!`
+        2. Source: https://github.com/PortSwigger/js-beautifier/blob/master/src/burp/JSBeautifier/JSBeautifierFunctions.java#L500
 5. ~~How to create Burp extension UI in Python.~~ Switched to Java, not needed
    anymore.
     1. ~~Lots of examples for Burp extensions in Java~~
@@ -75,6 +77,7 @@ def isScript(self, requestResponse):
 1. Handling large files?
     1. Beautifying and linting them will consume a lot of RAM. Let's assume we will run node with 4GBs of RAM.
         1. Add the node RAM option in the extension.
+        2. Convert node.js project into a binary: https://github.com/zeit/pkg
     2. Do we have a size limit? Works for the POC but not in action.
         1. Add a size limit in the extension.
     3. Split the files into chunks?
@@ -85,6 +88,7 @@ def isScript(self, requestResponse):
 2. Performance issues
     1. Both ESLint and the beautifier are slow on large files and use a lot of RAM.
         1. Find a beautifier in Java at least.
+            1. Not found yet.
 
 ----------
 
@@ -101,11 +105,24 @@ Options in order of preference:
 
 * https://gerrit.googlesource.com/java-prettify/
     * Old?
-* https://alvinalexander.com/java/jwarehouse/jext-src-5.0/src/plugins/Java/JSBeautifier.java.shtml
+* ~~https://alvinalexander.com/java/jwarehouse/jext-src-5.0/src/plugins/Java/JSBeautifier.java.shtml~~
     * Is this some random code or does it work?
+    * Despite the name, this was for Java.
 
-## Options 2
+## Option 2
 
 * https://github.com/beautify-web/js-beautify
     * Appears to the most popular option.
     * Has a Python package which would have worked if the extension was still in Python.
+
+## Option 3
+Tons of examples, it's popular-ish.
+
+* https://github.com/drewhamlett/netbeans-jsbeautify/blob/master/src/com/drewhamlett/jsbeautify/JSBeautify.java
+* Run js-beautifier on JVM https://github.com/beautify-web/js-beautify
+    * If I choose this option, this library is the way to go.
+
+Maybe we can run node too?
+
+* J2V8
+    * Java bindings for v8. Unfortunately, packages are platform specific so users need to build each extension themselves.
