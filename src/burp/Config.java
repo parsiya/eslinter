@@ -10,6 +10,11 @@ public class Config {
     // This is the extension's tab name.
     public static String TabName = "ESLinter";
 
+    // Storage path for extracted JavaScript files.
+    public static String StoragePath = "C:\\Users\\IEUser\\Desktop\\eslint\\";
+
+    // Maximum number of threads.
+    public static int NumberOfThreads = 10;
 
     /**
      * JavaScript MIME types.

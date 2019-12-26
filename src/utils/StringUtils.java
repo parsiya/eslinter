@@ -1,5 +1,10 @@
 package utils;
 
+import static burp.BurpExtender.callbacks;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * StringUtils
  */
@@ -13,6 +18,16 @@ public class StringUtils {
         return data.getBytes();
     }
 
+    public static String getStackTrace(Exception e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
+
+    public static void printStackTrace(Exception e) {
+        callbacks.printError(getStackTrace(e));
+    }
+    
     /**
      * isEmpty was copied from Apache commons-lang.StringUtils.
      * It's used in the capilize methods.

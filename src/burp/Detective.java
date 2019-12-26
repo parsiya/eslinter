@@ -1,10 +1,11 @@
 package burp;
 
-import utils.FilenameUtils;
 import utils.ReqResp;
 
 import java.net.URL;
 import java.util.ArrayList;
+
+import org.apache.commons.io.FilenameUtils;
 
 
 /**
@@ -43,7 +44,9 @@ public class Detective {
         // I do not think we can do better at Burp but that is not tested yet.
         // 2. Get the "Content-Type" header of the response.
         ArrayList<String> contentTypes = ReqResp.getHeader("Content-Type", false, requestResponse);
+        if (contentTypes == null) return EMPTY_STRING;
         for (String cType : contentTypes) {
+            // if (cType == null) continue;
             // Check if cType is in Config.JSMIMETypes.
             if (isJSMimeType(cType)) {
                 return JAVASCRIPT_MIMETYPE;
@@ -62,7 +65,9 @@ public class Detective {
         ArrayList<String> responseContentType =
             ReqResp.getHeader("Content-Type", false, requestResponse);
         
+        if (responseContentType == null) return false;
         for (String cType : responseContentType) {
+            if (cType == null) continue;
             if(isContainsScriptType(cType)) {
                 return true;
             }
@@ -98,6 +103,7 @@ public class Detective {
         // Get the extension URL.
         String ext = getRequestExtension(requestResponse);
         // Return true if it's one of the extensions we are looking for.
+        if (ext == null) return false;
         for (String extension : Config.FileExtensions) {
             if (ext.equalsIgnoreCase(extension)) {
                 return true;

@@ -11,6 +11,7 @@ dependencies {
     compile 'net.portswigger.burp.extender:burp-extender-api:2.1'
     compile 'com.google.code.gson:gson:2.8.6'
     compile 'commons-io:commons-io:2.6'
+    compile 'org.mozilla:rhino:1.7.11'
 }
 
 sourceSets {
@@ -23,7 +24,7 @@ sourceSets {
     }
     main {
         resources {
-            // Set the source directory to "src"
+            // Set the resource directory to "src/resources"
             srcDir 'src/resources'
         }
     }

@@ -10,6 +10,7 @@ public class Metadata {
     private String url;
     private String referer;
     private String hash;
+    private boolean beautified = false;
 
     public Metadata() {}
 
@@ -56,5 +57,13 @@ public class Metadata {
 
     public static Metadata fromString(String jsonString) {
         return new Gson().fromJson(jsonString, Metadata.class);
+    }
+
+    public boolean isBeautified() {
+        return beautified;
+    }
+
+    public void setBeautified(boolean done) {
+        this.beautified = done;
     }
 }
