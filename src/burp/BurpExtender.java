@@ -81,140 +81,66 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
         // Here we have responses.
         IResponseInfo respInfo = helpers.analyzeResponse(requestResponse.getResponse());
+
+        // Create the metadata, it might not be needed if there's nothing in the
+        // response but this is a small overhead for more readable code.
+
+        Metadata metadata = new Metadata();
+        try {
+            metadata = ReqResp.getMetadata(requestResponse);
+        } catch (NoSuchAlgorithmException e) {
+            // This should not happen because we are passing "MD5" to the
+            // digest manually. If we do not have the algorithm in Burp then
+            // we have bigger problems.
+            e.printStackTrace();
+            return;
+        }
+
+
         String scriptHeader = "false";
+        String containsScriptHeader = "false";
+        String javascript = "";
 
         if (Detective.isScript(requestResponse)) {
-            return;
-            // scriptHeader = "true";
-            // requestResponse.setHighlight("cyan");
-            // // We need to get this file and store it.
+            scriptHeader = "true";
+            requestResponse.setHighlight("cyan");
+            // Get the request body.
+            byte[] bodyBytes = ReqResp.getResponseBody(requestResponse);
+            if (bodyBytes.length == 0) return;
 
-            // // Create the MetaData.
-            // Metadata metadata = new Metadata();
-            // try {
-            //     metadata = ReqResp.getMetadata(requestResponse);
-            // } catch (NoSuchAlgorithmException e) {
-            //     // This should not happen because we are passing "MD5" to the
-            //     // digest manually. If we do not have the algorithm in Burp then
-            //     // we have bigger problems.
-            //     e.printStackTrace();
-            //     return;
-            // }
-
-            // // Get the request body.
-            // byte[] bodyBytes = ReqResp.getResponseBody(requestResponse);
-            // if (bodyBytes.length == 0) return;
-
-            // // TODO Spawn all of this in a new thread.
-
-            // // String metadataString = metadata.toString();
-            // // String filePath = "C:\\Users\\IEUser\\Desktop\\eslint\\".concat(metadata.getHash().concat(".js"));
-            //  try {
-            //     // PrintWriter pOut = new PrintWriter(filePath);
-            //     // pOut.write("/*\n");
-            //     // pOut.write(metadataString);
-            //     // pOut.write("\n*/\n\n");
-            //     // pOut.write(helpers.bytesToString(bodyBytes));
-            //     // pOut.close();
-            //     // callbacks.printOutput("whatever");
-            //     // Now beautify the file.
-            //     // StringWriter sw = new StringWriter();
-            //     // sw.write("/*\n");
-            //     // sw.write(metadataString);
-            //     // sw.write("\n*/\n\n");
-            //     // sw.write(helpers.bytesToString(bodyBytes));
-            //     // sw.close();
-
-            //     // JSBeautify.beautifyFile(filePath, filePath);
-            //     // String beautifiedStr = beautifier.beautify(sw.toString());
-            //     // if (StringUtils.isEmpty(beautifiedStr)) {
-            //     //     callbacks.printError("beautify(" + metadata.getUrl() + ") was empty.");
-            //     //     return;
-            //     // }
-                
-            //     // File outFile = new File(filePath);
-            //     // FileUtils.writeStringToFile(outFile, beautifiedStr, "UTF-8");
-                
-            //     // String output = Exec.execute("C:\\Users\\IEUser\\Desktop\\eslint", "js-beautify.exe", "-f", filePath, "-r");
-            //     // callbacks.printOutput(output);
-
-            //     // Spawn a new BeautifyTask to beautify and store the thing.
-            //     Runnable beautifyTask = new BeautifyTask(
-            //         beautifier, StringUtils.bytesToString(bodyBytes), metadata,
-            //         Config.StoragePath);
-                
-            //     // Fingers crossed this will work.
-            //     // TODO This presents a Future that will be null when task is
-            //     // complete. Can we use it?
-            //     pool.submit(beautifyTask);
-
-
-            // } catch (Exception e) {
-            //     // TODO Auto-generated catch block
-            //     StringUtils.printStackTrace(e);
-            // }
-
-        }
-        requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Is-Script", scriptHeader);
-
-        String containsScriptHeader = "false";
-        // Not a JavaScript file, but it might contain it.
-        if (Detective.containsScript(requestResponse)) {
+            javascript = StringUtils.bytesToString(bodyBytes);
+        } else if (Detective.containsScript(requestResponse)) {
+            // Not a JavaScript file, but it might contain JavaScript.
             containsScriptHeader = "true";
             requestResponse.setHighlight("red");
-            // TODO Extract and beautify stuff here too.
-            // Do not forget to add metadata.
-            // callbacks.printOutput("-------------------------");
-            // callbacks.printOutput(String.format("Extracted JS from: %s", requestResponse.getHttpService().toString()));
-            // callbacks.printOutput(Extractor.getJS(requestResponse.getResponse()));
-            // callbacks.printOutput("-------------------------");
-
-            String extractedJS = Extractor.getJS(requestResponse.getResponse());
-            if (StringUtils.isEmpty(extractedJS)) return;
-
-            // Create the MetaData.
-            Metadata metadata = new Metadata();
-            try {
-                metadata = ReqResp.getMetadata(requestResponse);
-            } catch (NoSuchAlgorithmException e) {
-                // This should not happen because we are passing "MD5" to the
-                // digest manually. If we do not have the algorithm in Burp then
-                // we have bigger problems.
-                e.printStackTrace();
-                return;
-            }
-
-            try {
-                // Spawn a new BeautifyTask to beautify and store the thing.
-                Runnable beautifyTask = new BeautifyTask(
-                    beautifier, extractedJS, metadata, Config.StoragePath);
-                
-                // Fingers crossed this will work.
-                // TODO This presents a Future that will be null when task is
-                // complete. Can we use it?
-                pool.submit(beautifyTask);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                StringUtils.printStackTrace(e);
-            }    
+            // Extract JavaScript.
+            javascript = Extractor.getJS(requestResponse.getResponse());
         }
+
+        // Set the debug headers.
+        // TODO Only do this in debug mode?
+        requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Is-Script", scriptHeader);
         requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Contains-Script", containsScriptHeader);
         requestResponse = ReqResp.addHeader(isRequest, requestResponse, "MIMETYPEs",
             String.format("%s -- %s", respInfo.getInferredMimeType(), respInfo.getStatedMimeType()));
 
-        // 1. TODO Check if the URL has already been processed.
-        // URL#sameFile(URL other) will be useful here.
+        if (StringUtils.isEmpty(javascript)) {
+            return;
+        }
 
-
-
-        // 3. TODO Get the request extension.
-
-
-        // Compare it against our internal list.
-        // 3. TODO Add this list to the extension's config.
-
-        // Process HTTP responses here and extract scripts from them.
-        
+        try {
+            // Spawn a new BeautifyTask to beautify and store the data.
+            Runnable beautifyTask = new BeautifyTask(
+                beautifier, javascript, metadata, Config.StoragePath);
+            
+            // Fingers crossed this will work.
+            // TODO This presents a Future that will be null when task is
+            // complete. Can we use it?
+            pool.submit(beautifyTask);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            StringUtils.printStackTrace(e);
+        }
 
         // TODO #1 Option to only run the linter on requests in certain tools
         // (e.g., proxy or repeater). The toolFlag variable should be used.
