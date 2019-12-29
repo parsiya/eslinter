@@ -69,6 +69,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
     @Override
     public void processHttpMessage(int toolFlag, boolean isRequest, IHttpRequestResponse requestResponse) {
 
+        if (requestResponse == null) return;
+
         // Process requests and get their extension.
         // If their extension matches what we want, get the response.
         if (isRequest) {
@@ -142,10 +144,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             StringUtils.printStackTrace(e);
         }
 
-        // TODO #1 Option to only run the linter on requests in certain tools
-        // (e.g., proxy or repeater). The toolFlag variable should be used.
-
-        // Process the response and get the scripts.
+        // Execute ESLint with Exec on the file.
 
 
     }

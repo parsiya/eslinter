@@ -144,3 +144,10 @@ java -cp rhino-1.7.11.jar org.mozilla.javascript.tools.jsc.Main -nosource beauti
 
 Options
 https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/JavaScript_Compiler
+
+----------
+
+## ESLint Rules
+
+* Writing custom ESLint rules: https://www.kenneth-truyers.net/2016/05/27/writing-custom-eslint-rules/
+

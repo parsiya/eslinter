@@ -101,7 +101,13 @@ public class ReqResp {
     public static Metadata getMetadata(IHttpRequestResponse requestResponse) throws NoSuchAlgorithmException {
 
         String url = ReqResp.getURL(requestResponse).toString();
-        String referer = ReqResp.getHeader("Referer", true, requestResponse).get(0);
+        // If there is no Referer header, getHeader will be null and we cannot
+        // call .get(0) on it.
+        ArrayList<String> refererHeaders = ReqResp.getHeader("Referer", true, requestResponse);
+        String referer = "";
+        if (refererHeaders != null) {
+            referer = refererHeaders.get(0);
+        }
         byte[] bodyBytes = ReqResp.getResponseBody(requestResponse);
         byte[] hashBytes = MessageDigest.getInstance("MD5").digest(bodyBytes);
         String hashString = StringUtils.encodeHexString(hashBytes);

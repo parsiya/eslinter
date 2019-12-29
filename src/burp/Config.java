@@ -14,7 +14,7 @@ public class Config {
     public static String StoragePath = "C:\\Users\\IEUser\\Desktop\\eslint\\";
 
     // Maximum number of threads.
-    public static int NumberOfThreads = 10;
+    public static int NumberOfThreads = 5;
 
     /**
      * JavaScript MIME types.

@@ -30,3 +30,4 @@ bin
 # burp console and error output files
 console-output.txt
 error-output.txt
+*.exe
