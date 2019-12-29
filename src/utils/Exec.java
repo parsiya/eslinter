@@ -24,7 +24,7 @@ public class Exec{
         workingDirectory = workDir;
     }
     
-    public static String execute(String dir, String... commands) throws IOException {
+    public static String execute(String workingDir, String... commands) throws IOException {
         ArrayList<String> cmd = new ArrayList<String>();
         String[] cmdPrompt = new String[] {
             "cmd.exe", "/c"
@@ -33,7 +33,7 @@ public class Exec{
         cmd.addAll(Arrays.asList(commands));
         // cmd.add("cd");
         ProcessBuilder pb = new ProcessBuilder(cmd);
-        pb.directory(new File(dir));
+        pb.directory(new File(workingDir));
         String output = IOUtils.toString(pb.start().getInputStream(), "UTF-8");
         // Process p = pb.inheritIO().start();
         return output;

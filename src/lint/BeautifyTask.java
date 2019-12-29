@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
+import burp.BurpExtender;
+import utils.Exec;
 import utils.StringUtils;
 
 /**
@@ -52,6 +55,7 @@ public class BeautifyTask implements Runnable {
             // If not successful, store the original content.
             sw.write(data);
         }
+
         try {
             // Write the contents to the file.
             FileUtils.writeStringToFile(outFile, sw.toString(), "UTF-8");
@@ -60,6 +64,28 @@ public class BeautifyTask implements Runnable {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             StringUtils.getStackTrace(e);
+            return;
+        }
+        // Execute ESLint with Exec on the file.
+
+        // Hardcoded for now.
+        // TODO Move to config and ultimately configurable via the UI.
+        String eslintDirectory = "C:\\Users\\IEUser\\Desktop\\git\\eslint-security-scanner-configs";
+        String eslintPath = FilenameUtils.concat(eslintDirectory, "node_modules\\.bin\\eslint");
+        String configPath = FilenameUtils.concat(eslintDirectory, "eslintrc-light.js");
+
+        try {
+            String res = Exec.execute(eslintDirectory, eslintPath, "-c", configPath, "-f",
+                    "codeframe", "--no-color", "-o",
+                    storagePath.concat(metadata.getHash().concat("-out.js")), path);
+            BurpExtender.callbacks.printOutput(String.format("outfile: %s\n", storagePath.concat(metadata.getHash().concat("-out.js"))));
+            BurpExtender.callbacks.printOutput(String.format("infile: %s\n", path));
+            BurpExtender.callbacks.printOutput(String.format("res: %s\n", res));
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
         }
     }
 }

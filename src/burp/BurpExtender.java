@@ -142,10 +142,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             StringUtils.printStackTrace(e);
+            return;
         }
-
-        // Execute ESLint with Exec on the file.
-
-
     }
 }
