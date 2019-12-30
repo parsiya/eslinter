@@ -7,7 +7,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import gui.MainPanel;
 import lint.Beautify;
 import lint.BeautifyNotFound;
 import lint.BeautifyTask;
@@ -22,6 +24,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
     // private static String EMPTY_STRING = "";
     private static Beautify beautifier = null;
     private static ExecutorService pool;
+    private MainPanel mainPanel;
 
     //
     // implement IBurpExtender
@@ -48,10 +51,12 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Configure the beautify executor service.
         pool = Executors.newFixedThreadPool(Config.NumberOfThreads);
 
+        mainPanel = new MainPanel();
+
         // Add the tab to Burp.
         callbacks.addSuiteTab(BurpExtender.this);
         // Register the listener.
-        callbacks.registerHttpListener(BurpExtender.this);
+        // callbacks.registerHttpListener(BurpExtender.this);
     }
 
     @Override
@@ -62,8 +67,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
     @Override
     public Component getUiComponent() {
         // TODO Return the tab here.
-        JPanel panel = new JPanel(new BorderLayout());
-        return panel;
+        return mainPanel.mainPanel;
     }
 
     @Override
