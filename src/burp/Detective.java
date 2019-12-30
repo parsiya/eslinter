@@ -5,8 +5,6 @@ import utils.ReqResp;
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.apache.commons.io.FilenameUtils;
-
 
 /**
  * Detective contains the JavaScript detection functions.
@@ -101,7 +99,7 @@ public class Detective {
 
     private static boolean isJSURL(IHttpRequestResponse requestResponse) {
         // Get the extension URL.
-        String ext = getRequestExtension(requestResponse);
+        String ext = ReqResp.getRequestExtension(requestResponse);
         // Return true if it's one of the extensions we are looking for.
         if (ext == null) return false;
         for (String extension : Config.FileExtensions) {
@@ -112,29 +110,9 @@ public class Detective {
         return false;
     }
 
-    private static String getRequestExtension(IHttpRequestResponse requestResponse) {
-        // Get the request URL.
-        // TODO Remove this if it's not needed later.
-        // URL requestURL = getRequestURL(requestResponse);
-        return FilenameUtils.getExtension(getRequestURL(requestResponse).getPath());
-        /**
-         * URL u = new
-         * URL("https://example.net/path/to/whatever.js?param1=val1&param2=val2");
-         * System.out.printf("getFile(): %s\n", u.getFile());
-         * System.out.printf("getPath(): %s\n", u.getPath());
-         * 
-         * URL.getPath() returns the path including the initial /. getPath():
-         * /path/to/whatever.js URL.getFile() return getPath along with GET query
-         * string. getFile(): /path/to/whatever.js?param1=val1&param2=val2
-         */
-    }
-
-    private static URL getRequestURL(IHttpRequestResponse requestResponse) {
+    public static URL getRequestURL(IHttpRequestResponse requestResponse) {
         IRequestInfo reqInfo = BurpExtender.helpers.analyzeRequest(requestResponse);
         return reqInfo.getUrl();
     }
-
-    
-
 
 }

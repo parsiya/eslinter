@@ -13,8 +13,17 @@ public class Config {
     // Storage path for extracted JavaScript files.
     public static String StoragePath = "C:\\Users\\IEUser\\Desktop\\eslint\\";
 
+    // ESLint installation path.
+    public static String ESLintBinaryPath = "C:\\Users\\IEUser\\Desktop\\git\\eslint-security-scanner-configs\\node_modules\\.bin\\eslint";
+
+    // Config path.
+    public static String ESLintConfigPath = "C:\\Users\\IEUser\\Desktop\\git\\eslint-security-scanner-configs\\eslintrc-light.js";
+
+    // Where ESLint results are stored.
+    public static String ESLintOutputPath = "C:\\Users\\IEUser\\Desktop\\eslint\\output\\";
+
     // Maximum number of threads.
-    public static int NumberOfThreads = 5;
+    public static int NumberOfThreads = 3;
 
     /**
      * JavaScript MIME types.

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -34,9 +33,10 @@ public class Exec{
         // cmd.add("cd");
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(new File(workingDir));
-        String output = IOUtils.toString(pb.start().getInputStream(), "UTF-8");
-        // Process p = pb.inheritIO().start();
-        return output;
+        Process p = pb.start();
+        String output = IOUtils.toString(p.getInputStream(), "UTF-8");
+        String error = IOUtils.toString(p.getErrorStream(), "UTF-8");
+        return output + "---" + error;
 
     }
 }

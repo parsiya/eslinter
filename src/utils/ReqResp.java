@@ -1,5 +1,6 @@
 package utils;
 
+import burp.Detective;
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.IResponseInfo;
@@ -11,6 +12,8 @@ import static burp.BurpExtender.helpers;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+
+import org.apache.commons.io.FilenameUtils;
 
 
 /**
@@ -113,5 +116,22 @@ public class ReqResp {
         String hashString = StringUtils.encodeHexString(hashBytes);
         return new Metadata(url, referer, hashString);
     }
+
+	public static String getRequestExtension(IHttpRequestResponse requestResponse) {
+	    // Get the request URL.
+	    // TODO Remove this if it's not needed later.
+	    // URL requestURL = getRequestURL(requestResponse);
+	    return FilenameUtils.getExtension(Detective.getRequestURL(requestResponse).getPath());
+	    /**
+	     * URL u = new
+	     * URL("https://example.net/path/to/whatever.js?param1=val1&param2=val2");
+	     * System.out.printf("getFile(): %s\n", u.getFile());
+	     * System.out.printf("getPath(): %s\n", u.getPath());
+	     * 
+	     * URL.getPath() returns the path including the initial /. getPath():
+	     * /path/to/whatever.js URL.getFile() return getPath along with GET query
+	     * string. getFile(): /path/to/whatever.js?param1=val1&param2=val2
+	     */
+	}
 
 }

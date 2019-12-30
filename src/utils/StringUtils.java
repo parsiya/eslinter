@@ -4,6 +4,10 @@ import static burp.BurpExtender.callbacks;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * StringUtils
@@ -26,6 +30,12 @@ public class StringUtils {
 
     public static void printStackTrace(Exception e) {
         callbacks.printError(getStackTrace(e));
+    }
+
+    // Returns the filename of a string URL without the extension.
+    // https://stackoverflow.com/a/17167743
+    public static String getURLBaseName(String url) throws MalformedURLException {
+        return FilenameUtils.getBaseName(new URL(url).getPath());
     }
     
     /**

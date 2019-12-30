@@ -3,11 +3,15 @@ package lint;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import burp.BurpExtender;
+import burp.Config;
 import utils.Exec;
 import utils.StringUtils;
 
@@ -39,8 +43,28 @@ public class BeautifyTask implements Runnable {
         beautified = StringUtils.isEmpty(output) ? false : true;
         metadata.setBeautified(beautified);
 
-        String path = storagePath.concat(metadata.getHash().concat(".js"));
-        File outFile = new File(path);
+        // Filename will be "filename_from_URL[minus extension]-hash.js".
+        String jsFileName = "";
+        try {
+            jsFileName = StringUtils.getURLBaseName(metadata.getUrl());
+            if (!StringUtils.isEmpty(jsFileName)) {
+                // If the URL does not end in a file jsFIleName will be empty.
+                // If it's not empty, we add the "-" to it.
+                jsFileName = jsFileName.concat("-");
+            }
+            // If jsFileName was empty do nothing.
+        } catch (Exception e) {
+            // If URL cannot be converted to a string use the hash.
+            // Technically this should not happen because the URL in the
+            // metadata should be well-formed but who knows.
+        }
+        // Attach the hash and the extension.
+        jsFileName = jsFileName.concat(metadata.getHash());
+
+        // Add the js extension.
+        String jsFilePath = FilenameUtils.concat(storagePath, jsFileName.concat(".js"));
+        // Create a File.
+        File jsFile = new File(jsFilePath);
 
         // Create the metadata string.
         StringWriter sw = new StringWriter();
@@ -58,29 +82,47 @@ public class BeautifyTask implements Runnable {
 
         try {
             // Write the contents to the file.
-            FileUtils.writeStringToFile(outFile, sw.toString(), "UTF-8");
-            // Seems like this has no effect.
-            // sw.close();
+            FileUtils.writeStringToFile(jsFile, sw.toString(), "UTF-8");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            // If things go wrong print the exception and return.
             StringUtils.getStackTrace(e);
             return;
         }
         // Execute ESLint with Exec on the file.
+        String eslintDirectory = FilenameUtils.getFullPath(Config.ESLintBinaryPath);
 
-        // Hardcoded for now.
-        // TODO Move to config and ultimately configurable via the UI.
-        String eslintDirectory = "C:\\Users\\IEUser\\Desktop\\git\\eslint-security-scanner-configs";
-        String eslintPath = FilenameUtils.concat(eslintDirectory, "node_modules\\.bin\\eslint");
-        String configPath = FilenameUtils.concat(eslintDirectory, "eslintrc-light.js");
+        // Create the output filename and path.
+        // Output filename is the same as the original filename with "-out".
+        String eslintResultFileName = jsFileName.concat("-out.js");
+        String eslintResultFilePath = FilenameUtils.concat(Config.ESLintOutputPath, eslintResultFileName);
 
         try {
-            String res = Exec.execute(eslintDirectory, eslintPath, "-c", configPath, "-f",
-                    "codeframe", "--no-color", "-o",
-                    storagePath.concat(metadata.getHash().concat("-out.js")), path);
-            BurpExtender.callbacks.printOutput(String.format("outfile: %s\n", storagePath.concat(metadata.getHash().concat("-out.js"))));
-            BurpExtender.callbacks.printOutput(String.format("infile: %s\n", path));
-            BurpExtender.callbacks.printOutput(String.format("res: %s\n", res));
+            // TODO: Change this.
+            String res = Exec.execute(eslintDirectory, Config.ESLintBinaryPath,
+                "-c", Config.ESLintConfigPath, "-f","codeframe", "--no-color",
+                // "-o", eslintResultFilePath,
+                "--no-inline-config", jsFilePath);
+            
+            // Write res to output file.
+            FileUtils.writeStringToFile(new File(eslintResultFilePath), res, "UTF-8");
+
+            // Regex to separate the findings.
+            // (.*?)\n\n\n
+
+            // String ptrn = "(.*?)\n\n\n";
+            // int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
+
+            // Pattern pt = Pattern.compile(ptrn, flags);
+            // Matcher mt = pt.matcher(res);
+
+            // // Now each item in the matcher is a separate finding.
+        
+            // // Add each finding as a finding to Burp.
+
+            BurpExtender.callbacks.printOutput(String.format("Results file: %s", eslintResultFilePath));
+            BurpExtender.callbacks.printOutput(String.format("Input file: %s", jsFilePath));
+            BurpExtender.callbacks.printOutput(String.format("ESLint execution result: %s\n", res));
+            BurpExtender.callbacks.printOutput("----------");
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
