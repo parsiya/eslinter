@@ -3,7 +3,7 @@ apply plugin: 'java'
 
 // Use Maven (because Burp Extender is on Maven)
 repositories {
-     mavenCentral()
+    mavenCentral()
 }
 
 dependencies {

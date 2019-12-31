@@ -76,4 +76,13 @@ public class Config {
         "If-None-Match"
         // TODO Find more headers.
     };
+
+    public static String[] lintTableColumnNames = new String[] {
+        "Host", "URL", "Status", "Number of Findings"
+    };
+
+    public static Class[] lintTableColumnClasses = new Class[] {
+        java.lang.String.class, java.lang.String.class,
+        java.lang.Integer.class, java.lang.String.class
+    };
 }

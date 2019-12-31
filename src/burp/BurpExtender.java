@@ -1,19 +1,18 @@
 package burp;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gui.MainPanel;
+import gui.BurpTab;
 import lint.Beautify;
 import lint.BeautifyNotFound;
 import lint.BeautifyTask;
 import lint.Metadata;
+import linttable.LintResult;
 import utils.ReqResp;
 import utils.StringUtils;
 
@@ -24,7 +23,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
     // private static String EMPTY_STRING = "";
     private static Beautify beautifier = null;
     private static ExecutorService pool;
-    private MainPanel mainPanel;
+    private BurpTab mainTab;
 
     //
     // implement IBurpExtender
@@ -51,12 +50,13 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Configure the beautify executor service.
         pool = Executors.newFixedThreadPool(Config.NumberOfThreads);
 
-        mainPanel = new MainPanel();
+        mainTab = new BurpTab();
+        callbacks.customizeUiComponent(mainTab.panel);
 
         // Add the tab to Burp.
         callbacks.addSuiteTab(BurpExtender.this);
         // Register the listener.
-        // callbacks.registerHttpListener(BurpExtender.this);
+        callbacks.registerHttpListener(BurpExtender.this);
     }
 
     @Override
@@ -66,8 +66,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
     @Override
     public Component getUiComponent() {
-        // TODO Return the tab here.
-        return mainPanel.mainPanel;
+        // Return the tab here.
+        return mainTab.panel;
     }
 
     @Override
@@ -102,7 +102,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             return;
         }
 
-
         String scriptHeader = "false";
         String containsScriptHeader = "false";
         String javascript = "";
@@ -134,19 +133,32 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             return;
         }
 
-        try {
-            // Spawn a new BeautifyTask to beautify and store the data.
-            Runnable beautifyTask = new BeautifyTask(
-                beautifier, javascript, metadata, Config.StoragePath);
+        // try {
+        //     // Spawn a new BeautifyTask to beautify and store the data.
+        //     Runnable beautifyTask = new BeautifyTask(
+        //         beautifier, javascript, metadata, Config.StoragePath);
             
-            // Fingers crossed this will work.
-            // TODO This presents a Future that will be null when task is
-            // complete. Can we use it?
-            pool.submit(beautifyTask);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            StringUtils.printStackTrace(e);
-            return;
-        }
+        //     // Fingers crossed this will work.
+        //     // TODO This presents a Future that will be null when task is
+        //     // complete. Can we use it?
+        //     pool.submit(beautifyTask);
+        // } catch (Exception e) {
+        //     // TODO Auto-generated catch block
+        //     StringUtils.printStackTrace(e);
+        //     return;
+        // }
+
+        // Create the LintResult and add to the table.
+        LintResult lr = new LintResult(
+            ReqResp.getHost(requestResponse),
+            ReqResp.getURL(requestResponse).toString(), "Added", 0
+        );
+
+        SwingUtilities.invokeLater (new Runnable () {
+            @Override
+            public void run () {
+                mainTab.lintTable.add(lr);
+            }
+        });
     }
 }

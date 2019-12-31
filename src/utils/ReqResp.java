@@ -121,8 +121,9 @@ public class ReqResp {
 	    // Get the request URL.
 	    // TODO Remove this if it's not needed later.
 	    // URL requestURL = getRequestURL(requestResponse);
-	    return FilenameUtils.getExtension(Detective.getRequestURL(requestResponse).getPath());
-	    /**
+        return FilenameUtils.getExtension(Detective.getRequestURL(requestResponse).getPath());
+        
+        /**
 	     * URL u = new
 	     * URL("https://example.net/path/to/whatever.js?param1=val1&param2=val2");
 	     * System.out.printf("getFile(): %s\n", u.getFile());
@@ -132,6 +133,10 @@ public class ReqResp {
 	     * /path/to/whatever.js URL.getFile() return getPath along with GET query
 	     * string. getFile(): /path/to/whatever.js?param1=val1&param2=val2
 	     */
-	}
+    }
+    
+    public static String getHost(IHttpRequestResponse requestResponse) {
+        return getURL(requestResponse).getHost();
+    }
 
 }

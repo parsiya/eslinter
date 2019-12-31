@@ -115,9 +115,9 @@ public class BeautifyTask implements Runnable {
             // Pattern pt = Pattern.compile(ptrn, flags);
             // Matcher mt = pt.matcher(res);
 
-            // // Now each item in the matcher is a separate finding.
+            // Now each item in the matcher is a separate finding.
         
-            // // Add each finding as a finding to Burp.
+            // Add each finding as a finding to Burp.
 
             BurpExtender.callbacks.printOutput(String.format("Results file: %s", eslintResultFilePath));
             BurpExtender.callbacks.printOutput(String.format("Input file: %s", jsFilePath));
