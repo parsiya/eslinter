@@ -1,11 +1,15 @@
 package burp;
 
 import java.awt.Component;
+import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.SwingUtilities;
+
+import org.apache.commons.io.FileUtils;
 
 import gui.BurpTab;
 import lint.Beautify;
@@ -20,10 +24,13 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
     public static IBurpExtenderCallbacks callbacks;
     public static IExtensionHelpers helpers;
+    public static Config extensionConfig;
+
     // private static String EMPTY_STRING = "";
     private static Beautify beautifier = null;
     private static ExecutorService pool;
     private BurpTab mainTab;
+    
 
     //
     // implement IBurpExtender
@@ -47,8 +54,20 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             return;
         }
 
+        // Read the config from the extension settings.
+        extensionConfig = new Config();
+        
+        String savedConfigString = callbacks.loadExtensionSetting("config");
+        if (StringUtils.isEmpty(savedConfigString)) {
+            // No saved config. Use the default version and prompt the user.
+            callbacks.issueAlert("No saved config found, please choose one.");
+        }
+
+        // Write the default config file to a file.
+        File cfgFile = new File("c:\\users\\ieuser\\desktop\\cfg.json");
+
         // Configure the beautify executor service.
-        pool = Executors.newFixedThreadPool(Config.NumberOfThreads);
+        pool = Executors.newFixedThreadPool(extensionConfig.NumberOfThreads);
 
         mainTab = new BurpTab();
         callbacks.customizeUiComponent(mainTab.panel);
@@ -75,11 +94,14 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
         if (requestResponse == null) return;
 
+        // TODO Only process if the callbacks.getToolName(toolFlag) is in
+        // processTools, otherwise return.
+
         // Process requests and get their extension.
         // If their extension matches what we want, get the response.
         if (isRequest) {
             // Remove cache headers from the request. We do not want 304s.
-            for (String rhdr : Config.RemovedHeaders) {
+            for (String rhdr : extensionConfig.RemovedHeaders) {
                 requestResponse = ReqResp.removeHeader(isRequest, requestResponse, rhdr);
             }
             return;

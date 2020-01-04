@@ -15,6 +15,8 @@ import burp.Config;
 import utils.Exec;
 import utils.StringUtils;
 
+import static burp.BurpExtender.extensionConfig;
+
 /**
  * ParallelBeautify
  */
@@ -89,17 +91,17 @@ public class BeautifyTask implements Runnable {
             return;
         }
         // Execute ESLint with Exec on the file.
-        String eslintDirectory = FilenameUtils.getFullPath(Config.ESLintBinaryPath);
+        String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.ESLintBinaryPath);
 
         // Create the output filename and path.
         // Output filename is the same as the original filename with "-out".
         String eslintResultFileName = jsFileName.concat("-out.js");
-        String eslintResultFilePath = FilenameUtils.concat(Config.ESLintOutputPath, eslintResultFileName);
+        String eslintResultFilePath = FilenameUtils.concat(extensionConfig.ESLintOutputPath, eslintResultFileName);
 
         try {
             // TODO: Change this.
-            String res = Exec.execute(eslintDirectory, Config.ESLintBinaryPath,
-                "-c", Config.ESLintConfigPath, "-f","codeframe", "--no-color",
+            String res = Exec.execute(eslintDirectory, extensionConfig.ESLintBinaryPath,
+                "-c", extensionConfig.ESLintConfigPath, "-f","codeframe", "--no-color",
                 // "-o", eslintResultFilePath,
                 "--no-inline-config", jsFilePath);
             

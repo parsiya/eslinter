@@ -37,6 +37,11 @@ public class StringUtils {
     public static String getURLBaseName(String url) throws MalformedURLException {
         return FilenameUtils.getBaseName(new URL(url).getPath());
     }
+
+    // Returns the opposite of isEmpty.
+    public static boolean isNotEmpty(final CharSequence cs) {
+        return !isEmpty(cs);
+    }
     
     /**
      * isEmpty was copied from Apache commons-lang.StringUtils.

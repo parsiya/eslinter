@@ -1,29 +1,72 @@
 package burp;
 
+import java.io.File;
+import java.io.IOException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
+
+import org.apache.commons.io.FileUtils;
+
+import utils.StringUtils;
+
 /**
  * Config
  */
 public class Config {
 
+    // Transient fields are not serialized or deserialized.
     // This appears in Extender.
-    public static String ExtensionName = "ESLint for Burp";
+    final public static transient String ExtensionName = "ESLint for Burp";
     // This is the extension's tab name.
-    public static String TabName = "ESLinter";
+    final public static transient String TabName = "ESLinter";
 
-    // Storage path for extracted JavaScript files.
-    public static String StoragePath = "C:\\Users\\IEUser\\Desktop\\eslint\\";
+    final public static transient String[] lintTableColumnNames = new String[] {
+        "Host", "URL", "Status", "Number of Findings"
+    };
 
-    // ESLint installation path.
-    public static String ESLintBinaryPath = "C:\\Users\\IEUser\\Desktop\\git\\eslint-security-scanner-configs\\node_modules\\.bin\\eslint";
+    final public static transient Class[] lintTableColumnClasses = new Class[] {
+        java.lang.String.class, java.lang.String.class,
+        java.lang.Integer.class, java.lang.String.class
+    };
 
-    // Config path.
-    public static String ESLintConfigPath = "C:\\Users\\IEUser\\Desktop\\git\\eslint-security-scanner-configs\\eslintrc-light.js";
+    // End final transient fields.
+
+    // Storage path for extracted beautified JavaScript files.
+    @SerializedName("beautified-javascript-path")
+    public String StoragePath;
+
+    // ESLint binary path. E.g., node_modules\.bin\eslint
+    @SerializedName("eslint-binary-path")
+    public String ESLintBinaryPath;
+
+    // Path to the ESLint configuration file.
+    @SerializedName("eslint-config-path")
+    public String ESLintConfigPath;
 
     // Where ESLint results are stored.
-    public static String ESLintOutputPath = "C:\\Users\\IEUser\\Desktop\\eslint\\output\\";
+    @SerializedName("eslint-output-path")
+    public String ESLintOutputPath;
+
+    // If true, only in-scope requests will be processed.
+    @SerializedName("process-in-scope")
+    public boolean processInScope = false;
+
+    // Only lint requests made by these tools. The names here must be the same
+    // as what is defined in
+    // https://portswigger.net/burp/extender/api/burp/IBurpExtenderCallbacks.html
+    // E.g., TOOL_PROXY, TOOL_REPEATER, TOOL_SPIDER
+    @SerializedName("process-requests-in-tools")
+    public String[] processTools = new String[] {
+        "TOOL_PROXY",
+        "TOOL_REPEATER",
+        "TOOL_SPIDER"
+    };
 
     // Maximum number of threads.
-    public static int NumberOfThreads = 3;
+    @SerializedName("number-of-threads")
+    public int NumberOfThreads = 3;
 
     /**
      * JavaScript MIME types.
@@ -32,7 +75,8 @@ public class Config {
      * Only "text/javascript" is supposedly supported but who knows.
      * Should be entered as lowercase here.
      */
-    public static String[] JSTypes = new String[] {
+    @SerializedName("js-mime-types")
+    public String[] JSTypes = new String[] {
         "application/javascript",
         "application/ecmascript",
         "application/x-ecmascript",
@@ -52,15 +96,18 @@ public class Config {
         "script" // This is what Burp returns as the MIMEType if it detects js.
     };
 
-    // File extensions.
-    public static String[] FileExtensions = new String[] {
+    // File extensions that might contain JavaScript.
+    @SerializedName("javascript-file-extensions")
+    public String[] FileExtensions = new String[] {
         "js",
         "javascript"
     };
 
-    // Content-Types that might contain scripts.
+    // Content-Types that might contain scripts, the JavaScript inside these
+    // will be extracted and used.
     // Should be entered as lowercase here.
-    public static String[] ContainsScriptTypes = new String[] {
+    @SerializedName("contains-javascript")
+    public String[] ContainsScriptTypes = new String[] {
         "text/html",
         "application/xhtml+xml" // XHTML, be sure to remove the CDATA tags.
     };
@@ -71,18 +118,31 @@ public class Config {
      * appear in Burp history but the outgoing request will not have these
      * headers.
      */
-    public static String[] RemovedHeaders = new String[] {
+    @SerializedName("removable-headers")
+    public String[] RemovedHeaders = new String[] {
         "If-Modified-Since",
         "If-None-Match"
         // TODO Find more headers.
     };
 
-    public static String[] lintTableColumnNames = new String[] {
-        "Host", "URL", "Status", "Number of Findings"
-    };
+    public String toString() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(this);
+    }
 
-    public static Class[] lintTableColumnClasses = new Class[] {
-        java.lang.String.class, java.lang.String.class,
-        java.lang.Integer.class, java.lang.String.class
-    };
+    // No-args constrcutor for Gson.
+    public Config() {}
+
+    // Will this come and kick us in the butt later?
+    public static Config configBuilder(String json) {
+        return new Gson().fromJson(json, Config.class);
+    }
+
+    public static void writeConfigtoFile(File path, String configStr) {
+        try {
+            FileUtils.writeStringToFile(path, configStr, "UTF=8");
+        } catch (Exception e) {
+            StringUtils.printStackTrace(e);
+        }
+    }
 }

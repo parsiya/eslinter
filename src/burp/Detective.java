@@ -4,6 +4,7 @@ import utils.ReqResp;
 
 import java.net.URL;
 import java.util.ArrayList;
+import static burp.BurpExtender.extensionConfig;
 
 
 /**
@@ -77,7 +78,7 @@ public class Detective {
         if (cType == null) {
             return false;
         }
-        for (String ct : Config.ContainsScriptTypes) {
+        for (String ct : extensionConfig.ContainsScriptTypes) {
             if (cType.contains(ct)) return true;
         }
         return false;
@@ -91,7 +92,7 @@ public class Detective {
         // Loop through all JSTypes and see if they occur in any of the headers.
         // This is better because the header usually contains the content-type
         // and stuff like charset.
-        for (String jt : Config.JSTypes) {
+        for (String jt : extensionConfig.JSTypes) {
             if (mType.contains(jt)) return true;
         }
         return false;
@@ -102,7 +103,7 @@ public class Detective {
         String ext = ReqResp.getRequestExtension(requestResponse);
         // Return true if it's one of the extensions we are looking for.
         if (ext == null) return false;
-        for (String extension : Config.FileExtensions) {
+        for (String extension : extensionConfig.FileExtensions) {
             if (ext.equalsIgnoreCase(extension)) {
                 return true;
             }
