@@ -9,7 +9,6 @@ import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
 
-import utils.StringUtils;
 
 /**
  * Config
@@ -50,15 +49,15 @@ public class Config {
     public String ESLintOutputPath;
 
     // If true, only in-scope requests will be processed.
-    @SerializedName("process-in-scope")
+    @SerializedName("only-process-in-scope")
     public boolean processInScope = false;
 
     // Only lint requests made by these tools. The names here must be the same
     // as what is defined in
     // https://portswigger.net/burp/extender/api/burp/IBurpExtenderCallbacks.html
     // E.g., TOOL_PROXY, TOOL_REPEATER, TOOL_SPIDER
-    @SerializedName("process-requests-in-tools")
-    public String[] processTools = new String[] {
+    @SerializedName("process-requests-tool-list")
+    public String[] processToolList = new String[] {
         "TOOL_PROXY",
         "TOOL_REPEATER",
         "TOOL_SPIDER"
@@ -125,6 +124,10 @@ public class Config {
         // TODO Find more headers.
     };
 
+    // If set to true, the extension will print extra information. This can be
+    // used for troubleshooting.
+    public boolean debug = true;
+
     public String toString() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
@@ -138,11 +141,9 @@ public class Config {
         return new Gson().fromJson(json, Config.class);
     }
 
-    public static void writeConfigtoFile(File path, String configStr) {
-        try {
-            FileUtils.writeStringToFile(path, configStr, "UTF=8");
-        } catch (Exception e) {
-            StringUtils.printStackTrace(e);
-        }
+    // Writes the config files to file.
+    public void writeToFile(File path) throws IOException {
+
+        FileUtils.writeStringToFile(path, toString(), "UTF=8");
     }
 }

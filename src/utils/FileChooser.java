@@ -7,6 +7,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.Component;
 import static utils.StringUtils.isNotEmpty;
+import static burp.BurpExtender.callbacks;
 
 /**
  * FileChooser
@@ -49,5 +50,16 @@ public class FileChooser {
             return null;
         }
         return fc.getSelectedFile();
+    }
+
+    // Get last working directory, should be "lastdir" in extension settings.
+    public static String getLastWorkingDirectory() {
+        String lastdir = callbacks.loadExtensionSetting("lastdir");
+        if (lastdir == null) return Constants.EMPTY_STRING;
+        return lastdir;
+    }
+
+    public static void setLastWorkingDirectory(String lastdir) {
+        callbacks.saveExtensionSetting("lastdir", lastdir);
     }
 }

@@ -14,7 +14,6 @@ import org.apache.commons.io.FileUtils;
 import gui.BurpTab;
 import lint.Beautify;
 import lint.BeautifyNotFound;
-import lint.BeautifyTask;
 import lint.Metadata;
 import linttable.LintResult;
 import utils.ReqResp;
@@ -26,7 +25,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
     public static IExtensionHelpers helpers;
     public static Config extensionConfig;
 
-    // private static String EMPTY_STRING = "";
     private static Beautify beautifier = null;
     private static ExecutorService pool;
     private BurpTab mainTab;
@@ -40,9 +38,32 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
         callbacks = burpCallbacks;
         helpers = callbacks.getHelpers();
-        // Read the config file.
-        // set our extension name
+        // Set the extension name.
         callbacks.setExtensionName(Config.ExtensionName);
+
+        // Read the config from the extension settings.
+        extensionConfig = new Config();
+        
+        String savedConfig = callbacks.loadExtensionSetting("config");
+        if (StringUtils.isEmpty(savedConfig)) {
+            // No saved config. Use the default version and prompt the user.
+            callbacks.issueAlert("No saved config found, please choose one.");
+        } else {
+            // Base64 decode the config string.
+            String decodedConfig = StringUtils.base64Decode(savedConfig);
+            extensionConfig = Config.configBuilder(decodedConfig);
+            StringUtils.print("Config loaded from extension settings");
+            if (extensionConfig.debug) StringUtils.print(decodedConfig);
+        }
+
+        // Write the default config file to a file.
+        File cfgFile = new File("c:\\users\\parsia\\desktop\\cfg.json");
+        try {
+            FileUtils.writeStringToFile(cfgFile, extensionConfig.toString(), "UTF-8");
+        } catch (IOException e) {
+            StringUtils.printStackTrace(e);
+        }
+        StringUtils.print(String.format("Wrote the config file to %s.", cfgFile));
 
         // Create the Beautify class.
         try {
@@ -50,32 +71,31 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         } catch (BeautifyNotFound e) {
             // If beautify.js was not found, issue a warning.
             StringUtils.printStackTrace(e);
-            callbacks.issueAlert(StringUtils.getStackTrace(e));
+            String err = "beautify.js was not loaded properly, the extension" +
+                " is terminating. Please troubleshoot using the error message" +
+                " in the Extender tab.";
+            callbacks.issueAlert(err);
+            StringUtils.error(StringUtils.getStackTrace(e));
             return;
         }
 
-        // Read the config from the extension settings.
-        extensionConfig = new Config();
-        
-        String savedConfigString = callbacks.loadExtensionSetting("config");
-        if (StringUtils.isEmpty(savedConfigString)) {
-            // No saved config. Use the default version and prompt the user.
-            callbacks.issueAlert("No saved config found, please choose one.");
-        }
-
-        // Write the default config file to a file.
-        File cfgFile = new File("c:\\users\\ieuser\\desktop\\cfg.json");
-
         // Configure the beautify executor service.
         pool = Executors.newFixedThreadPool(extensionConfig.NumberOfThreads);
+        if (extensionConfig.debug) {
+            StringUtils.print(String.format("Using %d threads.",
+                extensionConfig.NumberOfThreads));
+        }
 
         mainTab = new BurpTab();
+        if (extensionConfig.debug) StringUtils.print("Create the main tab.");
         callbacks.customizeUiComponent(mainTab.panel);
 
         // Add the tab to Burp.
         callbacks.addSuiteTab(BurpExtender.this);
         // Register the listener.
         callbacks.registerHttpListener(BurpExtender.this);
+
+        if (extensionConfig.debug) StringUtils.print("Loaded the extension.");
     }
 
     @Override
@@ -96,6 +116,10 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
         // TODO Only process if the callbacks.getToolName(toolFlag) is in
         // processTools, otherwise return.
+        String toolName = callbacks.getToolName(toolFlag);
+        if (!StringUtils.arrayContains(toolName, extensionConfig.processToolList)) {
+            return;
+        }
 
         // Process requests and get their extension.
         // If their extension matches what we want, get the response.

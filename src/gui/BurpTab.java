@@ -1,11 +1,24 @@
 package gui;
 
-import javax.swing.*;
-
-import linttable.LintTable;
+import static burp.BurpExtender.extensionConfig;
 
 import java.awt.Dimension;
+import java.io.File;
 
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
+
+import linttable.LintTable;
+import utils.FileChooser;
+import utils.StringUtils;
 
 /**
  * BurpTab
@@ -29,6 +42,25 @@ public class BurpTab {
         loadConfigButton = new JButton("Load Config");
 
         saveConfigButton = new JButton("Save Config");
+        saveConfigButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                File sf = FileChooser.saveFile(
+                    panel, FileChooser.getLastWorkingDirectory(),
+                    "Save config file", "json"
+                );
+                if (sf != null) {
+                    // Set the last working directory.
+                    FileChooser.setLastWorkingDirectory(sf.getParent());
+                    // Save the file.
+                    try {
+                        extensionConfig.writeToFile(sf);
+                    } catch (Exception e) {
+                        //TODO: handle exception
+                        StringUtils.printStackTrace(e);
+                    }
+                }
+            }
+        });
 
         processToggleButton = new JToggleButton("Process");
         // processToggleButton.addActionListener(new java.awt.event.ActionListener() {

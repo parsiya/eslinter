@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Base64;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -13,6 +14,16 @@ import org.apache.commons.io.FilenameUtils;
  * StringUtils
  */
 public class StringUtils {
+
+    // Print to extension output.
+    public static void print(String data) {
+        callbacks.printOutput(data);
+    }
+
+    // Print to extension error.
+    public static void error(String data) {
+        callbacks.printError(data);
+    }
 
     public static String bytesToString(byte[] data) {
         return new String(data);
@@ -29,13 +40,35 @@ public class StringUtils {
     }
 
     public static void printStackTrace(Exception e) {
-        callbacks.printError(getStackTrace(e));
+        error(getStackTrace(e));
     }
 
     // Returns the filename of a string URL without the extension.
     // https://stackoverflow.com/a/17167743
     public static String getURLBaseName(String url) throws MalformedURLException {
         return FilenameUtils.getBaseName(new URL(url).getPath());
+    }
+
+    // Base64 encode and decode methods that return a String instead of byte[].
+    public static String base64Encode(String plaintext) {
+        return Base64.getEncoder().encodeToString(stringToBytes(plaintext));
+    }
+
+    public static String base64Decode(String encoded) {
+        byte[] decodedBytes = Base64.getDecoder().decode(encoded);
+        return bytesToString(decodedBytes);
+    }
+
+    // Returns true if item is in arr. Does case-insensitive comparison.
+    /** For case-sensitive contains do:
+     * List<String> lst = java.util.Arrays.asList(arr);
+     * return lst.contains(item);
+     */
+    public static boolean arrayContains(String item, String[] arr) {
+        for (String arrayItem : arr) {
+            if (item.equalsIgnoreCase(arrayItem)) return true;
+        }
+        return false;
     }
 
     // Returns the opposite of isEmpty.

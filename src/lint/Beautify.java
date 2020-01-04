@@ -12,13 +12,12 @@ import org.mozilla.javascript.Scriptable;
 
 import burp.BurpExtender;
 import utils.StringUtils;
+import static utils.Constants.EMPTY_STRING;
 
 /**
  * Beautify
  */
 public class Beautify {
-
-    private static final String EMPTY_STRING = "";
 
     private static Scriptable scope = null;
     private static Function beautifyFunction = null;

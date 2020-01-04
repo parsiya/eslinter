@@ -5,6 +5,7 @@ import utils.ReqResp;
 import java.net.URL;
 import java.util.ArrayList;
 import static burp.BurpExtender.extensionConfig;
+import static utils.Constants.EMPTY_STRING;
 
 
 /**
@@ -12,7 +13,6 @@ import static burp.BurpExtender.extensionConfig;
  */
 public class Detective {
 
-    private static final String EMPTY_STRING = "";
     private static final String JAVASCRIPT_MIMETYPE = "text/javascript";
 
     public static boolean isScript(IHttpRequestResponse requestResponse) {
