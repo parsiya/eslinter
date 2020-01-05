@@ -20,9 +20,19 @@ public class StringUtils {
         callbacks.printOutput(data);
     }
 
+    // Print with format string.
+    public static void printFormat(String format, Object ...args) {
+        print(String.format(format, args));
+    }
+
     // Print to extension error.
     public static void error(String data) {
         callbacks.printError(data);
+    }
+
+    // Print errors with format string.
+    public static void errorFormat(String format, Object ...args) {
+        error(String.format(format, args));
     }
 
     public static String bytesToString(byte[] data) {

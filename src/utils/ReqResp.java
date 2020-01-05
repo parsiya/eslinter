@@ -111,7 +111,13 @@ public class ReqResp {
         if (refererHeaders != null) {
             referer = refererHeaders.get(0);
         }
-        byte[] bodyBytes = ReqResp.getResponseBody(requestResponse);
+
+        // If it only contains a request we will get errors here.
+        byte[] bodyBytes = new byte[0];
+        if (requestResponse.getResponse() != null) {
+            bodyBytes = ReqResp.getResponseBody(requestResponse);
+        }
+
         byte[] hashBytes = MessageDigest.getInstance("MD5").digest(bodyBytes);
         String hashString = StringUtils.encodeHexString(hashBytes);
         return new Metadata(url, referer, hashString);

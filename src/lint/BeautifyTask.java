@@ -1,21 +1,20 @@
 package lint;
 
+import static burp.BurpExtender.extensionConfig;
+import static burp.BurpExtender.log;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.google.gson.GsonBuilder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import burp.BurpExtender;
-import burp.Config;
 import utils.Exec;
 import utils.StringUtils;
-
-import static burp.BurpExtender.extensionConfig;
 
 /**
  * ParallelBeautify
@@ -36,6 +35,7 @@ public class BeautifyTask implements Runnable {
         this.beautified = false;
         this.metadata = metadata;
         this.storagePath = storagePath;
+        log.debug("Created a new BeautifyTask.\n%s", toString());
     }
 
     @Override
@@ -121,15 +121,19 @@ public class BeautifyTask implements Runnable {
         
             // Add each finding as a finding to Burp.
 
-            BurpExtender.callbacks.printOutput(String.format("Results file: %s", eslintResultFilePath));
-            BurpExtender.callbacks.printOutput(String.format("Input file: %s", jsFilePath));
-            BurpExtender.callbacks.printOutput(String.format("ESLint execution result: %s\n", res));
-            BurpExtender.callbacks.printOutput("----------");
+            log.debug("Results file: %s", eslintResultFilePath);
+            log.debug("Input file: %s", jsFilePath);
+            log.debug("ESLint execution result: %s\n", res);
+            log.debug("----------");
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(StringUtils.getStackTrace(e));
             return;
         }
+    }
+
+    public String toString() {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 }

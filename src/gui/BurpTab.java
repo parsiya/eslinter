@@ -1,9 +1,12 @@
 package gui;
 
 import static burp.BurpExtender.extensionConfig;
+import static burp.BurpExtender.log;
+import static burp.BurpExtender.callbacks;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -16,6 +19,9 @@ import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
 
+import org.apache.commons.io.FileUtils;
+
+import burp.Config;
 import linttable.LintTable;
 import utils.FileChooser;
 import utils.StringUtils;
@@ -40,6 +46,35 @@ public class BurpTab {
         topPanel = new JPanel();
         // configPanel.setBorder(BorderFactory.createBevelBorder(1));
         loadConfigButton = new JButton("Load Config");
+        loadConfigButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                File sf = FileChooser.openFile(panel, FileChooser.getLastWorkingDirectory(), "Save config file",
+                        "json");
+                if (sf != null) {
+                    // Set the last working directory.
+                    FileChooser.setLastWorkingDirectory(sf.getParent());
+                
+                    String configFromFile = "";
+                    // Read the file and load it into extensionConfig.
+                    try {
+                        configFromFile = FileUtils.readFileToString(sf, "UTF-8");
+                        extensionConfig = Config.configBuilder(configFromFile);
+                    } catch (IOException e) {
+                        log.alert("Could not open config file %s.", sf.getAbsolutePath());
+                        log.error("Could not open config file %s.", sf.getAbsolutePath());
+                        log.error(StringUtils.getStackTrace(e));
+                    }
+
+                    log.debug("Loaded extension config from %s", sf.getAbsolutePath());
+                    log.debug(configFromFile);
+                    
+                    // Base64 encode and save the extension to estension settings.
+                    String base64Encoded = StringUtils.base64Encode(configFromFile);
+                    callbacks.saveExtensionSetting("config", base64Encoded);
+                    log.debug("Saved the configuration to extension settings");
+                }
+            }
+        });
 
         saveConfigButton = new JButton("Save Config");
         saveConfigButton.addActionListener(new java.awt.event.ActionListener() {
@@ -55,8 +90,9 @@ public class BurpTab {
                     try {
                         extensionConfig.writeToFile(sf);
                     } catch (Exception e) {
-                        //TODO: handle exception
-                        StringUtils.printStackTrace(e);
+                        String errMsg = String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
+                        log.alert(errMsg);
+                        log.error(errMsg);
                     }
                 }
             }

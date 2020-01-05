@@ -3,10 +3,33 @@ Manual JavaScript Linting is a Bug.
 
 A talk in the series `Manual (Application) Security is a Bug` or just `Manual Security is a Bug`.
 
+## Add this to README
+In the config file, the tool names from Burp's `getToolName` are as follows.
+
+1. Not all tool flags return a name. Decoder and Comparer return null.
+2. Spider and Scanner return the same. If you need to differentiate between the
+   two, you should use tool flags.
+3. Use `extender` if you are interested in extra requests that are made by your
+   other extensions.
+
+| ToolFlag       | getToolName |
+|----------------|-------------|
+| TOOL_SUITE     | Suite       |
+| TOOL_TARGET    | Target      |
+| TOOL_PROXY     | Proxy       |
+| TOOL_SPIDER    | Scanner     |
+| TOOL_SCANNER   | Scanner     |
+| TOOL_INTRUDER  | Intruder    |
+| TOOL_REPEATER  | Repeater    |
+| TOOL_SEQUENCER | Sequencer   |
+| TOOL_DECODER   | null        |
+| TOOL_COMPARER  | null        |
+| TOOL_EXTENDER  | Extender    |
+
 ## Files
 
 * [Research Notes](notes.md)
-* ~~[Creating Burp Extension UIs in Python](python-burp-ui.md)~~
+* ~~Creating Burp Extension UIs in Python~~
     * Not needed anymore, switching to Java.
 
 ## TODO
@@ -58,3 +81,4 @@ Add and update as we go on.
 * [ ] Create our own ESLint rules?
 * [ ] ScanJS UI like system?
     * [ ] Or just reuse ScanJS?
+

@@ -34,33 +34,48 @@ public class Config {
 
     // Storage path for extracted beautified JavaScript files.
     @SerializedName("beautified-javascript-path")
-    public String StoragePath;
-
-    // ESLint binary path. E.g., node_modules\.bin\eslint
-    @SerializedName("eslint-binary-path")
-    public String ESLintBinaryPath;
-
-    // Path to the ESLint configuration file.
-    @SerializedName("eslint-config-path")
-    public String ESLintConfigPath;
+    public String StoragePath = "";
 
     // Where ESLint results are stored.
     @SerializedName("eslint-output-path")
-    public String ESLintOutputPath;
+    public String ESLintOutputPath = "";
+
+    // ESLint binary path. E.g., node_modules\.bin\eslint
+    @SerializedName("eslint-binary-path")
+    public String ESLintBinaryPath = "";
+
+    // Path to the ESLint configuration file.
+    @SerializedName("eslint-config-path")
+    public String ESLintConfigPath = "";
 
     // If true, only in-scope requests will be processed.
     @SerializedName("only-process-in-scope")
     public boolean processInScope = false;
 
+    // If true, requests containing JavaScript will be highlighted in history.
+    @SerializedName("highlight")
+    public boolean highlight = false;
+
     // Only lint requests made by these tools. The names here must be the same
-    // as what is defined in
-    // https://portswigger.net/burp/extender/api/burp/IBurpExtenderCallbacks.html
-    // E.g., TOOL_PROXY, TOOL_REPEATER, TOOL_SPIDER
-    @SerializedName("process-requests-tool-list")
+    // as what is defined in the getToolName column (case-insensitive):
+    // | ToolFlag       | getToolName |
+    // |----------------|-------------|
+    // | TOOL_SUITE     | Suite       |
+    // | TOOL_TARGET    | Target      |
+    // | TOOL_PROXY     | Proxy       |
+    // | TOOL_SPIDER    | Scanner     |
+    // | TOOL_SCANNER   | Scanner     |
+    // | TOOL_INTRUDER  | Intruder    |
+    // | TOOL_REPEATER  | Repeater    |
+    // | TOOL_SEQUENCER | Sequencer   |
+    // | TOOL_DECODER   | null        |
+    // | TOOL_COMPARER  | null        |
+    // | TOOL_EXTENDER  | Extender    |
+    @SerializedName("process-tool-list")
     public String[] processToolList = new String[] {
-        "TOOL_PROXY",
-        "TOOL_REPEATER",
-        "TOOL_SPIDER"
+        "Proxy",
+        "Scanner",
+        "Repeater"
     };
 
     // Maximum number of threads.
@@ -144,6 +159,6 @@ public class Config {
     // Writes the config files to file.
     public void writeToFile(File path) throws IOException {
 
-        FileUtils.writeStringToFile(path, toString(), "UTF=8");
+        FileUtils.writeStringToFile(path, toString(), "UTF-8");
     }
 }
