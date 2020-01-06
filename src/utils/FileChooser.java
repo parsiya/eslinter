@@ -1,13 +1,14 @@
 package utils;
 
+import static burp.BurpExtender.callbacks;
+import static utils.StringUtils.isNotEmpty;
+
+import java.awt.Component;
 import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import java.awt.Component;
-import static utils.StringUtils.isNotEmpty;
-import static burp.BurpExtender.callbacks;
 
 /**
  * FileChooser

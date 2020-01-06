@@ -1,8 +1,8 @@
 package gui;
 
+import static burp.BurpExtender.callbacks;
 import static burp.BurpExtender.extensionConfig;
 import static burp.BurpExtender.log;
-import static burp.BurpExtender.callbacks;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -48,55 +48,24 @@ public class BurpTab {
         loadConfigButton = new JButton("Load Config");
         loadConfigButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                File sf = FileChooser.openFile(panel, FileChooser.getLastWorkingDirectory(), "Save config file",
-                        "json");
-                if (sf != null) {
-                    // Set the last working directory.
-                    FileChooser.setLastWorkingDirectory(sf.getParent());
-                
-                    String configFromFile = "";
-                    // Read the file and load it into extensionConfig.
-                    try {
-                        configFromFile = FileUtils.readFileToString(sf, "UTF-8");
-                        extensionConfig = Config.configBuilder(configFromFile);
-                    } catch (IOException e) {
-                        log.alert("Could not open config file %s.", sf.getAbsolutePath());
-                        log.error("Could not open config file %s.", sf.getAbsolutePath());
-                        log.error(StringUtils.getStackTrace(e));
-                    }
-
-                    log.debug("Loaded extension config from %s", sf.getAbsolutePath());
-                    log.debug(configFromFile);
-                    
-                    // Base64 encode and save the extension to estension settings.
-                    String base64Encoded = StringUtils.base64Encode(configFromFile);
-                    callbacks.saveExtensionSetting("config", base64Encoded);
-                    log.debug("Saved the configuration to extension settings");
-                }
+                loadConfigAction();
             }
         });
 
         saveConfigButton = new JButton("Save Config");
         saveConfigButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                File sf = FileChooser.saveFile(
-                    panel, FileChooser.getLastWorkingDirectory(),
-                    "Save config file", "json"
-                );
-                if (sf != null) {
-                    // Set the last working directory.
-                    FileChooser.setLastWorkingDirectory(sf.getParent());
-                    // Save the file.
-                    try {
-                        extensionConfig.writeToFile(sf);
-                    } catch (Exception e) {
-                        String errMsg = String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
-                        log.alert(errMsg);
-                        log.error(errMsg);
-                    }
-                }
+                saveConfigAction();
             }
         });
+
+        configButton = new JButton("Create Configuration");
+        configButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createConfigAction();
+            }
+        });
+
 
         processToggleButton = new JToggleButton("Process");
         // processToggleButton.addActionListener(new java.awt.event.ActionListener() {
@@ -109,8 +78,7 @@ public class BurpTab {
 
         searchButton = new JButton("Search");
         resetButton = new JButton("Reset");
-        configButton = new JButton("Create Configuration");
-
+        
         topSeparator = new JSeparator(SwingConstants.VERTICAL);
         topSeparator.setMaximumSize(new Dimension(2, 30));
 
@@ -180,7 +148,83 @@ public class BurpTab {
 
         panel.setLeftComponent(topPanel);
         panel.setRightComponent(tableScrollPane);
-        panel.setEnabled(false); // This disables subcomponents if they inherit this from the parent and might create endless troubles for us.
+    }
+
+    private void loadConfigAction() {
+        File sf = FileChooser.openFile(
+            panel,
+            FileChooser.getLastWorkingDirectory(),
+            "Save config file",
+            "json"
+        );
+
+        if (sf != null) {
+            // Set the last working directory.
+            FileChooser.setLastWorkingDirectory(sf.getParent());
+
+            String configFromFile = "";
+            // Read the file and load it into extensionConfig.
+            try {
+                configFromFile = FileUtils.readFileToString(sf, "UTF-8");
+                extensionConfig = Config.configBuilder(configFromFile);
+            } catch (IOException e) {
+                log.alert("Could not open config file %s.", sf.getAbsolutePath());
+                log.error("Could not open config file %s.", sf.getAbsolutePath());
+                log.error(StringUtils.getStackTrace(e));
+            }
+
+            log.debug("Loaded extension config from %s", sf.getAbsolutePath());
+            log.debug(configFromFile);
+            
+            // Base64 encode and save the extension to estension settings.
+            String base64Encoded = StringUtils.base64Encode(configFromFile);
+            callbacks.saveExtensionSetting("config", base64Encoded);
+            log.debug("Saved the configuration to extension settings");
+        }
+    }
+
+    private void saveConfigAction() {
+        File sf = FileChooser.saveFile(
+            panel,
+            FileChooser.getLastWorkingDirectory(),
+            "Save config file",
+            "json"
+        );
+        
+        if (sf != null) {
+            // Set the last working directory.
+            FileChooser.setLastWorkingDirectory(sf.getParent());
+            // Save the file.
+            try {
+                extensionConfig.writeToFile(sf);
+            } catch (Exception e) {
+                String errMsg = String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
+                log.alert(errMsg);
+                log.error(errMsg);
+            }
+        }
+    }
+
+    // Create a sample config and store it in a file.
+    private void createConfigAction() {
+        File sf = FileChooser.saveFile(
+            panel,
+            FileChooser.getLastWorkingDirectory(),
+            "Create sample config",
+            "json"
+        );
+
+        if (sf != null) {
+            try {
+                // Create a temporary config and write it to file.
+                Config tmpConfig = new Config();
+                tmpConfig.writeToFile(sf);
+            } catch (Exception e) {
+                String errMsg = String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
+                log.alert(errMsg);
+                log.error(errMsg);
+            }
+        }
     }
 
     // GUI Variables

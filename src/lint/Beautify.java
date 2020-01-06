@@ -1,7 +1,5 @@
 package lint;
 
-import static burp.BurpExtender.callbacks;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -13,6 +11,7 @@ import org.mozilla.javascript.Scriptable;
 import burp.BurpExtender;
 import utils.StringUtils;
 import static utils.Constants.EMPTY_STRING;
+import static burp.BurpExtender.log;
 
 /**
  * Beautify
@@ -82,30 +81,30 @@ public class Beautify {
         File inFile = new File(inFilePath);
         String fileContent = FileUtils.readFileToString(inFile, "UTF-8");
         if(StringUtils.isEmpty(fileContent)) {
-            callbacks.printError(inFilePath + " was empty.");
+            log.error("Error in beautify. %s was empty.", inFilePath);
             return;
         }
 
         String beautified = beautify(fileContent);
         if (StringUtils.isEmpty(beautified)) {
-            callbacks.printError("beautify(" + inFilePath + ") is empty.");
+            log.error("beautify(%s) is empty.", inFilePath);
             return;
         }
 
         File outFile = new File(outFilePath);
         FileUtils.writeStringToFile(outFile, beautified, "UTF-8");
-        callbacks.printOutput("Beautified " + inFile + " and stored it in " + outFile);
+        log.debug("Beautified %s and stored it in %s.", inFile, outFile);
     }
 
     public void beautifyToFile(String minJS, String outFilePath) throws IOException {
         String beautified = beautify(minJS);
         if (StringUtils.isEmpty(beautified)) {
-            callbacks.printError("beautify(" + outFilePath + ") is empty.");
+            log.error("beautify(%s) is empty.", outFilePath);
             return;
         }
 
         File outFile = new File(outFilePath);
         FileUtils.writeStringToFile(outFile, beautified, "UTF-8");
-        callbacks.printOutput("Beautified data and stored it in " + outFile);
+        log.debug("Beautified data and stored it in %s.", outFile);
     }
 }

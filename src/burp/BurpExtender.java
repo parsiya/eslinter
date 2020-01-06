@@ -3,6 +3,7 @@ package burp;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -143,7 +144,18 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         }
         log.debug("Request or response metadata:\n%s", metadata.toString());
 
-        // TODO Only process if the callbacks.getToolName(toolFlag) is in
+        // Check if the request is in scope.
+        if (extensionConfig.processInScope) {
+            // Get the request URL.
+            URL reqURL = ReqResp.getURL(requestResponse);
+            if (!callbacks.isInScope(reqURL)) {
+                // Request is not in scope, return.
+                log.debug("Request is not in scope, returning from processHttpMessage");
+                return;
+            }
+        }
+
+        // Only process if the callbacks.getToolName(toolFlag) is in
         // processTools, otherwise return.
         final String toolName = callbacks.getToolName(toolFlag);
         log.debug("Got an item from %s.", toolName);

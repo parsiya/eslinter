@@ -57,7 +57,7 @@ public class Config {
     public boolean highlight = false;
 
     // Only lint requests made by these tools. The names here must be the same
-    // as what is defined in the getToolName column (case-insensitive):
+    // as the getToolName column (case-insensitive):
     // | ToolFlag       | getToolName |
     // |----------------|-------------|
     // | TOOL_SUITE     | Suite       |
@@ -82,12 +82,17 @@ public class Config {
     @SerializedName("number-of-threads")
     public int NumberOfThreads = 3;
 
+    // If set to true, the extension will print extra information. This can be
+    // used for troubleshooting.
+    public boolean debug = true;
+
     /**
      * JavaScript MIME types.
      * Search for "text/javascript" here
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
      * Only "text/javascript" is supposedly supported but who knows.
      * Should be entered as lowercase here.
+     * Burp returns "script" for JavaScript.
      */
     @SerializedName("js-mime-types")
     public String[] JSTypes = new String[] {
@@ -138,10 +143,6 @@ public class Config {
         "If-None-Match"
         // TODO Find more headers.
     };
-
-    // If set to true, the extension will print extra information. This can be
-    // used for troubleshooting.
-    public boolean debug = true;
 
     public String toString() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

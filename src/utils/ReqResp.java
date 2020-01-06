@@ -1,12 +1,5 @@
 package utils;
 
-import burp.Detective;
-import burp.IHttpRequestResponse;
-import burp.IRequestInfo;
-import burp.IResponseInfo;
-import lint.Metadata;
-import utils.StringUtils;
-
 import static burp.BurpExtender.helpers;
 
 import java.security.MessageDigest;
@@ -14,6 +7,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
+
+import burp.Detective;
+import burp.IHttpRequestResponse;
+import burp.IRequestInfo;
+import burp.IResponseInfo;
+import lint.Metadata;
 
 
 /**
@@ -112,7 +111,7 @@ public class ReqResp {
             referer = refererHeaders.get(0);
         }
 
-        // If it only contains a request we will get errors here.
+        // If requestResponse only has a request we will get errors here.
         byte[] bodyBytes = new byte[0];
         if (requestResponse.getResponse() != null) {
             bodyBytes = ReqResp.getResponseBody(requestResponse);
@@ -125,7 +124,6 @@ public class ReqResp {
 
 	public static String getRequestExtension(IHttpRequestResponse requestResponse) {
 	    // Get the request URL.
-	    // TODO Remove this if it's not needed later.
 	    // URL requestURL = getRequestURL(requestResponse);
         return FilenameUtils.getExtension(Detective.getRequestURL(requestResponse).getPath());
         
