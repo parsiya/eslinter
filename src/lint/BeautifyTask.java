@@ -5,34 +5,28 @@ import static burp.BurpExtender.log;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 
 import com.google.gson.GsonBuilder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import burp.BurpExtender;
 import utils.Exec;
 import utils.StringUtils;
 
 /**
- * ParallelBeautify
+ * BeautifyTask
  */
 public class BeautifyTask implements Runnable {
 
-    private Beautify beautifier;
+    // private Beautify beautifier;
     private String data;
     private Metadata metadata;
-    private boolean beautified;
     private String storagePath = "";
 
-    public BeautifyTask(Beautify beautifier, String data, Metadata metadata,
-        String storagePath) throws BeautifyNotFound {
+    public BeautifyTask(String data, Metadata metadata, String storagePath) {
 
-        this.beautifier = beautifier;
         this.data = data;
-        this.beautified = false;
         this.metadata = metadata;
         this.storagePath = storagePath;
         log.debug("Created a new BeautifyTask.\n%s", toString());
@@ -40,12 +34,8 @@ public class BeautifyTask implements Runnable {
 
     @Override
     public void run() {
-        // Beautify the data and return a string.
-        String output = beautifier.beautify(data);
-        beautified = StringUtils.isEmpty(output) ? false : true;
-        metadata.setBeautified(beautified);
 
-        // Filename will be "filename_from_URL[minus extension]-hash.js".
+        // Filename will be "filename_from_URL[minus extension]-[hash].js".
         String jsFileName = "";
         try {
             jsFileName = StringUtils.getURLBaseName(metadata.getUrl());
@@ -69,29 +59,48 @@ public class BeautifyTask implements Runnable {
         File jsFile = new File(jsFilePath);
 
         // Create the metadata string.
-        StringWriter sw = new StringWriter();
-        sw.write("/*\n");
-        sw.write(metadata.toString());
-        sw.write("\n*/\n\n");
-
-        if (beautified) {
-            // If successful, store the results in a file.
-            sw.write(output);
-        } else {
-            // If not successful, store the original content.
-            sw.write(data);
-        }
+        StringBuilder sb = new StringBuilder(metadata.toCommentString());
+        // Add the extracted JavaScript.
+        sb.append(data);
 
         try {
             // Write the contents to the file.
-            FileUtils.writeStringToFile(jsFile, sw.toString(), "UTF-8");
+            FileUtils.writeStringToFile(jsFile, sb.toString(), "UTF-8");
         } catch (IOException e) {
             // If things go wrong print the exception and return.
             StringUtils.getStackTrace(e);
             return;
         }
-        // Execute ESLint with Exec on the file.
+
+        // Now we have a file with metadata and not-beautified JavaScript.
+        // js-beautify -f [filename] -r
+        // -r or --replace replace the same file with the beautified content
+        // this will hopefully keep the metadata string intact (because it's a
+        // comment).
+
+        // Eslint and js-beautify directories are the same because they are
+        // installed in the same location.
         String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.ESLintBinaryPath);
+
+        try {
+            String res = Exec.execute(
+                eslintDirectory,
+                extensionConfig.JSBeautifyBinaryPath,
+                "-f", jsFilePath,
+                "-r"
+            );
+
+            log.debug("Executing: js-beautify -f %s -r", extensionConfig.JSBeautifyBinaryPath);
+            log.debug(res);
+
+        } catch (Exception e) {
+            log.error(StringUtils.getStackTrace(e));
+            return;
+        }
+
+        // Now we can read the file to get the beautified data if needed.
+
+        // Execute ESLint with Exec on the file.
 
         // Create the output filename and path.
         // Output filename is the same as the original filename with "-out".
@@ -99,15 +108,29 @@ public class BeautifyTask implements Runnable {
         String eslintResultFilePath = FilenameUtils.concat(extensionConfig.ESLintOutputPath, eslintResultFileName);
 
         try {
-            // TODO: Change this.
-            String res = Exec.execute(eslintDirectory, extensionConfig.ESLintBinaryPath,
-                "-c", extensionConfig.ESLintConfigPath, "-f","codeframe", "--no-color",
-                // "-o", eslintResultFilePath,
-                "--no-inline-config", jsFilePath);
-            
-            // Write res to output file.
-            FileUtils.writeStringToFile(new File(eslintResultFilePath), res, "UTF-8");
+            // TODO: Change this if needed.
+            String res = Exec.execute(
+                eslintDirectory,
+                extensionConfig.ESLintBinaryPath,
+                "-c", extensionConfig.ESLintConfigPath,
+                "-f", "codeframe",
+                "--no-color",
+                // "-o", eslintResultFilePath, // Use this if we want to create the output file manually.
+                "--no-inline-config",
+                jsFilePath
+            );
 
+            // Add the metadata to the output file.
+            sb = new StringBuilder(metadata.toCommentString());
+
+            if (StringUtils.isNotEmpty(res)) {
+                sb.append(res);
+                // Write res to output file.
+                FileUtils.writeStringToFile(
+                    new File(eslintResultFilePath), sb.toString(), "UTF-8"
+                );
+            }
+            
             // Regex to separate the findings.
             // (.*?)\n\n\n
 
@@ -119,11 +142,11 @@ public class BeautifyTask implements Runnable {
 
             // Now each item in the matcher is a separate finding.
         
-            // Add each finding as a finding to Burp.
+            // TODO Do something with each finding.
 
             log.debug("Results file: %s", eslintResultFilePath);
             log.debug("Input file: %s", jsFilePath);
-            log.debug("ESLint execution result: %s\n", res);
+            // log.debug("ESLint execution result: %s\n", res);
             log.debug("----------");
 
         } catch (Exception e) {

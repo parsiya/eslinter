@@ -1,8 +1,6 @@
 package burp;
 
 import java.awt.Component;
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
@@ -10,11 +8,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.SwingUtilities;
 
-import org.apache.commons.io.FileUtils;
-
 import gui.BurpTab;
-import lint.Beautify;
-import lint.BeautifyNotFound;
 import lint.BeautifyTask;
 import lint.Metadata;
 import linttable.LintResult;
@@ -29,7 +23,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
     public static Config extensionConfig;
     public static BurpLog log;
 
-    private static Beautify beautifier = null;
     private static ExecutorService pool;
     private BurpTab mainTab;
     
@@ -71,27 +64,14 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         log.debug("Decoded config (if any):\n%s", decodedConfig);
         // log.debug("savedConfig: %s", savedConfig);
 
-        // Write the default config file to a file.
-        final File cfgFile = new File("c:\\users\\parsia\\desktop\\cfg.json");
-        try {
-            FileUtils.writeStringToFile(cfgFile, extensionConfig.toString(), "UTF-8");
-        } catch (final IOException e) {
-            log.error("Could not write to file: %s", StringUtils.getStackTrace(e));
-        }
-        log.debug("Wrote the config file to %s.", cfgFile);
-
-        // Create the Beautify class.
-        try {
-            beautifier = new Beautify();
-        } catch (final BeautifyNotFound e) {
-            // If beautify.js was not found, issue a warning.
-            final String err = "beautify.js was not loaded properly, the extension" +
-                " is terminating. Please troubleshoot using the error" +
-                " messages in the Extender tab.";
-            log.alert(err);
-            log.error("Could not get beautify.js: %s", StringUtils.getStackTrace(e));
-            return;
-        }
+        // // Write the default config file to a file.
+        // final File cfgFile = new File("c:\\users\\parsia\\desktop\\cfg.json");
+        // try {
+        //     FileUtils.writeStringToFile(cfgFile, extensionConfig.toString(), "UTF-8");
+        // } catch (final IOException e) {
+        //     log.error("Could not write to file: %s", StringUtils.getStackTrace(e));
+        // }
+        // log.debug("Wrote the config file to %s.", cfgFile);
 
         // Configure the beautify executor service.
         pool = Executors.newFixedThreadPool(extensionConfig.NumberOfThreads);
@@ -214,8 +194,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             javascript = Extractor.getJS(requestResponse.getResponse());
         }
 
-        // Don't enable this unless you are debugging in Repeater. It will mess
-        // up your logs.
+        // Don't uncomment this unless you are debugging in Repeater. It will
+        // mess up your logs.
         // log.debug("Extracted JavaScript:\n%s", javascript);
         // log.debug("End of extracted JavaScript --------------------");
 
@@ -232,11 +212,11 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             return;
         }
 
-        // TODO: Add logging messages here.
         try {
             // Spawn a new BeautifyTask to beautify and store the data.
             final Runnable beautifyTask = new BeautifyTask(
-                beautifier, javascript, metadata, extensionConfig.StoragePath);
+                javascript, metadata, extensionConfig.StoragePath
+            );
 
             // Fingers crossed this will work.
             // TODO This presents a Future that will be null when task is

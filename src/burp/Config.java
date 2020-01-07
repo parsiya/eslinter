@@ -40,13 +40,17 @@ public class Config {
     @SerializedName("eslint-output-path")
     public String ESLintOutputPath = "";
 
-    // ESLint binary path. E.g., node_modules\.bin\eslint
+    // ESLint binary full path. [path]/node_modules/.bin/eslint
     @SerializedName("eslint-binary-path")
     public String ESLintBinaryPath = "";
 
     // Path to the ESLint configuration file.
     @SerializedName("eslint-config-path")
     public String ESLintConfigPath = "";
+
+    // Full path to the js-beautify binary/command. [path]/node_modules/.bin/eslint
+    @SerializedName("jsbeautify-binary-path")
+    public String JSBeautifyBinaryPath = "";
 
     // If true, only in-scope requests will be processed.
     @SerializedName("only-process-in-scope")

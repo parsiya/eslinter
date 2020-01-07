@@ -1,0 +1,3 @@
+[submodule "eslint-security"]
+	path = eslint-security
+	url = https://github.com/parsiya/eslint-security

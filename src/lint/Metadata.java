@@ -1,5 +1,6 @@
 package lint;
 
+import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -15,7 +16,7 @@ public class Metadata {
     private String url;
     private String referer;
     private String hash;
-    private boolean beautified = false;
+    // private boolean beautified = false;
     private String id;
 
     public Metadata() {}
@@ -73,6 +74,16 @@ public class Metadata {
         return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 
+    // toString() but wrapped in /* */
+    public String toCommentString() {
+        // StringWriter sw = new StringWriter();
+        // sw.write("/*\n");
+        // sw.write(toString());
+        // sw.write("\n*/\n\n");
+        // return sw.toString();
+        return "/*\n" + toString() + "\n*/\n\n";
+    }
+
     // public void fromString(String jsonString) {
     //     Metadata tmpMeta = new Gson().fromJson(jsonString, Metadata.class);
     //     url = tmpMeta.url;
@@ -80,13 +91,13 @@ public class Metadata {
     //     hash = tmpMeta.hash;
     // }
 
-    public boolean isBeautified() {
-        return beautified;
-    }
+    // public boolean isBeautified() {
+    //     return beautified;
+    // }
 
-    public void setBeautified(boolean done) {
-        this.beautified = done;
-    }
+    // public void setBeautified(boolean done) {
+    //     this.beautified = done;
+    // }
 
     public String getId() {
         return id;

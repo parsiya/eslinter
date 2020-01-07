@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class Exec{
 
+    // TODO Use this?
     private String command;
     private String[] arguments;
     private String workingDirectory;
@@ -30,13 +31,21 @@ public class Exec{
         };
         cmd.addAll(Arrays.asList(cmdPrompt));
         cmd.addAll(Arrays.asList(commands));
-        // cmd.add("cd");
+        // cmd.add("cd"); // This helps us figure out where we are.
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(new File(workingDir));
         Process p = pb.start();
         String output = IOUtils.toString(p.getInputStream(), "UTF-8");
         String error = IOUtils.toString(p.getErrorStream(), "UTF-8");
-        return output + "---" + error;
+
+        // TODO Find a better way of propagating the error results. Should we
+        // throw an exception instead?
+        // Make a custom exception and throw it with the message from error?
+        String result = "";
+        if (StringUtils.isNotEmpty(output)) result += output;
+        if (StringUtils.isNotEmpty(error)) result += "---" + output;
+               
+        return result;
 
     }
 }

@@ -26,6 +26,12 @@ In the config file, the tool names from Burp's `getToolName` are as follows.
 | TOOL_COMPARER  | null        |
 | TOOL_EXTENDER  | Extender    |
 
+## Update Submodules
+
+`git submodule update --recursive --remote` this pulls the latest revision of
+all submodules.
+
+
 ## Files
 
 * [Research Notes](notes.md)
