@@ -157,6 +157,6 @@ public class BeautifyTask implements Runnable {
     }
 
     public String toString() {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
+        return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(this);
     }
 }

@@ -149,8 +149,7 @@ public class Config {
     };
 
     public String toString() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(this);
+        return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(this);
     }
 
     // No-args constrcutor for Gson.
