@@ -29,7 +29,8 @@ public class BeautifyTask implements Runnable {
         this.data = data;
         this.metadata = metadata;
         this.storagePath = storagePath;
-        log.debug("Created a new BeautifyTask.\n%s", toString());
+        log.debug("Created a new BeautifyTask.\nmetadata\n%s\nStorage path: %s",
+            metadata.toString(), storagePath);
     }
 
     @Override
@@ -80,17 +81,17 @@ public class BeautifyTask implements Runnable {
 
         // Eslint and js-beautify directories are the same because they are
         // installed in the same location.
-        String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.ESLintBinaryPath);
+        String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.eslintBinaryPath);
 
         try {
             String res = Exec.execute(
                 eslintDirectory,
-                extensionConfig.JSBeautifyBinaryPath,
+                extensionConfig.jsBeautifyBinaryPath,
                 "-f", jsFilePath,
                 "-r"
             );
 
-            log.debug("Executing: js-beautify -f %s -r", extensionConfig.JSBeautifyBinaryPath);
+            log.debug("Executing: js-beautify -f %s -r", extensionConfig.jsBeautifyBinaryPath);
             log.debug(res);
 
         } catch (Exception e) {
@@ -105,14 +106,14 @@ public class BeautifyTask implements Runnable {
         // Create the output filename and path.
         // Output filename is the same as the original filename with "-out".
         String eslintResultFileName = jsFileName.concat("-out.js");
-        String eslintResultFilePath = FilenameUtils.concat(extensionConfig.ESLintOutputPath, eslintResultFileName);
+        String eslintResultFilePath = FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
 
         try {
             // TODO: Change this if needed.
             String res = Exec.execute(
                 eslintDirectory,
-                extensionConfig.ESLintBinaryPath,
-                "-c", extensionConfig.ESLintConfigPath,
+                extensionConfig.eslintBinaryPath,
+                "-c", extensionConfig.eslintConfigPath,
                 "-f", "codeframe",
                 "--no-color",
                 // "-o", eslintResultFilePath, // Use this if we want to create the output file manually.

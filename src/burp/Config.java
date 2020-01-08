@@ -17,14 +17,14 @@ public class Config {
 
     // Transient fields are not serialized or deserialized.
     // This appears in Extender.
-    final public static transient String ExtensionName = "ESLint for Burp";
+    final public static transient String extensionName = "ESLint for Burp";
     // This is the extension's tab name.
-    final public static transient String TabName = "ESLinter";
-
+    final public static transient String tabName = "ESLinter";
+    // Table's column names.
     final public static transient String[] lintTableColumnNames = new String[] {
         "Host", "URL", "Status", "Number of Findings"
     };
-
+    // Table's column classes.
     final public static transient Class[] lintTableColumnClasses = new Class[] {
         java.lang.String.class, java.lang.String.class,
         java.lang.Integer.class, java.lang.String.class
@@ -34,23 +34,23 @@ public class Config {
 
     // Storage path for extracted beautified JavaScript files.
     @SerializedName("beautified-javascript-path")
-    public String StoragePath = "";
+    public String storagePath = "";
 
     // Where ESLint results are stored.
     @SerializedName("eslint-output-path")
-    public String ESLintOutputPath = "";
+    public String eslintOutputPath = "";
 
     // ESLint binary full path. [path]/node_modules/.bin/eslint
     @SerializedName("eslint-binary-path")
-    public String ESLintBinaryPath = "";
+    public String eslintBinaryPath = "";
 
     // Path to the ESLint configuration file.
     @SerializedName("eslint-config-path")
-    public String ESLintConfigPath = "";
+    public String eslintConfigPath = "";
 
     // Full path to the js-beautify binary/command. [path]/node_modules/.bin/eslint
     @SerializedName("jsbeautify-binary-path")
-    public String JSBeautifyBinaryPath = "";
+    public String jsBeautifyBinaryPath = "";
 
     // If true, only in-scope requests will be processed.
     @SerializedName("only-process-in-scope")
@@ -84,7 +84,11 @@ public class Config {
 
     // Maximum number of threads.
     @SerializedName("number-of-threads")
-    public int NumberOfThreads = 3;
+    public int numberOfThreads = 3;
+
+    // Maximum size of JavaScript to process in Kilotbytes.
+    @SerializedName("maximum-js-size")
+    public int jsMaxSize = 10000;
 
     // If set to true, the extension will print extra information. This can be
     // used for troubleshooting.
@@ -99,7 +103,7 @@ public class Config {
      * Burp returns "script" for JavaScript.
      */
     @SerializedName("js-mime-types")
-    public String[] JSTypes = new String[] {
+    public String[] jsTypes = new String[] {
         "application/javascript",
         "application/ecmascript",
         "application/x-ecmascript",
@@ -121,7 +125,7 @@ public class Config {
 
     // File extensions that might contain JavaScript.
     @SerializedName("javascript-file-extensions")
-    public String[] FileExtensions = new String[] {
+    public String[] fileExtensions = new String[] {
         "js",
         "javascript"
     };
@@ -130,7 +134,7 @@ public class Config {
     // will be extracted and used.
     // Should be entered as lowercase here.
     @SerializedName("contains-javascript")
-    public String[] ContainsScriptTypes = new String[] {
+    public String[] containsScriptTypes = new String[] {
         "text/html",
         "application/xhtml+xml" // XHTML, be sure to remove the CDATA tags.
     };
@@ -142,7 +146,7 @@ public class Config {
      * headers.
      */
     @SerializedName("removable-headers")
-    public String[] RemovedHeaders = new String[] {
+    public String[] headersToRemove = new String[] {
         "If-Modified-Since",
         "If-None-Match"
         // TODO Find more headers.

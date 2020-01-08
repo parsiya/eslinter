@@ -28,7 +28,7 @@ In the config file, the tool names from Burp's `getToolName` are as follows.
 
 ## Update Submodules
 
-`git submodule update --recursive --remote` this pulls the latest revision of
+`git submodule update --init --recursive --remote` this pulls the latest revision of
 all submodules.
 
 

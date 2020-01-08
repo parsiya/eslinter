@@ -36,7 +36,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         callbacks = burpCallbacks;
         helpers = callbacks.getHelpers();
         // Set the extension name.
-        callbacks.setExtensionName(Config.ExtensionName);
+        callbacks.setExtensionName(Config.extensionName);
 
         // Create the log object.
         // Create the logger.
@@ -74,8 +74,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // log.debug("Wrote the config file to %s.", cfgFile);
 
         // Configure the beautify executor service.
-        pool = Executors.newFixedThreadPool(extensionConfig.NumberOfThreads);
-        log.debug("Using %d threads.", extensionConfig.NumberOfThreads);
+        pool = Executors.newFixedThreadPool(extensionConfig.numberOfThreads);
+        log.debug("Using %d threads.", extensionConfig.numberOfThreads);
 
         mainTab = new BurpTab();
         log.debug("Created the main tab.");
@@ -91,7 +91,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
     @Override
     public String getTabCaption() {
-        return Config.TabName;
+        return Config.tabName;
     }
 
     @Override
@@ -149,7 +149,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         if (isRequest) {
             log.debug("Got a request.");
             // Remove cache headers from the request. We do not want 304s.
-            for (final String rhdr : extensionConfig.RemovedHeaders) {
+            for (final String rhdr : extensionConfig.headersToRemove) {
                 requestResponse = ReqResp.removeHeader(isRequest, requestResponse, rhdr);
             }
             log.debug("Removed headers from the request, returning.");
@@ -159,8 +159,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Here we have responses.
         final IResponseInfo respInfo = helpers.analyzeResponse(requestResponse.getResponse());
         log.debug("Got a response.");
-
-        
 
         String scriptHeader = "false";
         String containsScriptHeader = "false";
@@ -212,10 +210,17 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             return;
         }
 
+        // Check for jsMaxSize.
+        if (javascript.length() >= (extensionConfig.jsMaxSize * 1024)) {
+            log.debug("Length of JavaScript: %d > %d threshold, returning.",
+                javascript.length(), extensionConfig.jsMaxSize * 1024);
+            return;
+        }
+
         try {
             // Spawn a new BeautifyTask to beautify and store the data.
             final Runnable beautifyTask = new BeautifyTask(
-                javascript, metadata, extensionConfig.StoragePath
+                javascript, metadata, extensionConfig.storagePath
             );
 
             // Fingers crossed this will work.
