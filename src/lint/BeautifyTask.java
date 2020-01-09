@@ -83,10 +83,14 @@ public class BeautifyTask implements Runnable {
         // Eslint and js-beautify directories are the same because they are
         // installed in the same location.
         String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.eslintBinaryPath);
-        String[] args = new String[] {
+        String[] beautifyArgs = new String[] {
             "-f", jsFilePath, "-r"
         };
-        Exec beautify = new Exec(extensionConfig.jsBeautifyBinaryPath, args, eslintDirectory);
+        Exec beautify = new Exec(
+            extensionConfig.jsBeautifyBinaryPath,
+            beautifyArgs,
+            eslintDirectory
+        );
 
         try {
             int exitVal = beautify.exec();
@@ -108,7 +112,7 @@ public class BeautifyTask implements Runnable {
         String eslintResultFileName = jsFileName.concat("-out.js");
         String eslintResultFilePath = FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
 
-        String[] args = new String[] {
+        String[] linterArgs = new String[] {
             "-c", extensionConfig.eslintConfigPath,
             "-f", "codeframe",
             "--no-color",
@@ -116,7 +120,11 @@ public class BeautifyTask implements Runnable {
             "--no-inline-config",
             jsFilePath
         };
-        Exec linter = new Exec(extensionConfig.eslintBinaryPath, args, eslintDirectory);
+        Exec linter = new Exec(
+            extensionConfig.eslintBinaryPath,
+            linterArgs,
+            eslintDirectory
+        );
 
         try {
             log.debug("Executing %s", linter.getCommandLine());
@@ -136,12 +144,10 @@ public class BeautifyTask implements Runnable {
 
             // String ptrn = "(.*?)\n\n\n";
             // int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
-
             // Pattern pt = Pattern.compile(ptrn, flags);
             // Matcher mt = pt.matcher(result);
 
             // Now each item in the matcher is a separate finding.
-        
             // TODO Do something with each finding.
 
             log.debug("Results file: %s", eslintResultFilePath);
