@@ -64,15 +64,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         log.debug("Decoded config (if any):\n%s", decodedConfig);
         // log.debug("savedConfig: %s", savedConfig);
 
-        // // Write the default config file to a file.
-        // final File cfgFile = new File("c:\\users\\parsia\\desktop\\cfg.json");
-        // try {
-        //     FileUtils.writeStringToFile(cfgFile, extensionConfig.toString(), "UTF-8");
-        // } catch (final IOException e) {
-        //     log.error("Could not write to file: %s", StringUtils.getStackTrace(e));
-        // }
-        // log.debug("Wrote the config file to %s.", cfgFile);
-
         // Configure the beautify executor service.
         pool = Executors.newFixedThreadPool(extensionConfig.numberOfThreads);
         log.debug("Using %d threads.", extensionConfig.numberOfThreads);
@@ -106,6 +97,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         if (requestResponse == null) return;
 
         log.debug("----------");
+        String requestOrResponse = (isRequest) ? "request" : "response";
+        log.debug("Got a %s.", requestOrResponse);
         // Create the metadata, it might not be needed if there's nothing in the
         // response but this is a small overhead for more readable code.
         Metadata metadata = new Metadata();
@@ -117,8 +110,10 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             // we have bigger problems.
             final String errMsg = StringUtils.getStackTrace(e);
             log.alert(errMsg);
-            log.error("Error creating metadata, most likely algorithm name is wrong: %s.",
-                errMsg);
+            log.error(
+                "Error creating metadata, algo name is probably wrong: %s.",
+                errMsg
+            );
             log.debug("Returning from processHttpMessage because of %s", errMsg);
             return;
         }
@@ -138,16 +133,18 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Only process if the callbacks.getToolName(toolFlag) is in
         // processTools, otherwise return.
         final String toolName = callbacks.getToolName(toolFlag);
-        log.debug("Got an item from %s.", toolName);
+        log.debug("Got a %s from %s.", requestOrResponse,toolName);
         if (!StringUtils.arrayContains(toolName, extensionConfig.processToolList)) {
-            log.debug("%s is not in the process-tool-list, return processHttpMessage", toolName);
+            log.debug(
+                "%s is not in the process-tool-list, return processHttpMessage",
+                toolName
+            );
             return;
         }
 
         // Process requests and get their extension.
         // If their extension matches what we want, get the response.
         if (isRequest) {
-            log.debug("Got a request.");
             // Remove cache headers from the request. We do not want 304s.
             for (final String rhdr : extensionConfig.headersToRemove) {
                 requestResponse = ReqResp.removeHeader(isRequest, requestResponse, rhdr);
@@ -158,7 +155,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
         // Here we have responses.
         final IResponseInfo respInfo = helpers.analyzeResponse(requestResponse.getResponse());
-        log.debug("Got a response.");
 
         String scriptHeader = "false";
         String containsScriptHeader = "false";

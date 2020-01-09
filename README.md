@@ -31,6 +31,10 @@ In the config file, the tool names from Burp's `getToolName` are as follows.
 `git submodule update --init --recursive --remote` this pulls the latest revision of
 all submodules.
 
+## config
+On Windows, remember to point to `.bin/eslint.cmd` and `.bin/js-beautify.cmd`.
+
+Note that Windows supports forward slash as the path separator.
 
 ## Files
 

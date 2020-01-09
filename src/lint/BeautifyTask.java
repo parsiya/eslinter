@@ -40,6 +40,7 @@ public class BeautifyTask implements Runnable {
         String jsFileName = "";
         try {
             jsFileName = StringUtils.getURLBaseName(metadata.getUrl());
+            jsFileName = jsFileName.replaceAll("=", "-");
             if (!StringUtils.isEmpty(jsFileName)) {
                 // If the URL does not end in a file jsFIleName will be empty.
                 // If it's not empty, we add the "-" to it.
@@ -82,20 +83,19 @@ public class BeautifyTask implements Runnable {
         // Eslint and js-beautify directories are the same because they are
         // installed in the same location.
         String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.eslintBinaryPath);
+        String[] args = new String[] {
+            "-f", jsFilePath, "-r"
+        };
+        Exec beautify = new Exec(extensionConfig.jsBeautifyBinaryPath, args, eslintDirectory);
 
         try {
-            String res = Exec.execute(
-                eslintDirectory,
-                extensionConfig.jsBeautifyBinaryPath,
-                "-f", jsFilePath,
-                "-r"
-            );
-
-            log.debug("Executing: js-beautify -f %s -r", extensionConfig.jsBeautifyBinaryPath);
-            log.debug(res);
+            int exitVal = beautify.exec();
+            log.debug("Executing %s", beautify.getCommandLine());
+            log.debug("Output: %s", beautify.getStdOut());
 
         } catch (Exception e) {
             log.error(StringUtils.getStackTrace(e));
+            log.error(beautify.getStdErr());
             return;
         }
 
@@ -108,29 +108,28 @@ public class BeautifyTask implements Runnable {
         String eslintResultFileName = jsFileName.concat("-out.js");
         String eslintResultFilePath = FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
 
+        String[] args = new String[] {
+            "-c", extensionConfig.eslintConfigPath,
+            "-f", "codeframe",
+            "--no-color",
+            // "-o", eslintResultFileName, // Use this if we want to create the output file manually.
+            "--no-inline-config",
+            jsFilePath
+        };
+        Exec linter = new Exec(extensionConfig.eslintBinaryPath, args, eslintDirectory);
+
         try {
-            // TODO: Change this if needed.
-            String res = Exec.execute(
-                eslintDirectory,
-                extensionConfig.eslintBinaryPath,
-                "-c", extensionConfig.eslintConfigPath,
-                "-f", "codeframe",
-                "--no-color",
-                // "-o", eslintResultFilePath, // Use this if we want to create the output file manually.
-                "--no-inline-config",
-                jsFilePath
-            );
+            log.debug("Executing %s", linter.getCommandLine());
+            int exitVal = linter.exec();
+            String result = linter.getStdOut();
 
             // Add the metadata to the output file.
             sb = new StringBuilder(metadata.toCommentString());
+            sb.append(result);
 
-            if (StringUtils.isNotEmpty(res)) {
-                sb.append(res);
-                // Write res to output file.
-                FileUtils.writeStringToFile(
-                    new File(eslintResultFilePath), sb.toString(), "UTF-8"
-                );
-            }
+            FileUtils.writeStringToFile(
+                new File(eslintResultFilePath), sb.toString(), "UTF-8"
+            );
             
             // Regex to separate the findings.
             // (.*?)\n\n\n
@@ -139,7 +138,7 @@ public class BeautifyTask implements Runnable {
             // int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
 
             // Pattern pt = Pattern.compile(ptrn, flags);
-            // Matcher mt = pt.matcher(res);
+            // Matcher mt = pt.matcher(result);
 
             // Now each item in the matcher is a separate finding.
         
@@ -147,12 +146,12 @@ public class BeautifyTask implements Runnable {
 
             log.debug("Results file: %s", eslintResultFilePath);
             log.debug("Input file: %s", jsFilePath);
-            // log.debug("ESLint execution result: %s\n", res);
             log.debug("----------");
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
             log.error(StringUtils.getStackTrace(e));
+            log.error(linter.getStdErr());
             return;
         }
     }

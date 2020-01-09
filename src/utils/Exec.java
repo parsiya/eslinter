@@ -1,27 +1,73 @@
 package utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.IOUtils;
-
 
 /**
  * Exec
  */
-public class Exec{
+public class Exec {
 
     // TODO Use this?
     private String command;
     private String[] arguments;
     private String workingDirectory;
+    private String stdOut = "";
+    private String stdErr = "";
+    private boolean done = false;
+    private CommandLine cmdLine;
 
     public Exec(String cmd, String[] args, String workDir) {
         command = cmd;
         arguments = args;
         workingDirectory = workDir;
+
+        // Add main command.
+        cmdLine = new CommandLine(command);
+        // Add arguments.
+        for (String arg : arguments) {
+            cmdLine.addArgument(arg);
+        }
+    }
+
+    public int exec() throws ExecuteException, IOException {
+
+        DefaultExecutor executor = new DefaultExecutor();
+
+        // How to get both stdout and stderr.
+        // https://stackoverflow.com/a/34571800
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+        PumpStreamHandler psh = new PumpStreamHandler(stdout, stderr);
+        executor.setStreamHandler(psh);
+        executor.setWorkingDirectory(new File(workingDirectory));
+        int exitValue = executor.execute(cmdLine);
+        done = true;
+        stdOut = stdout.toString();
+        stdErr = stderr.toString();
+        return exitValue;
+    }
+
+    public String getCommandLine() {
+        return cmdLine.toString();
+    }
+
+    public String getStdOut() {
+        return stdOut;
+    }
+
+    public String getStdErr() {
+        return stdErr;
     }
     
     public static String execute(String workingDir, String... commands) throws IOException {
@@ -44,7 +90,7 @@ public class Exec{
         String result = "";
         if (StringUtils.isNotEmpty(output)) result += output;
         if (StringUtils.isNotEmpty(error)) result += "---" + output;
-               
+        
         return result;
 
     }
