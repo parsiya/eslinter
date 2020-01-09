@@ -126,40 +126,40 @@ public class BeautifyTask implements Runnable {
             eslintDirectory
         );
 
-        try {
-            log.debug("Executing %s", linter.getCommandLine());
-            int exitVal = linter.exec();
-            String result = linter.getStdOut();
+        // try {
+        //     log.debug("Executing %s", linter.getCommandLine());
+        //     int exitVal = linter.exec();
+        //     String result = linter.getStdOut();
 
-            // Add the metadata to the output file.
-            sb = new StringBuilder(metadata.toCommentString());
-            sb.append(result);
+        //     // Add the metadata to the output file.
+        //     sb = new StringBuilder(metadata.toCommentString());
+        //     sb.append(result);
 
-            FileUtils.writeStringToFile(
-                new File(eslintResultFilePath), sb.toString(), "UTF-8"
-            );
+        //     FileUtils.writeStringToFile(
+        //         new File(eslintResultFilePath), sb.toString(), "UTF-8"
+        //     );
             
-            // Regex to separate the findings.
-            // (.*?)\n\n\n
+        //     // Regex to separate the findings.
+        //     // (.*?)\n\n\n
 
-            // String ptrn = "(.*?)\n\n\n";
-            // int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
-            // Pattern pt = Pattern.compile(ptrn, flags);
-            // Matcher mt = pt.matcher(result);
+        //     // String ptrn = "(.*?)\n\n\n";
+        //     // int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
+        //     // Pattern pt = Pattern.compile(ptrn, flags);
+        //     // Matcher mt = pt.matcher(result);
 
-            // Now each item in the matcher is a separate finding.
-            // TODO Do something with each finding.
+        //     // Now each item in the matcher is a separate finding.
+        //     // TODO Do something with each finding.
 
-            log.debug("Results file: %s", eslintResultFilePath);
-            log.debug("Input file: %s", jsFilePath);
-            log.debug("----------");
+        //     log.debug("Results file: %s", eslintResultFilePath);
+        //     log.debug("Input file: %s", jsFilePath);
+        //     log.debug("----------");
 
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            log.error(StringUtils.getStackTrace(e));
-            log.error(linter.getStdErr());
-            return;
-        }
+        // } catch (Exception e) {
+        //     // TODO Auto-generated catch block
+        //     log.error(StringUtils.getStackTrace(e));
+        //     log.error(linter.getStdErr());
+        //     return;
+        // }
     }
 
     public String toString() {

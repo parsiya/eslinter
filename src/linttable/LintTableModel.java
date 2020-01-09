@@ -68,12 +68,12 @@ public class LintTableModel extends AbstractTableModel {
 
     // AbstractTableModel implemented.
     
-    private boolean invalidIndex(int index) {
+    private boolean invalidRowIndex(int index) {
         return ((index < 0) || (index >= getRowCount()));
     }
 
     public LintResult get(int index) throws IndexOutOfBoundsException {
-        if (invalidIndex(index)) {
+        if (invalidRowIndex(index)) {
             String errorMessage = String.format("Requested index: %s - max index: %s", index, getRowCount());
             throw new IndexOutOfBoundsException(errorMessage);
         }
@@ -86,7 +86,7 @@ public class LintTableModel extends AbstractTableModel {
     }
 
     public void delete(int index) {
-        if (invalidIndex(index)) {
+        if (invalidRowIndex(index)) {
             String errorMessage = String.format("Requested index: %s - max index: %s", index, getRowCount());
             throw new IndexOutOfBoundsException(errorMessage);
         }
@@ -95,7 +95,7 @@ public class LintTableModel extends AbstractTableModel {
     }
 
     public void edit(int index, LintResult lr) throws IndexOutOfBoundsException {
-        if (invalidIndex(index)) {
+        if (invalidRowIndex(index)) {
             String errorMessage = String.format("Requested index: %s - max index: %s", index, getRowCount());
             throw new IndexOutOfBoundsException(errorMessage);
         }
@@ -116,5 +116,10 @@ public class LintTableModel extends AbstractTableModel {
 
     public ArrayList<LintResult> getAll() {
         return lintResults;
+    }
+
+    // Returns true if a column index is invalid.
+    public boolean invalidColumnIndex(int columnIndex) {
+        return ((columnIndex < 0) || (columnIndex >= getColumnCount()));
     }
 }

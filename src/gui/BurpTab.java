@@ -18,6 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.apache.commons.io.FileUtils;
 
@@ -75,9 +77,40 @@ public class BurpTab {
         // });
 
         searchTextField = new JTextField();
+        // Every time the textfield changes, update the table.
+        // https://docs.oracle.com/javase/tutorial/uiswing/examples/components/TableFilterDemoProject/src/components/TableFilterDemo.java
+        searchTextField.getDocument().addDocumentListener(
+            new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    searchAction(searchTextField.getText());
+                }
+                public void insertUpdate(DocumentEvent e) {
+                    searchAction(searchTextField.getText());
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    searchAction(searchTextField.getText());
+                }
+            }
+        );
 
-        searchButton = new JButton("Search");
+        // searchButton = new JButton("Search");
+        // searchButton.addActionListener(new java.awt.event.ActionListener() {
+        //     public void actionPerformed(java.awt.event.ActionEvent evt) {
+        //         // Get the text from searchTextField.
+        //         String query = searchTextField.getText().toLowerCase();
+        //         log.debug("Searching for %s.", query);
+        //         searchAction(query);
+        //     }
+        // });
+
+
         resetButton = new JButton("Reset");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                // Get the text from searchTextField.
+                searchTextField.setText("");
+            }
+        });
         
         topSeparator = new JSeparator(SwingConstants.VERTICAL);
         topSeparator.setMaximumSize(new Dimension(2, 30));
@@ -107,8 +140,8 @@ public class BurpTab {
                     .addGroup(topPanelLayout.createSequentialGroup()
                         .addComponent(searchTextField, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(searchButton)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        // .addComponent(searchButton)
+                        // .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(resetButton)
                         ))
                         .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -130,14 +163,14 @@ public class BurpTab {
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(topPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(searchTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(searchButton)
+                    // .addComponent(searchButton)
                     .addComponent(resetButton))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         // Link size of buttons.
         topPanelLayout.linkSize(SwingConstants.HORIZONTAL, loadConfigButton, saveConfigButton, configButton);
-        topPanelLayout.linkSize(SwingConstants.HORIZONTAL, searchButton, resetButton);
+        // topPanelLayout.linkSize(SwingConstants.HORIZONTAL, searchButton, resetButton);
 
         /**
          * End GUI generated code.
@@ -227,11 +260,17 @@ public class BurpTab {
         }
     }
 
+    // Filter the tablemodel.
+    private void searchAction(String query) {
+        // Change 1 to 0 if you want to search by host instead of URL.
+        lintTable.filter(query, 1);
+    }
+
     // GUI Variables
     private JButton loadConfigButton;
     private JButton saveConfigButton;
     private JTextField searchTextField;
-    private JButton searchButton;
+    // private JButton searchButton;
     private JButton resetButton;
     private JPanel topPanel;
     private JButton configButton;
