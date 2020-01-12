@@ -22,10 +22,9 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
     public static IExtensionHelpers helpers;
     public static Config extensionConfig;
     public static BurpLog log;
+    public static BurpTab mainTab;
 
     private static ExecutorService pool;
-    private BurpTab mainTab;
-    
 
     //
     // implement IBurpExtender
@@ -224,25 +223,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             // complete. Can we use it?
             pool.submit(beautifyTask);
         } catch (final Exception e) {
-            // TODO Auto-generated catch block
-            StringUtils.printStackTrace(e);
+            log.debug(StringUtils.getStackTrace(e));
             return;
         }
-
-        // Create the LintResult and add to the table.
-        final LintResult lr = new LintResult(
-            ReqResp.getHost(requestResponse),
-            ReqResp.getURL(requestResponse).toString(),
-            "Added",
-            0
-        );
-
-        SwingUtilities.invokeLater (new Runnable () {
-            @Override
-            public void run () {
-                mainTab.lintTable.add(lr);
-            }
-        });
-        log.debug("Added the request to the table.");
     }
 }

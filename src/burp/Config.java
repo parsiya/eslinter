@@ -29,6 +29,8 @@ public class Config {
         java.lang.String.class, java.lang.String.class,
         java.lang.Integer.class, java.lang.String.class
     };
+    // Maximum number of characters from the URL.
+    final public static transient int urlFileNameLimit = 50;
 
     // End final transient fields.
 

@@ -51,6 +51,8 @@ public class Exec {
         PumpStreamHandler psh = new PumpStreamHandler(stdout, stderr);
         executor.setStreamHandler(psh);
         executor.setWorkingDirectory(new File(workingDirectory));
+        // ESLint returns 2 on parsing errors so we do not want an exception.
+        executor.setExitValue(2);
         int exitValue = executor.execute(cmdLine);
         done = true;
         stdOut = stdout.toString();
