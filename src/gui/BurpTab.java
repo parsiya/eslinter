@@ -209,9 +209,7 @@ public class BurpTab {
             log.debug("Loaded extension config from %s", sf.getAbsolutePath());
             log.debug(configFromFile);
             
-            // Base64 encode and save the extension to estension settings.
-            String base64Encoded = StringUtils.base64Encode(configFromFile);
-            callbacks.saveExtensionSetting("config", base64Encoded);
+            extensionConfig.saveConfig();
             log.debug("Saved the configuration to extension settings");
         }
     }

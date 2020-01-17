@@ -2,6 +2,7 @@ package utils;
 
 import static burp.BurpExtender.callbacks;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -79,6 +80,12 @@ public class StringUtils {
             if (item.equalsIgnoreCase(arrayItem)) return true;
         }
         return false;
+    }
+
+    // Returns the parent directory of a full path.
+    public static String getParentDirectory(String fullpath) {
+        File f = new File(fullpath);
+        return f.getParent();
     }
 
     // Returns the opposite of isEmpty.

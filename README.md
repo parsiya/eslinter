@@ -36,6 +36,12 @@ On Windows, remember to point to `.bin/eslint.cmd` and `.bin/js-beautify.cmd`.
 
 Note that Windows supports forward slash as the path separator.
 
+To load a default config, place a file named `config.json` with your
+configuration in the same directory where the extension jar is located. The
+extension will load this configuration at startup. Remember to remove it after
+you are done, otherwise any configuration changes will be overwritten at startup
+again.
+
 ## Files
 
 * [Research Notes](notes.md)

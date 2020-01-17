@@ -5,9 +5,14 @@ import java.io.IOException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
+
+import utils.StringUtils;
+
+import static burp.BurpExtender.callbacks;
 
 
 /**
@@ -31,6 +36,8 @@ public class Config {
     };
     // Maximum number of characters from the URL.
     final public static transient int urlFileNameLimit = 50;
+    // Default config file name.
+    final public static transient String defaultConfigName = "config.json";
 
     // End final transient fields.
 
@@ -154,6 +161,7 @@ public class Config {
         // TODO Find more headers.
     };
 
+    // Convert the config to JSON.
     public String toString() {
         return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(this);
     }
@@ -161,14 +169,25 @@ public class Config {
     // No-args constrcutor for Gson.
     public Config() {}
 
-    // Will this come and kick us in the butt later?
-    public static Config configBuilder(String json) {
+    // Creates a config object from the json string.
+    public static Config configBuilder(String json) throws JsonSyntaxException {
         return new Gson().fromJson(json, Config.class);
     }
 
     // Writes the config files to file.
     public void writeToFile(File path) throws IOException {
-
         FileUtils.writeStringToFile(path, toString(), "UTF-8");
+    }
+
+    // 1. Converts the Config object to a json string.
+    // 2. Encodes it in base64.
+    // 3. Saves the config to extension settings.
+    public void saveConfig() {
+        // 1. Convert to string.
+        String cfgStr = toString();
+        // 2. Base64 encode.
+        String cfgBase64 = StringUtils.base64Encode(cfgStr);
+        // 3. Save it to extension settings.
+        callbacks.saveExtensionSetting("config", cfgBase64);
     }
 }

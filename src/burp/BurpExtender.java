@@ -1,17 +1,21 @@
 package burp;
 
 import java.awt.Component;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.SwingUtilities;
+import com.google.gson.JsonSyntaxException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import gui.BurpTab;
 import lint.BeautifyTask;
 import lint.Metadata;
-import linttable.LintResult;
 import utils.BurpLog;
 import utils.ReqResp;
 import utils.StringUtils;
@@ -26,9 +30,9 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
     private static ExecutorService pool;
 
-    //
-    // implement IBurpExtender
-    //
+    /**
+     * Implement IBurpExtender.
+     */
     @Override
     public void registerExtenderCallbacks(final IBurpExtenderCallbacks burpCallbacks) {
 
@@ -37,31 +41,21 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Set the extension name.
         callbacks.setExtensionName(Config.extensionName);
 
-        // Create the log object.
         // Create the logger.
         log = new BurpLog(true);
 
-        // Read the config from the extension settings.
-        extensionConfig = new Config();
+        // Read the default config. This is needed in case there is no config
+        // saved or there is no default config file.
+        setDefaultConfig();
+
+        // Search for the default config file and load it if it exists.
+        loadDefaultConfigFile(Config.defaultConfigName);
         
-        final String savedConfig = callbacks.loadExtensionSetting("config");
-        String decodedConfig = "";
+        // Load saved config from extension settings (if any).
+        loadSavedConfig();
 
-        if (StringUtils.isEmpty(savedConfig) || savedConfig == null) {
-            // No saved config. Use the default version and prompt the user.
-            log.alert("No saved config found, please choose one.");
-        } else {
-            // Base64 decode the config string.
-            decodedConfig = StringUtils.base64Decode(savedConfig);
-            extensionConfig = Config.configBuilder(decodedConfig);
-            StringUtils.print("Config loaded from extension settings");
-        }
-
-        // Set the debug flag from the loaded
+        // Set the debug flag from the loaded config.
         log.setDebugMode(extensionConfig.debug);
-
-        log.debug("Decoded config (if any):\n%s", decodedConfig);
-        // log.debug("savedConfig: %s", savedConfig);
 
         // Configure the beautify executor service.
         pool = Executors.newFixedThreadPool(extensionConfig.numberOfThreads);
@@ -76,7 +70,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Register the listener.
         callbacks.registerHttpListener(BurpExtender.this);
 
-        log.debug("Loaded the extension. End of registerExtenderCallbacks");
+        log.debug("Loaded the extension. End of registerExtenderCallbacks.");
     }
 
     @Override
@@ -225,6 +219,75 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         } catch (final Exception e) {
             log.debug(StringUtils.getStackTrace(e));
             return;
+        }
+    }
+
+    // Sets the extension config to the default config. Default config is the
+    // default values for the Config object as set in Config.java.
+    private static void setDefaultConfig() {
+        extensionConfig = new Config();
+    }
+
+    // Converts the String to a Config object and sets it as the extension
+    // config, then saves it in extension settings.
+    private static void setConfig(String json) throws JsonSyntaxException {
+        // Create a config object from the string.
+        extensionConfig = Config.configBuilder(json);
+        // If this was successful, save it to extension settings.
+        extensionConfig.saveConfig();
+    }
+
+    // Get saved config.
+    private static void loadSavedConfig() {
+        // See if the extension config was saved in extension settings. If
+        // default config was loaded from the file above, it will be saved.
+        final String savedConfig = callbacks.loadExtensionSetting("config");
+        String decodedConfig = "";
+
+        if (StringUtils.isEmpty(savedConfig)) {
+            // No saved config. Use the default version and prompt the user.
+            log.alert("No saved config found, please choose one after the extension has loaded.");
+        } else {
+            // Base64 decode the config string.
+            decodedConfig = StringUtils.base64Decode(savedConfig);
+            extensionConfig = Config.configBuilder(decodedConfig);
+            StringUtils.print("Config loaded from extension settings.");
+            log.debug("Decoded config (if any):\n%s", decodedConfig);
+            // log.debug("savedConfig: %s", savedConfig);
+        }
+    }
+
+    private static void loadDefaultConfigFile(String cfgFileName) {
+        // Check if there is a file named extensionConfig.defaultConfigName in
+        // the current directory, if so, load it and overwrite the extension.
+        try {
+            // Get the extension jar path.
+            String jarPath = callbacks.getExtensionFilename();
+            // Get the parent directory of the jar path.
+            String jarDirectory = StringUtils.getParentDirectory(jarPath);
+
+            // Create the full path for the default config file.
+            // jarDirectory/Config.defaultConfigName.
+            String defaultConfigFullPath = FilenameUtils.concat(jarDirectory, cfgFileName);
+            File f = new File(defaultConfigFullPath);
+
+            String cfgFile = FileUtils.readFileToString(f, "UTF-8");
+            setConfig(cfgFile);
+            log.debug("Config loaded from default config file %s", defaultConfigFullPath);
+        } catch (FileNotFoundException e) {
+            log.debug(
+                "Default config file '%s' was not found.",
+                Config.defaultConfigName
+            );
+        } catch (Exception e) {
+            // If anything goes wrong here, then something else was wrong other
+            // than the file not having 
+            log.debug(
+                "Error loading default config file %s: %s",
+                Config.defaultConfigName,
+                StringUtils.getStackTrace(e)
+            );
+            log.debug("This is not a show stopper, the extension is will continue loading");
         }
     }
 }
