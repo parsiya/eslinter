@@ -117,7 +117,7 @@ public class ReqResp {
             bodyBytes = ReqResp.getResponseBody(requestResponse);
         }
 
-        byte[] hashBytes = MessageDigest.getInstance("MD5").digest(bodyBytes);
+        byte[] hashBytes = MessageDigest.getInstance("SHA-1").digest(bodyBytes);
         String hashString = StringUtils.encodeHexString(hashBytes);
         return new Metadata(url, referer, hashString);
     }

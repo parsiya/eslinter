@@ -2,8 +2,6 @@ package lint;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,7 +16,6 @@ public class Metadata {
     private String url;
     private String referer;
     private String hash;
-    private String id;
 
     public Metadata() {}
 
@@ -26,21 +23,6 @@ public class Metadata {
         url = u;
         referer = ref;
         hash = hsh;
-        id = calculateID(url, hash);
-    }
-
-    // Identifier should be unique if the URL and hash of body match.
-    // Identifier is the hash of the URL||Hash.
-    private static String calculateID(String u, String h) {
-        byte[] json = StringUtils.stringToBytes(u.concat(h));
-        byte[] hashBytes;
-        try {
-            hashBytes = MessageDigest.getInstance("SHA-1").digest(json);
-        } catch (NoSuchAlgorithmException e) {
-            // This should not happen because Burp has SHA-1.
-            return "";
-        }
-        return StringUtils.encodeHexString(hashBytes);
     }
 
     public static Metadata fromString(String jsonString) {
@@ -111,21 +93,5 @@ public class Metadata {
 
     public String getHost() throws MalformedURLException {
         return new URL(getURL()).getHost();
-    }
-
-
-    // public void fromString(String jsonString) {
-    //     Metadata tmpMeta = new Gson().fromJson(jsonString, Metadata.class);
-    //     url = tmpMeta.url;
-    //     referer = tmpMeta.referer;
-    //     hash = tmpMeta.hash;
-    // }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

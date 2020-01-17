@@ -98,7 +98,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         try {
             metadata = ReqResp.getMetadata(requestResponse);
         } catch (final NoSuchAlgorithmException e) {
-            // This should not happen because we are passing "MD5" to the
+            // This should not happen because we are passing "SHA-1" to the
             // digest manually. If we do not have the algorithm in Burp then
             // we have bigger problems.
             final String errMsg = StringUtils.getStackTrace(e);
@@ -184,7 +184,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         // Don't uncomment this unless you are debugging in Repeater. It will
         // mess up your logs.
         // log.debug("Extracted JavaScript:\n%s", javascript);
-        // log.debug("End of extracted JavaScript --------------------");
+        // log.debug("End of extracted JavaScript ----------");
 
         // Set the debug headers.
         if (extensionConfig.debug) {

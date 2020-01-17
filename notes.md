@@ -129,12 +129,11 @@ Maybe we can run node too?
 
 ----------
 
-// Compile script.
+## Compile script.
 
-1. download the rhino jarfile.
+1. Download the rhino jarfile.
 2. java -cp rhino-1.7.11.jar org.mozilla.javascript.tools.jsc.Main beautify.js
 3. Now we can read and load the class file?
-
 
 First we will need to add the global stuff and the other things to the beautify.js file anyways.
 
