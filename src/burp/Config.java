@@ -61,6 +61,11 @@ public class Config {
     @SerializedName("jsbeautify-binary-path")
     public String jsBeautifyBinaryPath = "";
 
+    // Full path to the sqlite database file. It will be created if it does not
+    // exist.
+    @SerializedName("database-path")
+    public String dbPath = "";
+
     // If true, only in-scope requests will be processed.
     @SerializedName("only-process-in-scope")
     public boolean processInScope = false;
@@ -95,7 +100,7 @@ public class Config {
     @SerializedName("number-of-threads")
     public int numberOfThreads = 3;
 
-    // Maximum size of JavaScript to process in Kilotbytes.
+    // Maximum size of JavaScript to process in KBs.
     @SerializedName("maximum-js-size")
     public int jsMaxSize = 10000;
 

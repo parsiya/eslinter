@@ -3,16 +3,20 @@ package burp;
 import java.awt.Component;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import database.Database;
 import gui.BurpTab;
 import lint.BeautifyTask;
 import lint.Metadata;
@@ -20,13 +24,15 @@ import utils.BurpLog;
 import utils.ReqResp;
 import utils.StringUtils;
 
-public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
+public class BurpExtender implements
+    IBurpExtender, ITab, IHttpListener, IExtensionStateListener {
 
     public static IBurpExtenderCallbacks callbacks;
     public static IExtensionHelpers helpers;
     public static Config extensionConfig;
     public static BurpLog log;
     public static BurpTab mainTab;
+    public static Database db;
 
     private static ExecutorService pool;
 
@@ -50,7 +56,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
 
         // Search for the default config file and load it if it exists.
         loadDefaultConfigFile(Config.defaultConfigName);
-        
+
         // Load saved config from extension settings (if any).
         loadSavedConfig();
 
@@ -61,14 +67,26 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
         pool = Executors.newFixedThreadPool(extensionConfig.numberOfThreads);
         log.debug("Using %d threads.", extensionConfig.numberOfThreads);
 
+        // Create the main tab.
         mainTab = new BurpTab();
         log.debug("Created the main tab.");
         callbacks.customizeUiComponent(mainTab.panel);
+
+        // Create the database.
+        try {
+            db = new Database(extensionConfig.dbPath);
+            log.debug("Created a connection to the database: %s", extensionConfig.dbPath);
+        } catch (SQLException | IOException e) {
+            log.alert("Error accessing the database: %s", extensionConfig.dbPath);
+            log.error("Error creating database %s", StringUtils.getStackTrace(e));
+        }
 
         // Add the tab to Burp.
         callbacks.addSuiteTab(BurpExtender.this);
         // Register the listener.
         callbacks.registerHttpListener(BurpExtender.this);
+        // Register the extension state listener to handle extension unload.
+        callbacks.registerExtensionStateListener(BurpExtender.this);
 
         log.debug("Loaded the extension. End of registerExtenderCallbacks.");
     }
@@ -213,7 +231,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             );
 
             // Fingers crossed this will work.
-            // TODO This presents a Future that will be null when task is
+            // TODO This returns a Future that will be null when task is
             // complete. Can we use it?
             pool.submit(beautifyTask);
         } catch (final Exception e) {
@@ -281,7 +299,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             );
         } catch (Exception e) {
             // If anything goes wrong here, then something else was wrong other
-            // than the file not having 
+            // than the file not having the correct content.
             log.debug(
                 "Error loading default config file %s: %s",
                 Config.defaultConfigName,
@@ -289,5 +307,32 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener {
             );
             log.debug("This is not a show stopper, the extension is will continue loading");
         }
+    }
+
+    @Override
+    public void extensionUnloaded() {
+
+        log.debug("Starting to unload the extension");
+
+        // Shutdown the threadpool and wait for termination.
+        // https://stackoverflow.com/a/1250655
+
+        pool.shutdown();
+        try {
+            // TODO Set this in config?
+            pool.awaitTermination(60, TimeUnit.SECONDS);
+            log.debug("All threads are terminated.");
+        } catch (InterruptedException  e) {
+            log.error("Could not terminate all threads: %s", StringUtils.getStackTrace(e));
+        }
+
+        try {
+            db.close();
+            log.debug("Closed the database connection");
+        } catch (SQLException e) {
+            log.error("Error closing the database connection: %s", StringUtils.getStackTrace(e));
+        }
+
+        log.debug("Unloaded the extension.");
     }
 }

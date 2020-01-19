@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -52,7 +51,7 @@ public class Exec {
         executor.setStreamHandler(psh);
         executor.setWorkingDirectory(new File(workingDirectory));
         // ESLint returns 2 on parsing errors so we do not want an exception.
-        executor.setExitValue(2);
+        executor.setExitValues(new int[] {0, 2});
         int exitValue = executor.execute(cmdLine);
         done = true;
         stdOut = stdout.toString();

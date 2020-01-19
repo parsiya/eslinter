@@ -3,8 +3,11 @@ package lint;
 import static burp.BurpExtender.extensionConfig;
 import static burp.BurpExtender.log;
 import static burp.BurpExtender.mainTab;
+import static burp.BurpExtender.db;
 
 import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,16 +37,16 @@ public class BeautifyTask implements Runnable {
         this.data = data;
         this.metadata = metadata;
         this.storagePath = storagePath;
-        log.debug("Created a new BeautifyTask.\nmetadata\n%s\nStorage path: %s",
-            metadata.toString(), storagePath);
+        log.debug("Created a new BeautifyTask.\nmetadata\n%s\nStorage path: %s", metadata.toString(), storagePath);
     }
 
     @Override
     public void run() {
 
         Exec beautify = null, linter = null;
-        String status = "", host = "";
+        String status = "", host = "", beautifiedJavaScript = "";
         int numFindings = 0;
+        StringBuilder eslintResults = null;
 
         try {
             // Get the host from metadata.
@@ -55,7 +58,7 @@ public class BeautifyTask implements Runnable {
             String jsFilePath = FilenameUtils.concat(storagePath, jsFileName.concat(".js"));
             // Create a File.
             File jsFile = new File(jsFilePath);
-    
+
             // Create the metadata string.
             StringBuilder sb = new StringBuilder(metadata.toCommentString());
             // Add the extracted JavaScript.
@@ -74,43 +77,30 @@ public class BeautifyTask implements Runnable {
             // a comment).
 
             // Executing js-beautify.
-            String[] beautifyArgs = new String[] {
-                "-f", jsFilePath, "-r"
-            };
-            beautify = new Exec(
-                extensionConfig.jsBeautifyBinaryPath,
-                beautifyArgs,
-                eslintDirectory
-            );
+            String[] beautifyArgs = new String[] { "-f", jsFilePath, "-r" };
+            beautify = new Exec(extensionConfig.jsBeautifyBinaryPath, beautifyArgs, eslintDirectory);
 
             beautify.exec();
             log.debug("Executing %s", beautify.getCommandLine());
             log.debug("Output: %s", beautify.getStdOut());
 
-            // Now we can read the file to get the beautified data if needed.
-            
+            // Now we can read jsFilePath to get the beautified data if needed.
+            beautifiedJavaScript = FileUtils.readFileToString(jsFile, "UTF-8");
+
             // Executing ESLint with Exec on the file.
 
             // Create the output filename and path.
             // Output filename is the same as the original filename with "-out".
             String eslintResultFileName = jsFileName.concat("-out.js");
-            String eslintResultFilePath = 
-                FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
+            String eslintResultFilePath = FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
 
-            String[] linterArgs = new String[] {
-                "-c", extensionConfig.eslintConfigPath,
-                "-f", "codeframe",
-                "--no-color",
-                // "-o", eslintResultFileName, // We can use this if we want to create the output file manually.
-                "--no-inline-config",
-                jsFilePath
-            };
-            
-            linter = new Exec(
-                extensionConfig.eslintBinaryPath,
-                linterArgs,
-                eslintDirectory
-            );
+            String[] linterArgs = new String[] { "-c", extensionConfig.eslintConfigPath, "-f", "codeframe",
+                    "--no-color",
+                    // "-o", eslintResultFileName, // We can use this if we want to create the
+                    // output file manually.
+                    "--no-inline-config", jsFilePath };
+
+            linter = new Exec(extensionConfig.eslintBinaryPath, linterArgs, eslintDirectory);
 
             log.debug("Executing %s", linter.getCommandLine());
             int exitVal = linter.exec();
@@ -124,13 +114,11 @@ public class BeautifyTask implements Runnable {
             }
 
             // Add the metadata to the output file.
-            sb = new StringBuilder(metadata.toCommentString());
-            sb.append(result);
+            eslintResults = new StringBuilder(metadata.toCommentString());
+            eslintResults.append(result);
 
-            FileUtils.writeStringToFile(
-                new File(eslintResultFilePath), sb.toString(), "UTF-8"
-            );
-            
+            FileUtils.writeStringToFile(new File(eslintResultFilePath), eslintResults.toString(), "UTF-8");
+
             // Regex to separate the findings.
             // (.*?)\n\n\n
 
@@ -153,7 +141,7 @@ public class BeautifyTask implements Runnable {
 
             if (beautify != null) {
                 if (StringUtils.isNotEmpty(beautify.getStdErr())) {
-                    status += beautify.getStdErr();
+                    status += beautify.getStdOut();
                 }
             }
 
@@ -171,6 +159,23 @@ public class BeautifyTask implements Runnable {
                 status = "Beautified";
             }
 
+            // Add the data to the table.
+            try {
+                db.addRow(
+                    metadata.getURL(),      // url
+                    metadata.getReferer(),  // referer
+                    metadata.getHash(),     // hash
+                    beautifiedJavaScript,   // beautified JavaScript in jsFilePath
+                    status,                 // status
+                    eslintResults.toString(), // eslint result
+                    1,                      // is_processed
+                    numFindings             // number_of_results
+                );
+                log.debug("Added row for hash %s to the database.", metadata.getHash());
+            } catch (SQLException | IOException e) {
+                log.error(StringUtils.getStackTrace(e));
+            }
+
             // Create the LintResult and add to the table.
             final LintResult lr = new LintResult(
                 host,
@@ -179,7 +184,7 @@ public class BeautifyTask implements Runnable {
                 numFindings
             );
 
-            SwingUtilities.invokeLater (new Runnable () {
+            SwingUtilities.invokeLater(new Runnable () {
                 @Override
                 public void run () {
 					mainTab.lintTable.add(lr);
