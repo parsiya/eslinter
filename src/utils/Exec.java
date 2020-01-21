@@ -25,11 +25,17 @@ public class Exec {
     private String stdErr = "";
     private boolean done = false;
     private CommandLine cmdLine;
+    private int[] exitValues;
 
-    public Exec(String cmd, String[] args, String workDir) {
+    // exitValues are valid exit values. By default, any exit value other than 0
+    // is treated like an error by Commons-Exec. We can add others here. If you
+    // set anything other than 0, be sure to include 0 because 0 will then be
+    // treated like an error.
+    public Exec(String cmd, String[] args, String workDir, int ...exitValues) {
         command = cmd;
         arguments = args;
         workingDirectory = workDir;
+        this.exitValues = exitValues;
 
         // Add main command.
         cmdLine = new CommandLine(command);
@@ -51,7 +57,7 @@ public class Exec {
         executor.setStreamHandler(psh);
         executor.setWorkingDirectory(new File(workingDirectory));
         // ESLint returns 2 on parsing errors so we do not want an exception.
-        executor.setExitValues(new int[] {0, 2});
+        executor.setExitValues(exitValues);
         int exitValue = executor.execute(cmdLine);
         done = true;
         stdOut = stdout.toString();
