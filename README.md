@@ -42,6 +42,30 @@ extension will load this configuration at startup. Remember to remove it after
 you are done, otherwise any configuration changes will be overwritten at startup
 again.
 
+## Processing Logic
+
+1. Check if we got a request.
+2. If it's a request, remove the headers and return.
+3. If it's a response, check for JavaScript.
+4. Extract the JavaScript.
+5. Check the database to see if hash of body is already in the table.
+6. If hash exists.
+    1. Copy `beautified_javascript`, `status`, `results`, `is_processed` and `number_of_results`.
+    2. Even if `is_processed == 0`, then the rest of the columns do not have valid data and will be populated when this hash is processed.
+    3. Store the beautified JS file and results in their correct places.
+    4. Go to 8.
+7. If hash does not exist.
+    1. Beautify the extracted JS.
+    2. Populate the rest of the columns.
+        1. `beautified_javascript`: Beautified extracted JS.
+        2. `status` = pending.
+        3. `results` = empty. Don't care.
+        4. `is_processed` = 0.
+        5. `number_of_results` = 0. Don't care.
+    3. Store the beautified JS file and results in their correct places.
+    4. Go to 8.
+8. Add the request to the table.
+
 ## Files
 
 * [Research Notes](notes.md)

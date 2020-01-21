@@ -199,18 +199,18 @@ public class BurpTab {
             // Read the file and load it into extensionConfig.
             try {
                 configFromFile = FileUtils.readFileToString(sf, "UTF-8");
-                extensionConfig = Config.configBuilder(configFromFile);
+                extensionConfig = Config.loadConfig(configFromFile);
             } catch (IOException e) {
                 log.alert("Could not open config file %s.", sf.getAbsolutePath());
                 log.error("Could not open config file %s.", sf.getAbsolutePath());
                 log.error(StringUtils.getStackTrace(e));
             }
 
-            log.debug("Loaded extension config from %s", sf.getAbsolutePath());
-            log.debug(configFromFile);
-            
-            extensionConfig.saveConfig();
-            log.debug("Saved the configuration to extension settings");
+            log.debug(
+                "Loaded extension config from %s and saved it to extension settings",
+                sf.getAbsolutePath()
+            );
+            log.debug("Loaded config: %s", configFromFile);
         }
     }
 

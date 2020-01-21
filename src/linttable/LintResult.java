@@ -14,14 +14,21 @@ public class LintResult {
     public String url;
     public String status;
     public int numResults;
+    public transient String results; // We do not want this to end up in toString().
+    public Metadata metadata;
 
     public LintResult() {}
 
-    public LintResult(String host, String url, String status, int numResults) {
+    public LintResult(
+        String host, String url, String status, int numResults, String results,
+        Metadata metadata) {
+
         this.host = host;
         this.url = url;
         this.status = status;
         this.numResults = numResults;
+        this.results = results;
+        this.metadata = metadata;
     }
 
     public String toString() {

@@ -63,12 +63,17 @@ public class Metadata {
         return "/*\n" + toString() + "\n*/\n\n";
     }
 
+    // non-indented toString().
+    public String toUglyString() {
+        return new GsonBuilder().disableHtmlEscaping().create().toJson(this);
+    }
+
     // Returns the filename calculated from the metadata object minus the
     // extension.
 
     // Filename will be
     // "filename_from_URL[minus extension and limited to 50 chars]-[hash]".
-    public String getFileName() throws MalformedURLException {
+    public String getFileNameWithouExtension() throws MalformedURLException {
         
         String jsFileName = "";
 

@@ -95,7 +95,8 @@ public class ProcessResponseTask implements Runnable {
                 metadata.getURL(),
                 status,
                 0,
-                ""
+                "",
+                metadata
             );
 
             SwingUtilities.invokeLater(new Runnable () {

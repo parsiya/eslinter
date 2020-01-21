@@ -187,12 +187,27 @@ public class Config {
     // 1. Converts the Config object to a json string.
     // 2. Encodes it in base64.
     // 3. Saves the config to extension settings.
-    public void saveConfig() {
+    public void saveConfigToExtensionSettings() {
         // 1. Convert to string.
         String cfgStr = toString();
         // 2. Base64 encode.
         String cfgBase64 = StringUtils.base64Encode(cfgStr);
         // 3. Save it to extension settings.
         callbacks.saveExtensionSetting("config", cfgBase64);
+    }
+
+    // Creates a new config from the json string and returns it. Also waits for
+    // the threadpool to shutdown, closes the DB connection and establishes a
+    // connection to the new DB set in the new config file.
+    public static Config loadConfig(String json) {
+        // Unload the extension, because we are loading a new config.
+        BurpExtender.unloadExtension();
+        // Read the json string and create a new config.
+        Config cfg = configBuilder(json);
+        // Connect to the new database file.
+        BurpExtender.databaseConnect(cfg.dbPath);
+        // Save the config file in extension settings.
+        cfg.saveConfigToExtensionSettings();
+        return cfg;
     }
 }

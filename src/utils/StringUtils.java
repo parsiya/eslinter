@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 import org.apache.commons.io.FilenameUtils;
@@ -22,7 +24,7 @@ public class StringUtils {
     }
 
     // Print with format string.
-    public static void printFormat(String format, Object ...args) {
+    public static void printFormat(String format, Object... args) {
         print(String.format(format, args));
     }
 
@@ -32,7 +34,7 @@ public class StringUtils {
     }
 
     // Print errors with format string.
-    public static void errorFormat(String format, Object ...args) {
+    public static void errorFormat(String format, Object... args) {
         error(String.format(format, args));
     }
 
@@ -71,21 +73,32 @@ public class StringUtils {
     }
 
     // Returns true if item is in arr. Does case-insensitive comparison.
-    /** For case-sensitive contains do:
-     * List<String> lst = java.util.Arrays.asList(arr);
-     * return lst.contains(item);
+    /**
+     * For case-sensitive contains do: List<String> lst =
+     * java.util.Arrays.asList(arr); return lst.contains(item);
      */
     public static boolean arrayContains(String item, String[] arr) {
         for (String arrayItem : arr) {
-            if (item.equalsIgnoreCase(arrayItem)) return true;
+            if (item.equalsIgnoreCase(arrayItem))
+                return true;
         }
         return false;
     }
 
     // Returns the parent directory of a full path.
     public static String getParentDirectory(String fullpath) {
-        File f = new File(fullpath);
-        return f.getParent();
+        return FilenameUtils.getFullPath(fullpath);
+        // File f = new File(fullpath);
+        // return f.getParent();
+    }
+
+    // TODO Remove this if not needed.
+    // Returns the SHA-1 hash of a String as a String.
+    public static String sha1(String data) throws NoSuchAlgorithmException {
+
+        byte[] hashBytes = MessageDigest.getInstance("SHA-1").digest(data.getBytes());
+        return StringUtils.encodeHexString(hashBytes);
+
     }
 
     // Returns the opposite of isEmpty.

@@ -4,22 +4,20 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonSyntaxException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import database.Database;
 import gui.BurpTab;
-import lint.BeautifyTask;
 import lint.Metadata;
+import lint.ProcessRequestTask;
+import lint.ProcessResponseTask;
 import utils.BurpLog;
 import utils.ReqResp;
 import utils.StringUtils;
@@ -50,9 +48,9 @@ public class BurpExtender implements
         // Create the logger.
         log = new BurpLog(true);
 
-        // Read the default config. This is needed in case there is no config
+        // Use the default config. This is needed in case there is no config
         // saved or there is no default config file.
-        setDefaultConfig();
+        extensionConfig = getDefaultConfig();
 
         // Search for the default config file and load it if it exists.
         loadDefaultConfigFile(Config.defaultConfigName);
@@ -72,14 +70,8 @@ public class BurpExtender implements
         log.debug("Created the main tab.");
         callbacks.customizeUiComponent(mainTab.panel);
 
-        // Create the database.
-        try {
-            db = new Database(extensionConfig.dbPath);
-            log.debug("Created a connection to the database: %s", extensionConfig.dbPath);
-        } catch (SQLException | IOException e) {
-            log.alert("Error accessing the database: %s", extensionConfig.dbPath);
-            log.error("Error creating database %s", StringUtils.getStackTrace(e));
-        }
+        // Connect to the database (or create it if it doesn't exist).
+        databaseConnect(extensionConfig.dbPath);
 
         // Add the tab to Burp.
         callbacks.addSuiteTab(BurpExtender.this);
@@ -107,9 +99,26 @@ public class BurpExtender implements
 
         if (requestResponse == null) return;
 
+        // If it's a request, spawn a new thread and process it. We do not need
+        // to worry about responses being processed before their requests
+        // because the response will only arrive after the request is processed
+        // and sent out. D'oh.
+        if (isRequest) {
+            // Processing requests is lightweight so we do not create a
+            // threadpool. If it turns out to be a resource hog we can do so
+            // later.
+            ProcessRequestTask reqTask =
+                new ProcessRequestTask(
+                    toolFlag, requestResponse, extensionConfig
+                );
+            Thread reqThread = new Thread(reqTask);
+            reqThread.start();
+            return;
+        }
+
+        // Here we have responses.
         log.debug("----------");
-        String requestOrResponse = (isRequest) ? "request" : "response";
-        log.debug("Got a %s.", requestOrResponse);
+        log.debug("Got a response.");
         // Create the metadata, it might not be needed if there's nothing in the
         // response but this is a small overhead for more readable code.
         Metadata metadata = new Metadata();
@@ -128,41 +137,7 @@ public class BurpExtender implements
             log.debug("Returning from processHttpMessage because of %s", errMsg);
             return;
         }
-        log.debug("Request or response metadata:\n%s", metadata.toString());
-
-        // Check if the request is in scope.
-        if (extensionConfig.processInScope) {
-            // Get the request URL.
-            URL reqURL = ReqResp.getURL(requestResponse);
-            if (!callbacks.isInScope(reqURL)) {
-                // Request is not in scope, return.
-                log.debug("Request is not in scope, returning from processHttpMessage");
-                return;
-            }
-        }
-
-        // Only process if the callbacks.getToolName(toolFlag) is in
-        // processTools, otherwise return.
-        final String toolName = callbacks.getToolName(toolFlag);
-        log.debug("Got a %s from %s.", requestOrResponse,toolName);
-        if (!StringUtils.arrayContains(toolName, extensionConfig.processToolList)) {
-            log.debug(
-                "%s is not in the process-tool-list, return processHttpMessage",
-                toolName
-            );
-            return;
-        }
-
-        // Process requests and get their extension.
-        // If their extension matches what we want, get the response.
-        if (isRequest) {
-            // Remove cache headers from the request. We do not want 304s.
-            for (final String rhdr : extensionConfig.headersToRemove) {
-                requestResponse = ReqResp.removeHeader(isRequest, requestResponse, rhdr);
-            }
-            log.debug("Removed headers from the request, returning.");
-            return;
-        }
+        log.debug("Response metadata:\n%s", metadata.toString());
 
         // Here we have responses.
         final IResponseInfo respInfo = helpers.analyzeResponse(requestResponse.getResponse());
@@ -179,7 +154,7 @@ public class BurpExtender implements
                 requestResponse.setHighlight("cyan");
             }
 
-            // Get the request body.
+            // Get the response body.
             final byte[] bodyBytes = ReqResp.getResponseBody(requestResponse);
             if (bodyBytes.length == 0) {
                 log.debug("Empty response, returning from processHttpMessage.");
@@ -195,12 +170,12 @@ public class BurpExtender implements
                 requestResponse.setHighlight("yellow");
             }
 
-            // Extract JavaScript.
+            // Extract any JavaScript from the response.
             javascript = Extractor.getJS(requestResponse.getResponse());
         }
 
         // Don't uncomment this unless you are debugging in Repeater. It will
-        // mess up your logs.
+        // fill the debug log with noise.
         // log.debug("Extracted JavaScript:\n%s", javascript);
         // log.debug("End of extracted JavaScript ----------");
 
@@ -213,11 +188,12 @@ public class BurpExtender implements
         }
 
         if (StringUtils.isEmpty(javascript)) {
-            log.debug("Response did not have any in-line JavaScript, returning.");
+            log.debug("Cound not find any in-line JavaScript, returning.");
             return;
         }
 
         // Check for jsMaxSize.
+        // TODO: Issue#19 happens here.
         if (javascript.length() >= (extensionConfig.jsMaxSize * 1024)) {
             log.debug("Length of JavaScript: %d > %d threshold, returning.",
                 javascript.length(), extensionConfig.jsMaxSize * 1024);
@@ -226,8 +202,8 @@ public class BurpExtender implements
 
         try {
             // Spawn a new BeautifyTask to beautify and store the data.
-            final Runnable beautifyTask = new BeautifyTask(
-                javascript, metadata, extensionConfig.storagePath
+            final Runnable beautifyTask = new ProcessResponseTask(
+                javascript, metadata, extensionConfig
             );
 
             // Fingers crossed this will work.
@@ -235,24 +211,15 @@ public class BurpExtender implements
             // complete. Can we use it?
             pool.submit(beautifyTask);
         } catch (final Exception e) {
-            log.debug(StringUtils.getStackTrace(e));
+            log.debug("%s", StringUtils.getStackTrace(e));
             return;
         }
     }
 
-    // Sets the extension config to the default config. Default config is the
-    // default values for the Config object as set in Config.java.
-    private static void setDefaultConfig() {
-        extensionConfig = new Config();
-    }
-
-    // Converts the String to a Config object and sets it as the extension
-    // config, then saves it in extension settings.
-    private static void setConfig(String json) throws JsonSyntaxException {
-        // Create a config object from the string.
-        extensionConfig = Config.configBuilder(json);
-        // If this was successful, save it to extension settings.
-        extensionConfig.saveConfig();
+    // Returns the default config. Default config is the default values for the
+    // Config object as set in Config.java.
+    private static Config getDefaultConfig() {
+        return new Config();
     }
 
     // Get saved config.
@@ -290,7 +257,7 @@ public class BurpExtender implements
             File f = new File(defaultConfigFullPath);
 
             String cfgFile = FileUtils.readFileToString(f, "UTF-8");
-            setConfig(cfgFile);
+            extensionConfig = Config.loadConfig(cfgFile);
             log.debug("Config loaded from default config file %s", defaultConfigFullPath);
         } catch (FileNotFoundException e) {
             log.debug(
@@ -309,11 +276,29 @@ public class BurpExtender implements
         }
     }
 
+    // Connects to the database (or creates it if it does not exist).
+    public static void databaseConnect(String dbPath) {
+        // Create the database.
+        try {
+            db = new Database(dbPath);
+            log.debug("Created a connection to the database: %s", dbPath);
+        } catch (SQLException | IOException e) {
+            log.alert("Error accessing the database: %s", dbPath);
+            log.error("Error creating database %s", StringUtils.getStackTrace(e));
+        }
+    }
+
+    // Invoked when the extension is unloaded.
     @Override
     public void extensionUnloaded() {
-
         log.debug("Starting to unload the extension");
+        unloadExtension();
+        log.debug("Unloaded the extension.");
+    }
 
+    // Shutdowns the threadpool and waits for the active threads to finish.
+    // Closes the DB connection.
+    public static void unloadExtension() {
         // Shutdown the threadpool and wait for termination.
         // https://stackoverflow.com/a/1250655
 
@@ -327,12 +312,10 @@ public class BurpExtender implements
         }
 
         try {
-            db.close();
+            if (db != null) db.close();
             log.debug("Closed the database connection");
         } catch (SQLException e) {
             log.error("Error closing the database connection: %s", StringUtils.getStackTrace(e));
         }
-
-        log.debug("Unloaded the extension.");
     }
 }
