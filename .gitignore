@@ -26,6 +26,7 @@ hs_err_pid*
 .gradle
 build
 bin
+release
 
 # burp console and error output files
 console-output.txt
