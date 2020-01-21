@@ -32,7 +32,7 @@ public class Config {
     // Table's column classes.
     final public static transient Class[] lintTableColumnClasses = new Class[] {
         java.lang.String.class, java.lang.String.class,
-        java.lang.Integer.class, java.lang.String.class
+        java.lang.String.class, java.lang.String.class // Although last column is int, we want it to be left-aligned.
     };
     // Maximum number of characters from the URL.
     final public static transient int urlFileNameLimit = 50;

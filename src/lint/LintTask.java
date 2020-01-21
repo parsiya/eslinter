@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import burp.Config;
 import linttable.LintResult;
 import utils.Exec;
+import utils.StringUtils;
 
 /**
  * LintTask lints a bunch of JavaScript text and returns the result.
@@ -98,6 +99,8 @@ public class LintTask {
 
         log.debug("Results file: %s", eslintResultFilePath);
         log.debug("Input file: %s", tempJSPath);
+
+        if (StringUtils.isEmpty(status)) status = "Linted";
         
         // Start creating the returning LintResult.
         LintResult lr = new LintResult(

@@ -84,7 +84,7 @@ public class LintTable extends JTable implements MouseListener {
         }
         
         RowFilter<LintTableModel, Object> rf = null;
-        //If current expression doesn't parse, don't update.
+        // If the current expression doesn't parse, don't update.
         try {
             rf = RowFilter.regexFilter(text, columnIndex);
             
