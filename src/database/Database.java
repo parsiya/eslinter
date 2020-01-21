@@ -74,15 +74,15 @@ public class Database {
     // Adds a new row to the eslint table and returns the number of updated
     // records which should usually be 1.
     public int addRow(
-        String url, String referer, String hash, String beautified,
+        String metadata, String url, String hash, String beautified,
         String status, String results, int is_processed, int number_of_results
     ) throws SQLException, IOException {
 
         String addRowQuery = getResourceFile("/db/add_row.sql");
 
         PreparedStatement addRow = conn.prepareStatement(addRowQuery);
-        addRow.setString(1, url);
-        addRow.setString(2, referer);
+        addRow.setString(1, metadata);
+        addRow.setString(2, url);
         addRow.setString(3, hash);
         addRow.setString(4, beautified);
         addRow.setString(5, status);

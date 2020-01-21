@@ -11,7 +11,6 @@ WHEN
 BEGIN
     UPDATE eslint
     SET
-        -- beautified_javascript = new.beautified_javascript,
         status = new.status,
         results = new.results,
         is_processed = new.is_processed,

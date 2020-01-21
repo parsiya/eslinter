@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS eslint (
-    url TEXT NOT NULL, 
-    referer TEXT NOT NULL, 
-    hash TEXT NOT NULL, 
+    metadata TEXT NOT NULL,
+    url TEXT,
+    hash TEXT,
     beautified_javascript TEXT,
-    status TEXT, 
-    results TEXT, 
-    is_processed INTEGER, 
-    number_of_results INTEGER, 
-    PRIMARY KEY (url, referer, hash) 
+    status TEXT,
+    results TEXT,
+    is_processed INTEGER,
+    number_of_results INTEGER,
+    PRIMARY KEY (metadata)
 ) WITHOUT ROWID;

@@ -74,8 +74,8 @@ public class ProcessResponseTask implements Runnable {
         // Add the data to the table.
         try {
             db.addRow(
-                metadata.getURL(),      // url
-                metadata.getReferer(),  // referer
+                metadata.toUglyString(),// metadata
+                metadata.getURL(),  // url
                 metadata.getHash(),     // hash
                 beautifiedJavaScript,   // beautified JavaScript in jsFilePath
                 status,                 // status

@@ -21,5 +21,5 @@ BEGIN
             )
     WHERE
         /* This should only target the last inserted row. */
-        url == new.url AND referer == new.referer AND hash == new.hash;
+        metadata == new.metadata;
 END;
