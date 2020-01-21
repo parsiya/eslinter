@@ -70,18 +70,22 @@ public class ProcessResponseTask implements Runnable {
         if (StringUtils.isEmpty(status)) {
             status = "Beautified";
         }
-
-        // Add the data to the table.
+        
         try {
+            // Run the LintTask on the data.
+            LintTask lt = new LintTask(metadata, beautifiedJavaScript, extensionConfig);
+            LintResult lr = lt.execute();
+
+            // Add the data to the table.
             db.addRow(
                 metadata.toUglyString(),// metadata
-                metadata.getURL(),  // url
+                metadata.getURL(),      // url
                 metadata.getHash(),     // hash
                 beautifiedJavaScript,   // beautified JavaScript in jsFilePath
-                status,                 // status
-                "",                     // eslint result
-                0,                      // is_processed
-                0                       // number_of_results
+                lr.status,              // status
+                lr.results,             // eslint result
+                1,                      // is_processed
+                lr.numResults           // number_of_results
             );
             log.debug("Added row for hash %s to the database.", metadata.getHash());
             
@@ -90,14 +94,14 @@ public class ProcessResponseTask implements Runnable {
             // table.
 
             // Create the LintResult and add to the table.
-            final LintResult lr = new LintResult(
-                metadata.getHost(),
-                metadata.getURL(),
-                status,
-                0,
-                "",
-                metadata
-            );
+            // final LintResult lr = new LintResult(
+            //     metadata.getHost(),
+            //     metadata.getURL(),
+            //     status,
+            //     0,
+            //     "",
+            //     metadata
+            // );
 
             SwingUtilities.invokeLater(new Runnable () {
                 @Override

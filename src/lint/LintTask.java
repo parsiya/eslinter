@@ -13,7 +13,6 @@ import org.apache.commons.io.FilenameUtils;
 import burp.Config;
 import linttable.LintResult;
 import utils.Exec;
-import utils.StringUtils;
 
 /**
  * LintTask lints a bunch of JavaScript text and returns the result.
@@ -23,7 +22,6 @@ public class LintTask {
     private Metadata metadata;
     private String javascript = "";
     private Config extensionConfig;
-    private LintResult lintResult;
 
     public LintTask(Metadata metadata, String javascript, Config extensionConfig) {
         this.metadata = metadata;
@@ -36,8 +34,6 @@ public class LintTask {
 
         // ESLint command's working directory.
         String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.eslintBinaryPath);
-
-        // Create SHA-1 hash of JavaScript.
 
         // Store the JavaScript in a temp file. The method takes care of
         // filename uniqueness.
