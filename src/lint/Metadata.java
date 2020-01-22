@@ -73,7 +73,7 @@ public class Metadata {
 
     // Filename will be
     // "filename_from_URL[minus extension and limited to 50 chars]-[hash]".
-    public String getFileNameWithouExtension() throws MalformedURLException {
+    public String getFileNameWithoutExtension() throws MalformedURLException {
         
         String jsFileName = "";
 

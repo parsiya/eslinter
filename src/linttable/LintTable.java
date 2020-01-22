@@ -1,13 +1,26 @@
 package linttable;
 
+import static burp.BurpExtender.log;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.ArrayList;
-
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import utils.FileChooser;
+import utils.StringUtils;
 
 /**
  * LintTable
@@ -16,6 +29,7 @@ public class LintTable extends JTable implements MouseListener {
 
     private LintTableModel model;
     private TableRowSorter<LintTableModel> sorter;
+    private JPopupMenu menu;
 
     public LintTable() {
         model = new LintTableModel();
@@ -100,6 +114,13 @@ public class LintTable extends JTable implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO implement this.
+        // Double-click should open the save results menu.
+
+        if (e.getClickCount() == 2) {
+
+            saveRecord(e);
+        }
+
     }
 
     @Override
@@ -114,5 +135,42 @@ public class LintTable extends JTable implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {}
 
-    
+    // End of MouseListener implementation.
+
+    // save should let user select a directory and then save two files
+    // there, one is beautified JavaScript and the other is the ESLint
+    // results. Both of these files should belong to the record that was
+    // right-clicked.
+    private void saveRecord(MouseEvent evt) {
+
+        LintTable table = (LintTable) evt.getSource();
+        // Open the directory selection dialog.
+        String lastDir = FileChooser.getLastWorkingDirectory();
+        File selectedDir = FileChooser.saveDirectory(table, lastDir, "Save JavaScript and Results");
+
+        if (selectedDir != null) {
+            // Get the selected result.
+            LintResult selected = table.getSelectedResult();
+
+            try {
+                // Create the beautified JavaScript file name.
+                String beautifiedFileName = selected.metadata.getFileNameWithoutExtension().concat("js");
+                String beautifiedFilePath = FilenameUtils.concat(selectedDir.getPath(), beautifiedFileName);
+
+                String resultsFileName = selected.metadata.getFileNameWithoutExtension().concat("-linted.js");
+                String resultsFilePath = FilenameUtils.concat(selectedDir.getPath(), resultsFileName);
+
+                // Save both files.
+                FileUtils.writeStringToFile(new File(beautifiedFilePath), selected.beautifiedJS, "UTF-8");
+                FileUtils.writeStringToFile(new File(resultsFilePath), selected.results, "UTF-8");
+                log.debug("Stored beautified JavaScipt in: %s.", beautifiedFilePath);
+                log.debug("Stored results in: %s.", resultsFilePath);
+            } catch (Exception e) {
+                log.error("Could not save results %s.", StringUtils.getStackTrace(e));
+            }
+            return;
+        }
+        log.debug("Cancelled the save results dialog.");
+    }
+
 }

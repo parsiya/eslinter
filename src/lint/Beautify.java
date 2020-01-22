@@ -53,7 +53,7 @@ public class Beautify {
 
         try {
             // Create the filename for this URL minus the extension.
-            String jsFileName = metadata.getFileNameWithouExtension();
+            String jsFileName = metadata.getFileNameWithoutExtension();
             // Add the js extension.
             jsFilePath = FilenameUtils.concat(storagePath, jsFileName.concat(".js"));
             // Create the File to hold the beautified JavaScript.

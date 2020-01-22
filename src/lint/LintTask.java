@@ -44,7 +44,7 @@ public class LintTask {
         FileUtils.write(tempJS, javascript, "UTF-8");
 
         // Create the output filename for this data.
-        String eslintResultFileName = metadata.getFileNameWithouExtension().concat("-out.js");
+        String eslintResultFileName = metadata.getFileNameWithoutExtension().concat("-linted.js");
         // Create the full path for the output file.
         String eslintResultFilePath = FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
 
@@ -109,6 +109,7 @@ public class LintTask {
             status,
             numResults,
             results,
+            javascript,
             metadata
         );
 
