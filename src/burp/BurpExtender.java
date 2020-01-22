@@ -193,7 +193,6 @@ public class BurpExtender implements
         }
 
         // Check for jsMaxSize.
-        // TODO: Issue#19 happens here.
         if (javascript.length() >= (extensionConfig.jsMaxSize * 1024)) {
             log.debug("Length of JavaScript: %d > %d threshold, returning.",
                 javascript.length(), extensionConfig.jsMaxSize * 1024);
