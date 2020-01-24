@@ -9,15 +9,15 @@ import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-
 import database.Database;
 import gui.BurpTab;
 import lint.Metadata;
+import lint.ProcessLintQueue;
 import lint.ProcessRequestTask;
 import lint.ProcessResponseTask;
+import lint.UpdateTableTask;
 import utils.BurpLog;
 import utils.ReqResp;
 import utils.StringUtils;
@@ -31,8 +31,17 @@ public class BurpExtender implements
     public static BurpLog log;
     public static BurpTab mainTab;
     public static Database db;
+    public static boolean keepThread;
 
     private static ExecutorService pool;
+    private static ExecutorService requestPool;
+    private static ExecutorService responsePool;
+    private static Thread processThread;
+    private static Thread updateThread;
+
+    private static int threadNum = 10;
+    private static int timeout = 60;
+    
 
     /**
      * Implement IBurpExtender.
@@ -61,9 +70,27 @@ public class BurpExtender implements
         // Set the debug flag from the loaded config.
         log.setDebugMode(extensionConfig.debug);
 
+        // Configure the process request and response threadpools.
+        requestPool = Executors.newFixedThreadPool(threadNum);
+        responsePool = Executors.newFixedThreadPool(threadNum);
+
         // Configure the beautify executor service.
         pool = Executors.newFixedThreadPool(extensionConfig.numberOfThreads);
         log.debug("Using %d threads.", extensionConfig.numberOfThreads);
+        // Create the ProcessLintQueue object and assigned the threadpool.
+        ProcessLintQueue linter = new ProcessLintQueue(extensionConfig, pool);
+
+        keepThread = true;
+        // Start processing.
+        processThread = new Thread(linter);
+        processThread.start();
+
+        // Create the table update thread.
+        UpdateTableTask updater = new UpdateTableTask(extensionConfig);
+        updateThread = new Thread(updater);
+        updateThread.start();
+
+        log.debug("Started both threads.");
 
         // Create the main tab.
         mainTab = new BurpTab();
@@ -104,15 +131,17 @@ public class BurpExtender implements
         // because the response will only arrive after the request is processed
         // and sent out. D'oh.
         if (isRequest) {
-            // Processing requests is lightweight so we do not create a
-            // threadpool. If it turns out to be a resource hog we can do so
-            // later.
-            ProcessRequestTask reqTask =
+            // Using a threadpool to process requests so we can shut it down
+            // when unload the extension.
+            ProcessRequestTask processRequest =
                 new ProcessRequestTask(
                     toolFlag, requestResponse, extensionConfig
                 );
-            Thread reqThread = new Thread(reqTask);
-            reqThread.start();
+
+            requestPool.execute(processRequest);
+
+            // Thread reqThread = new Thread(processRequest);
+            // reqThread.start();
             return;
         }
 
@@ -200,18 +229,24 @@ public class BurpExtender implements
         }
 
         try {
-            // Spawn a new BeautifyTask to beautify and store the data.
-            final Runnable beautifyTask = new ProcessResponseTask(
-                javascript, metadata, extensionConfig
+            // Spawn a new processResponse task that adds the captured
+            // JavaScript to the db.
+            final Runnable processResponse = new ProcessResponseTask(
+                javascript, metadata
             );
 
-            // Fingers crossed this will work.
-            // TODO This returns a Future that will be null when task is
+            // TODO submit returns a Future that will be null when task is
             // complete. Can we use it?
-            pool.submit(beautifyTask);
+            // pool.submit(processResponse);
+
+            responsePool.execute(processResponse);
+
+            // Without threadpools.
+            // Thread responseThread = new Thread(processResponse);
+            // responseThread.start();
+
         } catch (final Exception e) {
             log.debug("%s", StringUtils.getStackTrace(e));
-            return;
         }
     }
 
@@ -292,6 +327,9 @@ public class BurpExtender implements
     public void extensionUnloaded() {
         log.debug("Starting to unload the extension");
         unloadExtension();
+        // Kill the tread.
+        processThread.stop();
+        keepThread = false;
         log.debug("Unloaded the extension.");
     }
 
@@ -301,20 +339,47 @@ public class BurpExtender implements
         // Shutdown the threadpool and wait for termination.
         // https://stackoverflow.com/a/1250655
 
-        pool.shutdown();
-        try {
-            // TODO Set this in config?
-            pool.awaitTermination(60, TimeUnit.SECONDS);
-            log.debug("All threads are terminated.");
-        } catch (InterruptedException  e) {
-            log.error("Could not terminate all threads: %s", StringUtils.getStackTrace(e));
+        if (requestPool != null) {
+            // Shutdown requestPool. This should be quick.
+            requestPool.shutdown();
+            try {
+                requestPool.awaitTermination(timeout, TimeUnit.SECONDS);
+                log.debug("requestPool terminated.");
+            } catch (Exception e) {
+                log.error("Could not terminate requestPool: %s", StringUtils.getStackTrace(e));
+            }
+        }
+
+        if (responsePool != null) {
+            // Shutdown responsePool. This should be quick.
+            responsePool.shutdown();
+            try {
+                responsePool.awaitTermination(timeout, TimeUnit.SECONDS);
+                log.debug("responsePool terminated.");
+            } catch (Exception e) {
+                log.error("Could not terminate responsePool: %s", StringUtils.getStackTrace(e));
+            }
+        }
+        
+        if (pool != null) {
+            pool.shutdown();
+            try {
+                pool.awaitTermination(timeout, TimeUnit.SECONDS);
+                log.debug("All threads are terminated.");
+            } catch (InterruptedException  e) {
+                log.error("Could not terminate all threads: %s", StringUtils.getStackTrace(e));
+            }
         }
 
         try {
-            if (db != null) db.close();
-            log.debug("Closed the database connection");
+            if (db != null) {
+                db.close();
+                log.debug("Closed the database connection");
+            }
         } catch (SQLException e) {
             log.error("Error closing the database connection: %s", StringUtils.getStackTrace(e));
         }
+
+
     }
 }

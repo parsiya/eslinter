@@ -1,6 +1,5 @@
 package gui;
 
-import static burp.BurpExtender.callbacks;
 import static burp.BurpExtender.extensionConfig;
 import static burp.BurpExtender.log;
 

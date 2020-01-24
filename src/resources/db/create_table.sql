@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS eslint (
     is_processed INTEGER,
     number_of_results INTEGER,
     PRIMARY KEY (metadata)
-) WITHOUT ROWID;
+)

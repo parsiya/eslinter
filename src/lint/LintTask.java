@@ -1,118 +1,80 @@
 package lint;
 
-import static burp.BurpExtender.log;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
 import burp.Config;
 import linttable.LintResult;
-import utils.Exec;
 import utils.StringUtils;
 
+import static burp.BurpExtender.log;
+import static burp.BurpExtender.db;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
- * LintTask lints a bunch of JavaScript text and returns the result.
+ * LintTask
  */
-public class LintTask {
+public class LintTask implements Runnable {
 
-    private Metadata metadata;
-    private String javascript = "";
+    // private Metadata metadata;
     private Config extensionConfig;
+    private LintResult lr;
+    private String status = "";
 
-    public LintTask(Metadata metadata, String javascript, Config extensionConfig) {
-        this.metadata = metadata;
-        this.javascript = javascript;
+    public LintTask(Config extensionConfig, LintResult lr) {
         this.extensionConfig = extensionConfig;
+        this.lr = lr;
     }
 
-    // Runs the linter.
-    public LintResult execute() throws IOException {
+    @Override
+    public void run() {
 
-        // ESLint command's working directory.
-        String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.eslintBinaryPath);
+        LintResult linted = null;
 
-        // Store the JavaScript in a temp file. The method takes care of
-        // filename uniqueness.
-        File tempJS = File.createTempFile("eslint", ""); // Throws IOException.
-        String tempJSPath = tempJS.getAbsolutePath();
-        // Store the data in the temp file.
-        FileUtils.write(tempJS, javascript, "UTF-8");
+        try {
 
-        // Create the output filename for this data.
-        String eslintResultFileName = metadata.getFileNameWithoutExtension().concat("-linted.js");
-        // Create the full path for the output file.
-        String eslintResultFilePath = FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
+            // First we need to beautify.
+            Beautify be = new Beautify(lr.beautifiedJavaScript, lr.metadata, extensionConfig.storagePath,
+                    extensionConfig.jsBeautifyBinaryPath);
 
-        // Create linter args to run ESLint.
-        String[] linterArgs = new String[] { "-c", extensionConfig.eslintConfigPath, "-f", "codeframe",
-        "--no-color",
-        // "-o", eslintResultFileName, // We can use this if we want to create the
-        // output file manually.
-        "--no-inline-config", tempJSPath };
+            String beautifiedJS = be.execute();
 
-        // Create the ESLint Exec.
-        Exec linter = new Exec(
-            extensionConfig.eslintBinaryPath,
-            linterArgs,
-            eslintDirectory,
-            0, 1, 2 // Exit values for ESLint.
-        );
+            // Next we need to lint it.
+            Lint lint = new Lint(lr.metadata, beautifiedJS, extensionConfig);
 
-        log.debug("Executing %s", linter.getCommandLine());
-        int exitVal = linter.exec();
-        // If exitVal is 2, it means there was a parsing error. In this case
-        // we do not want an exception but we will log the error.
-        String results = linter.getStdOut();
-        String err = linter.getStdErr();
-        
-        String status = "";
-        if (exitVal == 2 || exitVal == 1) {
-            status += err;
+            linted = lint.execute();
+
+        } catch (CustomException e) {
+            log.error("Inside LintTask for %s - %s", e.getMessage(), lr.metadata.toUglyString());
+            status = e.getMessage();
+        } catch (IOException e) {
+            log.error("Inside LintTask for %s - %s", StringUtils.getStackTrace(e), lr.metadata.toUglyString());
+            status += e.getMessage();
+        } catch (Exception e) { // TODO Is this needed?
+            log.error("Inside LintTask for %s - %s", StringUtils.getStackTrace(e), lr.metadata.toUglyString());
+            status += e.getMessage();
+        } finally {
+
+            // If linted != null, there was an error.
+            // We update the status and store the original LintResult.
+
+            // This means that if beautify was executed w/o errors and lint
+            // failed, we are throwing away the beautify results away.
+            LintResult updatedRecord;
+
+            if (linted != null) {
+                updatedRecord = linted;
+            } else {
+                updatedRecord = lr;
+                updatedRecord.status = status;
+            }
+
+            try {
+                int up = db.updateRow(updatedRecord);
+                log.debug("db.updateRow: %d", up);
+            } catch (IOException | SQLException e) {
+                log.error("Inside LintTask for %s - %s", StringUtils.getStackTrace(e), lr.metadata.toUglyString());
+            }
         }
-
-        // Add the metadata to the output file contents.
-        StringBuilder eslintResults = new StringBuilder(metadata.toCommentString());
-        // Add the ESLint results.
-        eslintResults.append(results);
-
-        // Write the results to the output file.
-        FileUtils.writeStringToFile(new File(eslintResultFilePath), eslintResults.toString(), "UTF-8");
-
-        // Process results
-
-        // Regex to separate the results.
-        // (.*?)\n\n\n
-
-        String ptrn = "(.*?)\n\n\n";
-        int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
-        Pattern pt = Pattern.compile(ptrn, flags);
-        Matcher mt = pt.matcher(results);
-
-        // Now each item in the matcher is a separate finding.
-        // TODO Do something with each finding.
-        int numResults = (int) mt.results().count();
-
-        log.debug("Results file: %s", eslintResultFilePath);
-        log.debug("Input file: %s", tempJSPath);
-
-        if (StringUtils.isEmpty(status)) status = "Linted";
-        
-        // Start creating the returning LintResult.
-        LintResult lr = new LintResult(
-            metadata.getHost(),
-            metadata.getURL(),
-            status,
-            numResults,
-            results,
-            javascript,
-            metadata
-        );
-
-        return lr;
     }
+
 }

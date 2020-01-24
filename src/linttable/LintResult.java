@@ -10,32 +10,35 @@ import lint.Metadata;
 // Displayed in the LintTable.
 public class LintResult {
 
+    public Metadata metadata;
     public String host;
     public String url;
+    public String hash;
+    public transient String beautifiedJavaScript; // transient == does not appear in toString()
     public String status;
+    public transient String results; // transient
+    public int isProcessed;
     public int numResults;
-    public transient String results; // We do not want this to end up in toString().
-    public transient String beautifiedJS;
-    public Metadata metadata;
-
+    
     public LintResult() {}
 
     public LintResult(
-        String host, String url, String status, int numResults, String results,
-        String beautifiedJS, Metadata metadata) {
-
+            Metadata metadata, String host, String url, String hash,
+            String beautifiedJavaScript, String status, String results,
+            int isProcessed, int numResults) {
+        
+        this.metadata = metadata;
         this.host = host;
         this.url = url;
+        this.hash = hash;
+        this.beautifiedJavaScript = beautifiedJavaScript;
         this.status = status;
-        this.numResults = numResults;
         this.results = results;
-        this.beautifiedJS = beautifiedJS;
-        this.metadata = metadata;
+        this.isProcessed = isProcessed;
+        this.numResults = numResults;
     }
 
     public String toString() {
         return new Gson().toJson(this);
     }
-
-
 }

@@ -2,23 +2,20 @@ package linttable;
 
 import static burp.BurpExtender.log;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
-import javax.swing.JMenuItem;
+
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
-import javax.swing.SwingUtilities;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+
 import utils.FileChooser;
 import utils.StringUtils;
 
@@ -29,7 +26,6 @@ public class LintTable extends JTable implements MouseListener {
 
     private LintTableModel model;
     private TableRowSorter<LintTableModel> sorter;
-    private JPopupMenu menu;
 
     public LintTable() {
         model = new LintTableModel();
@@ -83,6 +79,10 @@ public class LintTable extends JTable implements MouseListener {
 
     public ArrayList<LintResult> getAll() {
         return model.getAll();
+    }
+
+    public void populate(ArrayList<LintResult> res) {
+        model.populate(res);
     }
 
     // Filters column with columnIndex by text.
@@ -144,14 +144,14 @@ public class LintTable extends JTable implements MouseListener {
     private void saveRecord(MouseEvent evt) {
 
         LintTable table = (LintTable) evt.getSource();
+        // Get the selected result. Because we are updating the table and losing
+        // our selection every second, we need to get the results first.
+        LintResult selected = table.getSelectedResult();
         // Open the directory selection dialog.
         String lastDir = FileChooser.getLastWorkingDirectory();
         File selectedDir = FileChooser.saveDirectory(table, lastDir, "Save JavaScript and Results");
 
         if (selectedDir != null) {
-            // Get the selected result.
-            LintResult selected = table.getSelectedResult();
-
             try {
                 // Create the beautified JavaScript file name.
                 String beautifiedFileName = selected.metadata.getFileNameWithoutExtension().concat("js");
@@ -161,7 +161,7 @@ public class LintTable extends JTable implements MouseListener {
                 String resultsFilePath = FilenameUtils.concat(selectedDir.getPath(), resultsFileName);
 
                 // Save both files.
-                FileUtils.writeStringToFile(new File(beautifiedFilePath), selected.beautifiedJS, "UTF-8");
+                FileUtils.writeStringToFile(new File(beautifiedFilePath), selected.beautifiedJavaScript, "UTF-8");
                 FileUtils.writeStringToFile(new File(resultsFilePath), selected.results, "UTF-8");
                 log.debug("Stored beautified JavaScipt in: %s.", beautifiedFilePath);
                 log.debug("Stored results in: %s.", resultsFilePath);
