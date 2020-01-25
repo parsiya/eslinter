@@ -154,7 +154,7 @@ public class LintTable extends JTable implements MouseListener {
         if (selectedDir != null) {
             try {
                 // Create the beautified JavaScript file name.
-                String beautifiedFileName = selected.metadata.getFileNameWithoutExtension().concat("js");
+                String beautifiedFileName = selected.metadata.getFileNameWithoutExtension().concat(".js");
                 String beautifiedFilePath = FilenameUtils.concat(selectedDir.getPath(), beautifiedFileName);
 
                 String resultsFileName = selected.metadata.getFileNameWithoutExtension().concat("-linted.js");

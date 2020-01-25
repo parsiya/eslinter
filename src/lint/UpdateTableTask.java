@@ -3,16 +3,17 @@ package lint;
 import static burp.BurpExtender.db;
 import static burp.BurpExtender.keepThread;
 import static burp.BurpExtender.log;
+import static burp.BurpExtender.mainTab;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+
+import javax.swing.SwingUtilities;
+
 import burp.Config;
-import database.SelectResult;
 import linttable.LintResult;
 import utils.StringUtils;
-
-import static burp.BurpExtender.mainTab;
 
 /**
  * UpdateTableTask updates the table with the results from the database.
@@ -20,8 +21,9 @@ import static burp.BurpExtender.mainTab;
 public class UpdateTableTask implements Runnable {
 
     private Config extensionConfig;
-    private final int timeout = 1;
 
+    // TODO Get this from the extension config.
+    private final int timeout = 1;
 
     public UpdateTableTask(Config extensionConfig) {
         this.extensionConfig = extensionConfig;
@@ -41,10 +43,15 @@ public class UpdateTableTask implements Runnable {
                 // 2. Delete all rows in the table model.
                 // 3. Add all rows to the table.
                 // populate() does both.
-                if (mainTab != null) {
-                    mainTab.lintTable.populate(results);
-                }
-                log.debug("Inside UpdateTableTask - Updated the table from the database.");
+                // Do everything inside the Swing Event Dispatch Thread.
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (mainTab != null) {
+                            mainTab.lintTable.populate(results);
+                        }
+                        log.debug("Inside UpdateTableTask - Updated the table from the database.");
+                    }
+                });
 
                 log.debug("Inside UpdateTableTask - Sleeping for %d seconds.", timeout);
                 // 4. Sleep for X seconds.
@@ -53,7 +60,7 @@ public class UpdateTableTask implements Runnable {
                 /// 5. Go to 1.
             }
         }
-        log.error("Inside UpdateTableTask - Done with the thread.");
+        log.debug("Inside UpdateTableTask - Done with the thread.");
     }
 
     @Override

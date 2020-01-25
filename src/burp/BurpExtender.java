@@ -41,7 +41,7 @@ public class BurpExtender implements
 
     private static int threadNum = 10;
     private static int timeout = 60;
-    
+
 
     /**
      * Implement IBurpExtender.
@@ -80,6 +80,11 @@ public class BurpExtender implements
         // Create the ProcessLintQueue object and assigned the threadpool.
         ProcessLintQueue linter = new ProcessLintQueue(extensionConfig, pool);
 
+        // Connect to the database (or create it if it doesn't exist). If the
+        // database connection is not established before the threads start, we
+        // might have issues.
+        databaseConnect(extensionConfig.dbPath);
+
         keepThread = true;
         // Start processing.
         processThread = new Thread(linter);
@@ -96,9 +101,6 @@ public class BurpExtender implements
         mainTab = new BurpTab();
         log.debug("Created the main tab.");
         callbacks.customizeUiComponent(mainTab.panel);
-
-        // Connect to the database (or create it if it doesn't exist).
-        databaseConnect(extensionConfig.dbPath);
 
         // Add the tab to Burp.
         callbacks.addSuiteTab(BurpExtender.this);
