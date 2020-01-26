@@ -1,32 +1,26 @@
 package lint;
 
 import static burp.BurpExtender.db;
-import static burp.BurpExtender.keepThread;
 import static burp.BurpExtender.log;
 import static burp.BurpExtender.mainTab;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import javax.swing.SwingUtilities;
-
-import burp.Config;
 import linttable.LintResult;
 import utils.StringUtils;
 
 /**
  * UpdateTableTask updates the table with the results from the database.
  */
-public class UpdateTableTask implements Runnable {
+public class UpdateTableThread implements Runnable {
 
-    private Config extensionConfig;
+    private int delay;
+    private volatile boolean running;
 
-    // TODO Get this from the extension config.
-    private final int timeout = 1;
-
-    public UpdateTableTask(Config extensionConfig) {
-        this.extensionConfig = extensionConfig;
+    public UpdateTableThread(int delay) {
+        this.delay = delay;
+        this.running = true;
     }
 
     // 1. Read all rows from the database.
@@ -34,7 +28,7 @@ public class UpdateTableTask implements Runnable {
     // 3. Add all new rows to the JTable.
     public void process() throws IOException, SQLException, InterruptedException {
 
-        while(keepThread) {
+        while (running) {
             if (db != null) {
                 // 1. Read every row from the table eslint in the database.
                 final ArrayList<LintResult> results = db.getAllRows();
@@ -53,13 +47,14 @@ public class UpdateTableTask implements Runnable {
                     }
                 });
 
-                log.debug("Inside UpdateTableTask - Sleeping for %d seconds.", timeout);
+                log.debug("Inside UpdateTableTask - Sleeping for %d seconds.", delay);
                 // 4. Sleep for X seconds.
-                Thread.sleep(timeout * 1000);
+                Thread.sleep(delay * 1000);
 
                 /// 5. Go to 1.
             }
         }
+
         log.debug("Inside UpdateTableTask - Done with the thread.");
     }
 
@@ -72,5 +67,13 @@ public class UpdateTableTask implements Runnable {
         }
     }
 
-    
+    // Stop the thread.
+    public void stop() {
+        running = false;
+    }
+
+    // Wrap it in a thread.
+    public void start() {
+        new Thread(this).start();
+    }
 }

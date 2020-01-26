@@ -117,7 +117,6 @@ public class LintTable extends JTable implements MouseListener {
         // Double-click should open the save results menu.
 
         if (e.getClickCount() == 2) {
-
             saveRecord(e);
         }
 

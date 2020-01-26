@@ -1,15 +1,12 @@
 package lint;
 
+import static burp.BurpExtender.callbacks;
+import static burp.BurpExtender.log;
+import java.net.URL;
+import burp.Config;
 import burp.IHttpRequestResponse;
 import utils.ReqResp;
 import utils.StringUtils;
-
-import static burp.BurpExtender.log;
-import static burp.BurpExtender.callbacks;
-
-import java.net.URL;
-
-import burp.Config;
 
 /**
  * ProcessRequestTask processes each incoming request.

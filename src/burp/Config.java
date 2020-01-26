@@ -1,18 +1,14 @@
 package burp;
 
+import static burp.BurpExtender.callbacks;
 import java.io.File;
 import java.io.IOException;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
-
 import org.apache.commons.io.FileUtils;
-
 import utils.StringUtils;
-
-import static burp.BurpExtender.callbacks;
 
 
 /**
@@ -96,9 +92,34 @@ public class Config {
         "Repeater"
     };
 
-    // Maximum number of threads.
-    @SerializedName("number-of-threads")
-    public int numberOfThreads = 3;
+    // Maximum number of linting threads.
+    @SerializedName("number-of-linting-threads")
+    public int numLintThreads = 3;
+
+    // How many seconds to wait for a linting task to complete. Increase this if
+    // you are beautifying and linting huge files.
+    @SerializedName("linting-timeout")
+    public int lintTimeout = 60;
+
+    // Maximum number of request/response processing threads.
+    // These tasks are light-weight.
+    @SerializedName("number-of-request-threads")
+    public int numRequestThreads = 10;
+
+    // Threadpool shutdown timeout in seconds. How many seconds to wait before
+    // shutting down threadpools when unloading the extension.
+    @SerializedName("threadpool-timeout")
+    public int threadpoolTimeout = 10;
+
+    // The number of seconds the lint task sleeps between reading new lint tasks
+    // from the database.
+    @SerializedName("lint-task-delay")
+    public int lintTaskDelay = 10;
+
+    // Update table frequency in seconds. The number of seconds the updat table
+    // task sleeps between updates.
+    @SerializedName("update-table-delay")
+    public int updateTableDelay = 5;
 
     // Maximum size of JavaScript to process in KBs.
     @SerializedName("maximum-js-size")

@@ -1,14 +1,12 @@
 package lint;
 
+import static burp.BurpExtender.db;
+import static burp.BurpExtender.log;
+import java.io.IOException;
+import java.sql.SQLException;
 import burp.Config;
 import linttable.LintResult;
 import utils.StringUtils;
-
-import static burp.BurpExtender.log;
-import static burp.BurpExtender.db;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * LintTask
@@ -31,7 +29,6 @@ public class LintTask implements Runnable {
         LintResult linted = null;
 
         try {
-
             // First we need to beautify.
             Beautify be = new Beautify(lr.beautifiedJavaScript, lr.metadata, extensionConfig.storagePath,
                     extensionConfig.jsBeautifyBinaryPath);

@@ -87,7 +87,7 @@ public class Beautify {
             // and rewrite it.
             String beautifiedJS = FileUtils.readFileToString(jsFile, "UTF-8");
 
-            // TODO: This might be inefficient, we might need to find a better
+            // TODO: This might be inefficient, might need to find a better
             // way to do it.
 
             // Create the metadata string.

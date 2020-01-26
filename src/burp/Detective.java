@@ -1,11 +1,10 @@
 package burp;
 
-import utils.ReqResp;
-
-import java.net.URL;
-import java.util.ArrayList;
 import static burp.BurpExtender.extensionConfig;
 import static utils.Constants.EMPTY_STRING;
+import java.net.URL;
+import java.util.ArrayList;
+import utils.ReqResp;
 
 
 /**

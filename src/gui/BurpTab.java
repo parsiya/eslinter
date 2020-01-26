@@ -1,12 +1,14 @@
 package gui;
 
 import static burp.BurpExtender.extensionConfig;
+import static burp.BurpExtender.lintPool;
 import static burp.BurpExtender.log;
-
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-
+import javax.swing.AbstractButton;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -19,9 +21,7 @@ import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import org.apache.commons.io.FileUtils;
-
 import burp.Config;
 import linttable.LintTable;
 import utils.FileChooser;
@@ -47,59 +47,59 @@ public class BurpTab {
         topPanel = new JPanel();
         // configPanel.setBorder(BorderFactory.createBevelBorder(1));
         loadConfigButton = new JButton("Load Config");
-        loadConfigButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        loadConfigButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 loadConfigAction();
             }
         });
 
         saveConfigButton = new JButton("Save Config");
-        saveConfigButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        saveConfigButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 saveConfigAction();
             }
         });
 
         configButton = new JButton("Create Configuration");
-        configButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        configButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 createConfigAction();
             }
         });
 
 
         processToggleButton = new JToggleButton("Process");
-        // processToggleButton.addActionListener(new java.awt.event.ActionListener() {
-        //     public void actionPerformed(java.awt.event.ActionEvent evt) {
-        //         processToggleButtonActionPerformed(evt);
-        //     }
-        // });
+        processToggleButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                processToggleAction(evt);
+            }
+        });
 
         searchTextField = new JTextField();
         // Every time the textfield changes, update the table.
         // https://docs.oracle.com/javase/tutorial/uiswing/examples/components/TableFilterDemoProject/src/components/TableFilterDemo.java
-        searchTextField.getDocument().addDocumentListener(
-            new DocumentListener() {
-                public void changedUpdate(DocumentEvent e) {
-                    searchAction(searchTextField.getText());
-                }
-                public void insertUpdate(DocumentEvent e) {
-                    searchAction(searchTextField.getText());
-                }
-                public void removeUpdate(DocumentEvent e) {
-                    searchAction(searchTextField.getText());
-                }
+        searchTextField.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                searchAction(searchTextField.getText());
             }
-        );
+
+            public void insertUpdate(DocumentEvent e) {
+                searchAction(searchTextField.getText());
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                searchAction(searchTextField.getText());
+            }
+        });
 
         // searchButton = new JButton("Search");
         // searchButton.addActionListener(new java.awt.event.ActionListener() {
-        //     public void actionPerformed(java.awt.event.ActionEvent evt) {
-        //         // Get the text from searchTextField.
-        //         String query = searchTextField.getText().toLowerCase();
-        //         log.debug("Searching for %s.", query);
-        //         searchAction(query);
-        //     }
+        // public void actionPerformed(java.awt.event.ActionEvent evt) {
+        // // Get the text from searchTextField.
+        // String query = searchTextField.getText().toLowerCase();
+        // log.debug("Searching for %s.", query);
+        // searchAction(query);
+        // }
         // });
 
 
@@ -110,7 +110,7 @@ public class BurpTab {
                 searchTextField.setText("");
             }
         });
-        
+
         topSeparator = new JSeparator(SwingConstants.VERTICAL);
         topSeparator.setMaximumSize(new Dimension(2, 30));
 
@@ -120,55 +120,55 @@ public class BurpTab {
         /**
          * Start GUI generated code. Do not modify.
          */
-        topPanelLayout.setHorizontalGroup(
-            topPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(topPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(topPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(topPanelLayout.createSequentialGroup()
-                        .addComponent(processToggleButton, GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(topSeparator)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(loadConfigButton)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(saveConfigButton)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(configButton)
-                        )
-                    .addGroup(topPanelLayout.createSequentialGroup()
-                        .addComponent(searchTextField, GroupLayout.PREFERRED_SIZE, 400, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        // .addComponent(searchButton)
-                        // .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(resetButton)
-                        ))
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        topPanelLayout.setVerticalGroup(
-            topPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(topPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(topPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(topPanelLayout.createSequentialGroup()
+        topPanelLayout.setHorizontalGroup(topPanelLayout
+                .createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(topPanelLayout.createSequentialGroup().addContainerGap()
                         .addGroup(topPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addGroup(topPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(loadConfigButton)
-                                .addComponent(saveConfigButton)
-                                .addComponent(configButton))
-                            .addComponent(topSeparator)))
-                    .addGroup(topPanelLayout.createSequentialGroup()
-                        .addComponent(processToggleButton)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)))
-                .addGroup(topPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(searchTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    // .addComponent(searchButton)
-                    .addComponent(resetButton))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                                .addGroup(topPanelLayout.createSequentialGroup()
+                                        .addComponent(processToggleButton,
+                                                GroupLayout.PREFERRED_SIZE, 200,
+                                                GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(topSeparator)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(loadConfigButton)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(saveConfigButton)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(configButton))
+                                .addGroup(topPanelLayout.createSequentialGroup()
+                                        .addComponent(searchTextField, GroupLayout.PREFERRED_SIZE,
+                                                400, GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        // .addComponent(searchButton)
+                                        // .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(resetButton)))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        topPanelLayout.setVerticalGroup(topPanelLayout
+                .createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(topPanelLayout.createSequentialGroup().addContainerGap().addGroup(
+                        topPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(
+                                topPanelLayout.createSequentialGroup().addGroup(topPanelLayout
+                                        .createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addGroup(topPanelLayout
+                                                .createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(loadConfigButton)
+                                                .addComponent(saveConfigButton)
+                                                .addComponent(configButton))
+                                        .addComponent(topSeparator)))
+                                .addGroup(topPanelLayout.createSequentialGroup()
+                                        .addComponent(processToggleButton)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(topPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(searchTextField, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                // .addComponent(searchButton)
+                                .addComponent(resetButton))
+                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         // Link size of buttons.
-        topPanelLayout.linkSize(SwingConstants.HORIZONTAL, loadConfigButton, saveConfigButton, configButton);
+        topPanelLayout.linkSize(SwingConstants.HORIZONTAL, loadConfigButton, saveConfigButton,
+                configButton);
         // topPanelLayout.linkSize(SwingConstants.HORIZONTAL, searchButton, resetButton);
 
         /**
@@ -183,12 +183,8 @@ public class BurpTab {
     }
 
     private void loadConfigAction() {
-        File sf = FileChooser.openFile(
-            panel,
-            FileChooser.getLastWorkingDirectory(),
-            "Save config file",
-            "json"
-        );
+        File sf = FileChooser.openFile(panel, FileChooser.getLastWorkingDirectory(),
+                "Save config file", "json");
 
         if (sf != null) {
             // Set the last working directory.
@@ -205,22 +201,16 @@ public class BurpTab {
                 log.error(StringUtils.getStackTrace(e));
             }
 
-            log.debug(
-                "Loaded extension config from %s and saved it to extension settings",
-                sf.getAbsolutePath()
-            );
+            log.debug("Loaded extension config from %s and saved it to extension settings",
+                    sf.getAbsolutePath());
             log.debug("Loaded config: %s", configFromFile);
         }
     }
 
     private void saveConfigAction() {
-        File sf = FileChooser.saveFile(
-            panel,
-            FileChooser.getLastWorkingDirectory(),
-            "Save config file",
-            "json"
-        );
-        
+        File sf = FileChooser.saveFile(panel, FileChooser.getLastWorkingDirectory(),
+                "Save config file", "json");
+
         if (sf != null) {
             // Set the last working directory.
             FileChooser.setLastWorkingDirectory(sf.getParent());
@@ -228,7 +218,8 @@ public class BurpTab {
             try {
                 extensionConfig.writeToFile(sf);
             } catch (Exception e) {
-                String errMsg = String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
+                String errMsg =
+                        String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
                 log.alert(errMsg);
                 log.error(errMsg);
             }
@@ -237,12 +228,8 @@ public class BurpTab {
 
     // Create a sample config and store it in a file.
     private void createConfigAction() {
-        File sf = FileChooser.saveFile(
-            panel,
-            FileChooser.getLastWorkingDirectory(),
-            "Create sample config",
-            "json"
-        );
+        File sf = FileChooser.saveFile(panel, FileChooser.getLastWorkingDirectory(),
+                "Create sample config", "json");
 
         if (sf != null) {
             try {
@@ -250,10 +237,23 @@ public class BurpTab {
                 Config tmpConfig = new Config();
                 tmpConfig.writeToFile(sf);
             } catch (Exception e) {
-                String errMsg = String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
+                String errMsg =
+                        String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
                 log.alert(errMsg);
                 log.error(errMsg);
             }
+        }
+    }
+
+    // Called when the toggle button state changes.
+    private void processToggleAction(ActionEvent evt) {
+        // http://www.java2s.com/Tutorials/Java/Java_Swing/0880__Java_Swing_JToggleButton.htm
+        AbstractButton abstractButton = (AbstractButton) evt.getSource();
+        boolean selected = abstractButton.getModel().isSelected();
+        if (selected) {
+            lintPool.resume();
+        } else {
+            lintPool.pause();
         }
     }
 

@@ -17,13 +17,11 @@ import org.apache.commons.io.IOUtils;
  */
 public class Exec {
 
-    // TODO Use this?
     private String command;
     private String[] arguments;
     private String workingDirectory;
     private String stdOut = "";
     private String stdErr = "";
-    private boolean done = false;
     private CommandLine cmdLine;
     private int[] exitValues;
 
@@ -59,7 +57,6 @@ public class Exec {
         // ESLint returns 2 on parsing errors so we do not want an exception.
         executor.setExitValues(exitValues);
         int exitValue = executor.execute(cmdLine);
-        done = true;
         stdOut = stdout.toString();
         stdErr = stderr.toString();
         return exitValue;
