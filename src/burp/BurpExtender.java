@@ -19,6 +19,7 @@ import lint.ProcessRequestTask;
 import lint.ProcessResponseTask;
 import lint.UpdateTableThread;
 import utils.BurpLog;
+import utils.CustomException;
 import utils.PausableExecutor;
 import utils.ReqResp;
 import utils.StringUtils;
@@ -63,6 +64,15 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
 
         // Load saved config from extension settings (if any).
         loadSavedConfig();
+
+        // Check and create paths. We might get errors if we are loading a new
+        // config but users should be able diagnose that.
+        try {
+            CheckPaths.checkAndCreatePaths(extensionConfig);
+        } catch (CustomException e) {
+            log.error(e.getMessage());
+        }
+        log.debug("Finished path check.");
 
         // Set the debug flag from the loaded config.
         log.setDebugMode(extensionConfig.debug);

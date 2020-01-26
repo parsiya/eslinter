@@ -1,4 +1,4 @@
-package lint;
+package utils;
 
 // Custom exception to return Beautify errors.
 public class CustomException extends Exception {

@@ -12,10 +12,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 /**
- * FileChooser
+ * FileChooser extends JFileChooser and adds an overwrite warning.
  */
 public class FileChooser extends JFileChooser {
 
+    // Show an overwrite warning if the selected file exists.
     @Override
     public void approveSelection() {
                 

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import burp.Config;
 import linttable.LintResult;
+import utils.CustomException;
 import utils.StringUtils;
 
 /**
