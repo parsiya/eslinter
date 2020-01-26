@@ -276,7 +276,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
             String defaultConfigFullPath = FilenameUtils.concat(jarDirectory, cfgFileName);
             File f = new File(defaultConfigFullPath);
 
-            String cfgFile = FileUtils.readFileToString(f, "UTF-8");
+            String cfgFile = FileUtils.readFileToString(f, StringUtils.UTF8);
             extensionConfig = Config.loadConfig(cfgFile);
             log.debug("Config loaded from default config file %s", defaultConfigFullPath);
         } catch (FileNotFoundException e) {

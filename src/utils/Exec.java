@@ -85,8 +85,8 @@ public class Exec {
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.directory(new File(workingDir));
         Process p = pb.start();
-        String output = IOUtils.toString(p.getInputStream(), "UTF-8");
-        String error = IOUtils.toString(p.getErrorStream(), "UTF-8");
+        String output = IOUtils.toString(p.getInputStream(), StringUtils.UTF8);
+        String error = IOUtils.toString(p.getErrorStream(), StringUtils.UTF8);
 
         // TODO Find a better way of propagating the error results. Should we
         // throw an exception instead?

@@ -230,7 +230,7 @@ public class Database {
     private static String getResourceFile(String name) throws IOException {
 
         InputStream in = BurpExtender.class.getResourceAsStream(name); 
-        String content = IOUtils.toString(in, "UTF-8");
+        String content = IOUtils.toString(in, StringUtils.UTF8);
         in.close();
         return content;
     }

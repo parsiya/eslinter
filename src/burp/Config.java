@@ -201,7 +201,7 @@ public class Config {
 
     // Writes the config files to file.
     public void writeToFile(File path) throws IOException {
-        FileUtils.writeStringToFile(path, toString(), "UTF-8");
+        FileUtils.writeStringToFile(path, toString(), StringUtils.UTF8);
     }
 
     // 1. Converts the Config object to a json string.

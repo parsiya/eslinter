@@ -62,7 +62,7 @@ public class Beautify {
             // Add the extracted JavaScript to data.
             StringBuilder sb = new StringBuilder(data);
             // Write the contents to a file in the storage path.
-            FileUtils.writeStringToFile(jsFile, sb.toString(), "UTF-8");
+            FileUtils.writeStringToFile(jsFile, sb.toString(), StringUtils.UTF8);
 
             // Get the working directory of the js-beautify command. This is
             // usually the root of the `eslint-security` repo.
@@ -85,7 +85,7 @@ public class Beautify {
             // Read the beautified JavaScript from jsFile. This is the return
             // value. However, we must first add the metadata string to the file
             // and rewrite it.
-            String beautifiedJS = FileUtils.readFileToString(jsFile, "UTF-8");
+            String beautifiedJS = FileUtils.readFileToString(jsFile, StringUtils.UTF8);
 
             // TODO: This might be inefficient, might need to find a better
             // way to do it.
@@ -95,7 +95,7 @@ public class Beautify {
             // Add the beautified JavaScript to it.
             sb.append(beautifiedJS);
             // Write the data to the file.
-            FileUtils.writeStringToFile(jsFile, sb.toString(), "UTF-8");
+            FileUtils.writeStringToFile(jsFile, sb.toString(), StringUtils.UTF8);
 
             // Return the beautified JavaScript without the metadata.
             return beautifiedJS;

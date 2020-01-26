@@ -41,7 +41,7 @@ public class Lint {
         File tempJS = File.createTempFile("eslint", ""); // Throws IOException.
         String tempJSPath = tempJS.getAbsolutePath();
         // Store the data in the temp file.
-        FileUtils.write(tempJS, javascript, "UTF-8");
+        FileUtils.write(tempJS, javascript, StringUtils.UTF8);
 
         // Create the output filename for this data.
         String eslintResultFileName = metadata.getFileNameWithoutExtension().concat("-linted.js");
@@ -81,7 +81,7 @@ public class Lint {
         eslintResults.append(results);
 
         // Write the results to the output file.
-        FileUtils.writeStringToFile(new File(eslintResultFilePath), eslintResults.toString(), "UTF-8");
+        FileUtils.writeStringToFile(new File(eslintResultFilePath), eslintResults.toString(), StringUtils.UTF8);
 
         // Process results
 

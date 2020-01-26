@@ -1,8 +1,6 @@
 package utils;
 
 import static burp.BurpExtender.callbacks;
-
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -10,13 +8,14 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-
 import org.apache.commons.io.FilenameUtils;
 
 /**
  * StringUtils
  */
 public class StringUtils {
+
+    public static String UTF8 = StringUtils.UTF8;
 
     // Print to extension output.
     public static void print(String data) {

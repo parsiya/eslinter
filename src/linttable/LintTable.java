@@ -160,8 +160,8 @@ public class LintTable extends JTable implements MouseListener {
                 String resultsFilePath = FilenameUtils.concat(selectedDir.getPath(), resultsFileName);
 
                 // Save both files.
-                FileUtils.writeStringToFile(new File(beautifiedFilePath), selected.beautifiedJavaScript, "UTF-8");
-                FileUtils.writeStringToFile(new File(resultsFilePath), selected.results, "UTF-8");
+                FileUtils.writeStringToFile(new File(beautifiedFilePath), selected.beautifiedJavaScript, StringUtils.UTF8);
+                FileUtils.writeStringToFile(new File(resultsFilePath), selected.results, StringUtils.UTF8);
                 log.debug("Stored beautified JavaScipt in: %s.", beautifiedFilePath);
                 log.debug("Stored results in: %s.", resultsFilePath);
             } catch (Exception e) {

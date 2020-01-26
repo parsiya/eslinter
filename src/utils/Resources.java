@@ -17,7 +17,7 @@ public class Resources {
     // E.g., "resources/path/whatever.txt" -> getResourceFile("/path/whatever.txt").
     public static String getResourceFile(Class cls, String name) throws IOException {
         InputStream in = cls.getResourceAsStream(name); 
-        String content = IOUtils.toString(in, "UTF-8");
+        String content = IOUtils.toString(in, StringUtils.UTF8);
         in.close();
         return content;
     }
