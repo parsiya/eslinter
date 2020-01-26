@@ -7,13 +7,33 @@ import java.awt.Component;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 /**
  * FileChooser
  */
-public class FileChooser {
+public class FileChooser extends JFileChooser {
+
+    @Override
+    public void approveSelection() {
+                
+        File selected = getSelectedFile();
+        if (selected.exists()) {
+            int ret = JOptionPane.showConfirmDialog(
+                this.getParent(),
+                "Overwrite existing file " + selected + "?",
+                "File exists",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            if (ret == JOptionPane.OK_OPTION)
+                super.approveSelection();
+        } else {
+            super.approveSelection();
+        }
+    }
 
     // Parent = parent swing component.
     // startingPath = where to start.
@@ -23,7 +43,10 @@ public class FileChooser {
     public static File saveFile(Component parent, String startingPath, String title,
             String extension) {
 
-        JFileChooser fc = new JFileChooser();
+        // Issue27, overwrite dialog prompt.
+        // JFileChooser fc = new JFileChooser();
+        FileChooser fc = new FileChooser();
+
         // If starting path is set, use it.
         if (isNotEmpty(startingPath))
             fc.setCurrentDirectory(new File(startingPath));
@@ -45,12 +68,12 @@ public class FileChooser {
         // Only choose files.
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         // Show the dialog and store the return value.
-        int retVal = fc.showSaveDialog(parent); // The only difference with openFile.
+        int retVal = fc.showSaveDialog(parent);
         // If the dialog was cancelled, return null.
         if (retVal != JFileChooser.APPROVE_OPTION)
             return null;
 
-        return fc.getSelectedFile();
+            return fc.getSelectedFile();
     }
 
     // Parent = parent swing component.

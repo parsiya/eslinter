@@ -148,7 +148,7 @@ public class LintTable extends JTable implements MouseListener {
         LintResult selected = table.getSelectedResult();
         // Open the directory selection dialog.
         String lastDir = FileChooser.getLastWorkingDirectory();
-        File selectedDir = FileChooser.saveDirectory(table, lastDir, "Save JavaScript and Results");
+        File selectedDir = FileChooser.saveDirectory(table.getParent(), lastDir, "Save JavaScript and Results");
 
         if (selectedDir != null) {
             try {
