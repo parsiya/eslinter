@@ -34,7 +34,7 @@ public class Lint {
     public LintResult execute() throws IOException {
 
         // ESLint command's working directory.
-        String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.eslintBinaryPath);
+        String eslintDirectory = FilenameUtils.getFullPath(extensionConfig.eslintCommandPath);
 
         // Store the JavaScript in a temp file. The method takes care of
         // filename uniqueness.
@@ -57,7 +57,7 @@ public class Lint {
 
         // Create the ESLint Exec.
         Exec linter = new Exec(
-            extensionConfig.eslintBinaryPath,
+            extensionConfig.eslintCommandPath,
             linterArgs,
             eslintDirectory,
             0, 1, 2 // Exit values for ESLint.

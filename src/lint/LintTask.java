@@ -31,7 +31,7 @@ public class LintTask implements Runnable {
         try {
             // First we need to beautify.
             Beautify be = new Beautify(lr.beautifiedJavaScript, lr.metadata, extensionConfig.storagePath,
-                    extensionConfig.jsBeautifyBinaryPath);
+                    extensionConfig.jsBeautifyCommandPath);
 
             String beautifiedJS = be.execute();
 

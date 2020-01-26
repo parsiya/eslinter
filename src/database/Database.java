@@ -1,20 +1,16 @@
 package database;
 
 import static burp.BurpExtender.log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import org.apache.commons.io.IOUtils;
-
 import burp.BurpExtender;
 import lint.Metadata;
 import linttable.LintResult;
@@ -25,7 +21,8 @@ import utils.StringUtils;
  */
 public class Database {
 
-    public Connection conn;
+    private Connection conn;
+    // TODO Remove this if it's not used.
     private String path;
 
     // Creates the database and populates the connection.

@@ -11,7 +11,7 @@ import linttable.LintResult;
 import utils.StringUtils;
 
 /**
- * UpdateTableTask updates the table with the results from the database.
+ * UpdateTableThread updates the table with the results from the database.
  */
 public class UpdateTableThread implements Runnable {
 
@@ -32,7 +32,7 @@ public class UpdateTableThread implements Runnable {
             if (db != null) {
                 // 1. Read every row from the table eslint in the database.
                 final ArrayList<LintResult> results = db.getAllRows();
-                log.debug("Inside UpdateTableTask - Reading all rows.");
+                log.debug("Inside UpdateTableThread - Reading all rows.");
 
                 // 2. Delete all rows in the table model.
                 // 3. Add all rows to the table.
@@ -43,19 +43,19 @@ public class UpdateTableThread implements Runnable {
                         if (mainTab != null) {
                             mainTab.lintTable.populate(results);
                         }
-                        log.debug("Inside UpdateTableTask - Updated the table from the database.");
+                        log.debug("Inside UpdateTableThread - Updated the table from the database.");
                     }
                 });
 
-                log.debug("Inside UpdateTableTask - Sleeping for %d seconds.", delay);
+                log.debug("Inside UpdateTableThread - Sleeping for %d seconds.", delay);
                 // 4. Sleep for X seconds.
                 Thread.sleep(delay * 1000);
 
                 /// 5. Go to 1.
             }
         }
-
-        log.debug("Inside UpdateTableTask - Done with the thread.");
+        db.close();
+        log.debug("Inside UpdateTableThread - Done with the thread.");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class UpdateTableThread implements Runnable {
         try {
             process();
         } catch (Exception e) {
-            log.error("Inside UpdateTableTask - %s.", StringUtils.getStackTrace(e));
+            log.error("Inside UpdateTableThread - %s.", StringUtils.getStackTrace(e));
         }
     }
 

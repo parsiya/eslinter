@@ -35,7 +35,7 @@ public class Config {
     // Default config file name.
     final public static transient String defaultConfigName = "config.json";
 
-    // End final transient fields.
+    // End transient fields.
 
     // Storage path for extracted beautified JavaScript files.
     @SerializedName("beautified-javascript-path")
@@ -46,16 +46,16 @@ public class Config {
     public String eslintOutputPath = "";
 
     // ESLint binary full path. [path]/node_modules/.bin/eslint
-    @SerializedName("eslint-binary-path")
-    public String eslintBinaryPath = "";
+    @SerializedName("eslint-command-path")
+    public String eslintCommandPath = "";
 
     // Path to the ESLint configuration file.
     @SerializedName("eslint-config-path")
     public String eslintConfigPath = "";
 
     // Full path to the js-beautify binary/command. [path]/node_modules/.bin/eslint
-    @SerializedName("jsbeautify-binary-path")
-    public String jsBeautifyBinaryPath = "";
+    @SerializedName("jsbeautify-command-path")
+    public String jsBeautifyCommandPath = "";
 
     // Full path to the sqlite database file. It will be created if it does not
     // exist.
@@ -92,6 +92,10 @@ public class Config {
         "Repeater"
     };
 
+    // If set to true, the extension will print extra information. This can be
+    // used for troubleshooting.
+    public boolean debug = true;
+
     // Maximum number of linting threads.
     @SerializedName("number-of-linting-threads")
     public int numLintThreads = 3;
@@ -124,10 +128,6 @@ public class Config {
     // Maximum size of JavaScript to process in KBs.
     @SerializedName("maximum-js-size")
     public int jsMaxSize = 10000;
-
-    // If set to true, the extension will print extra information. This can be
-    // used for troubleshooting.
-    public boolean debug = true;
 
     /**
      * JavaScript MIME types.
@@ -184,7 +184,6 @@ public class Config {
     public String[] headersToRemove = new String[] {
         "If-Modified-Since",
         "If-None-Match"
-        // TODO Find more headers.
     };
 
     // Convert the config to JSON.
