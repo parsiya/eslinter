@@ -226,7 +226,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
         }
 
         // Check for jsMaxSize.
-        if (javascript.length() >= (extensionConfig.jsMaxSize * 1024)) {
+        if (javascript.length() >= (extensionConfig.jsMaxSize * 1024) && extensionConfig.jsMaxSize != 0) {
             log.debug("Length of JavaScript: %d > %d threshold, returning.",
                 javascript.length(), extensionConfig.jsMaxSize * 1024);
             return;
