@@ -32,17 +32,19 @@ and lints them with [ESLint][eslint-org].
 ## Quickstart
 
 1. Clone the repository.
-2. Run `git submodule update --init --recursive --remote` to clone the `eslint-security` git submodule.
+2. Run `git submodule update --init --recursive --remote` to clone the
+   `eslint-security` git submodule.
 3. Navigate to `eslint-security` and run `npm install`.
-4. Edit the provided sample config file in `release`. At a minimum, you need to
-   provide paths to (see the [Detailed Configuration](##detailed-configuration) section for
-   more information):
+4. Edit the sample config file in [config.json](config.json). At a minimum, you
+   need to provide paths to (see [docs/configuration.md](docs/configuration.md)
+   for more information):
     * `beautified-javascript-path`: Path to store extracted JavaScript files.
     * `eslint-output-path`: Path to store ESLint results.
     * `eslint-command-path`: Path to the `eslint` command.
     * `eslint-config-path`: Path to the ESLint configuration file.
     * `jsbeautify-command-path`:  Path to the `js-beautify` command.
-    * `database-path`: Location of the target database (it will be created if it does not exist).
+    * `database-path`: Location of the target database (it will be created if it
+      does not exist).
 5. Add the jar file to Burp.
 6. Browse the target website normally with Burp as proxy.
 7. Navigate to the `ESLinter` tab.
@@ -51,12 +53,13 @@ and lints them with [ESLint][eslint-org].
 10. Wait a few minutes for everything to be updated.
 11. Double-click on any result to open a dialog box. Choose a path to save
     both the beautified the JavaScript and ESLint results.
-12. Look under the `beautified-javascript-path` and `eslint-output-path`
-    paths provided in the config file for beautified JavaScript and their linting results.
+12. Look under the `beautified-javascript-path` and `eslint-output-path` paths
+    provided in the config file for beautified JavaScript and their linting
+    results.
 
 ## Detailed Configuration
-At a minimum, you need to add the five keys discussed above to the configuration file. For
-in-depth configuration, please see
+At a minimum, you need to add the six keys discussed above to the configuration
+file. For in-depth configuration, please see
 [docs/configuration.md](docs/configuration.md).
 
 ## Technical Details
@@ -71,7 +74,8 @@ Start by modifying one of the ESLint config files in the
 needs a new plugin/package you have to add it manually (usually via npm) to the
 location of your `eslint` and `js-beautify` commands.
 
-If you end up creating rules and want to contribute feel free to make pull request in `eslint-security`.
+If you end up creating rules and want to contribute feel free to make pull
+request in `eslint-security`.
 
 For more information on configuring ESLint please see:
 
@@ -80,7 +84,8 @@ For more information on configuring ESLint please see:
 ### Process Requests Coming From Other Extensions
 
 1. Add `Extender` to the `process-tool-list`.
-2. Move ESLinter to the bottom of your extension list in the Burp Extender window.
+2. Move ESLinter to the bottom of your extension list in the Burp Extender
+   window.
 3. Now ESLinter should be able to detect requests made by other extensions.
 
 ## Bugs
@@ -97,9 +102,9 @@ The table in the extension tab is updated every few seconds (controlled via the
 will be unselected when the table updates.
 
 This might look odd when double-clicking a row. The FileChooser dialog pops up
-to select a path. When the table is updated, the selection is visually gone. This
-is not an issue. The data in the row are retrieved when you double-click and is
-not interrupted when the row is deselected after the table update.
+to select a path. When the table is updated, the selection is visually gone.
+This is not an issue. The data in the row are retrieved when you double-click
+and is not interrupted when the row is deselected after the table update.
 
 ## FAQ
 
@@ -117,8 +122,8 @@ The extension uses the [codeframe][eslint-codeframe] format. This format has a
 few lines of code before and after what was flagged by ESLint. The extension
 keeps a copy of the original JavaScript file after it's beautified.
 
-Double-clicking on any result row will open a filechooser dialog to save both the
-ESLint results and the original JavaScript.
+Double-clicking on any result row will open a filechooser dialog to save both
+the ESLint results and the original JavaScript.
 
 [eslint-codeframe]: https://eslint.org/docs/user-guide/formatters/#codeframe
 
@@ -160,8 +165,8 @@ See his presentation [Manual JavaScript Analysis is a Bug][lewis-slides].
 [lewis-slides]: https://www.slideshare.net/LewisArdern/manual-javascript-anaylsis-is-a-bug-176308491
 
 ### ESLinting JavaScript
-The original idea for the ESLinting JavaScript received in Burp was from the following blog post by
-[Jacob Wilkin][jacob-wilkin-twitter]:
+The original idea for the ESLinting JavaScript received in Burp was from the
+following blog post by [Jacob Wilkin][jacob-wilkin-twitter]:
 
 * https://medium.com/greenwolf-security/linting-for-bugs-vulnerabilities-49bc75a61c6
 
@@ -179,14 +184,16 @@ Summary:
 
 ### Automation
 My main drive for automation comes from reading the amazing article named
-[Manual Work is a Bug][manual-work] by [Thomas Limoncelli][tom-twitter]. **READ IT**.
+[Manual Work is a Bug][manual-work] by [Thomas Limoncelli][tom-twitter].
+**READ IT**.
 
 The article defines four levels of automation:
 
 1. Document the steps.
     * Jacob's post above. 
 2. Create automation equivalents.
-    * At my day job, I create a prototype that linted JavaScript files after I extracted them from Burp manually.
+    * At my day job, I create a prototype that linted JavaScript files after I
+      extracted them from Burp manually.
 3. Create automation.
 4. Self-service and autonomous systems.
     * This extension is here.
@@ -205,7 +212,7 @@ never released.
 
 ## Future Work and Feedback
 Please see the Github issues. If you have an idea, please make a Github issue.
-~~~~
+
 ## License
 Opensourced under "GNU General Public License v3.0". Please see
 [LICENSE](LICENSE) for details.

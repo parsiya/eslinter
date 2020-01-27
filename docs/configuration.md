@@ -2,20 +2,20 @@
 `ESLinter` uses a config file in json format.
 
 - [Loading and Storing Configurations](#loading-and-storing-configurations)
-    - [The Default Configuration File](#the-default-configuration-file)
-    - [Saving and Loading Configuration Files](#saving-and-loading-configuration-files)
+  - [The Default Configuration File](#the-default-configuration-file)
+  - [Saving and Loading Configuration Files](#saving-and-loading-configuration-files)
 - [Configuration File Elements](#configuration-file-elements)
-    - [Storage Paths](#storage-paths)
-    - [Command Paths](#command-paths)
-    - [Highlight Requests](#highlight-requests)
-    - [Process Requests Created by Specific Burp Tools](#process-requests-created-by-specific-burp-tools)
-    - [Only Process Requests in Scope](#only-process-requests-in-scope)
-    - [Performance](#performance)
-    - [Configuring JavaScript Detection](#configuring-javascript-detection)
-        - [Pure JavaScript](#pure-javascript)
-        - [Embedded JavaScript](#embedded-javascript)
-    - [Removing Request Headers](#removing-request-headers)
-    - [The Debug Flag](#the-debug-flag)
+  - [Storage Paths](#storage-paths)
+  - [Command Paths](#command-paths)
+  - [Highlight Requests](#highlight-requests)
+  - [Process Requests Created by Specific Burp Tools](#process-requests-created-by-specific-burp-tools)
+  - [Only Process Requests in Scope](#only-process-requests-in-scope)
+  - [Performance](#performance)
+  - [Configuring JavaScript Detection](#configuring-javascript-detection)
+    - [Pure JavaScript](#pure-javascript)
+    - [Embedded JavaScript](#embedded-javascript)
+  - [Removing Request Headers](#removing-request-headers)
+  - [The Debug Flag](#the-debug-flag)
 
 ## Loading and Storing Configurations
 
@@ -30,8 +30,8 @@ the jar file. This will ensure that you are always using a configuration that
 you have set.
 
 ### Saving and Loading Configuration Files
-To create a sample config file, use the `Create Configuration` button. The top 5
-elements (the paths) must be populated.
+To create a sample config file, use the `Create Configuration` button. The top
+six elements (the paths) must be populated.
 
 To load a config file, use the `Load Config` button. `Save Config` saves the
 current configuration to a file.
@@ -43,7 +43,7 @@ explained above).
 
 ## Configuration File Elements
 The configuration file provides several options to control the behavior of the
-extension. For most users, providing the top 5 elements discussed in the
+extension. For most users, providing the top six elements discussed in the
 Quickstart section is enough.
 
 ### Storage Paths
@@ -88,7 +88,9 @@ providing paths with backslashes be sure to escape them. E.g.,
 [eslint-security]: https://github.com/parsiya/eslint-security
 
 ### Highlight Requests
-The extension can highlight requests in Burp's HTTP History. `"highlight" :true` enables this behavior. This can help you quickly figure out which requests have JavaScript.
+The extension can highlight requests in Burp's HTTP History. `"highlight" :true`
+enables this behavior. This can help you quickly figure out which requests have
+JavaScript.
 
 * `cyan`: Requests that point to a JavaScript resource. E.g.,
   `https://example.net/whatever.js`.
@@ -153,9 +155,9 @@ page could load a few dozen JavaScript files or a large vendored file. You can
 configure the number of threads used by the extension to configure the load for
 your machine.
 
-`number-of-linting-threads` is the most important item in this section. You can most
-likely keep the default values. If you are running Burp on a slow machine or one
-without a lot of RAM, reduce this number.
+`number-of-linting-threads` is the most important item in this section. You can
+most likely keep the default values. If you are running Burp on a slow machine
+or one without a lot of RAM, reduce this number.
 
 Note that most concurrent operations use threadpools. Meaning if you set a low
 number, nothing is lost and the work is queued. The results are also
@@ -170,19 +172,21 @@ extension is loaded again.
 * `number-of-request-threads`: Every request and response is processed in a
   separate thread. This element controls the number of concurrent request and
   response processing threads.
-* `linting-timeout`: The maximum number of seconds for each beautifying and linting task. Increase this number if you are processing large JavaScript files.
+* `linting-timeout`: The maximum number of seconds for each beautifying and
+  linting task. Increase this number if you are processing large JavaScript
+  files.
 * `maximum-js-size`: Files over this number (in KiloBytes) are not processed.
   `0` disables this setting. This is useful if you are dealing a lot of 3rd
   party libraries or vendor files on a slower machine or you are not interested
   in large files.
 * `lint-task-delay`: Number of seconds to wait before reading new rows from the
-  database and adding them to the linting threadpool. Increase
-  this number if you are not dealing with a lot of JavaScript. An extension thread
-  constantly reads from the database and adds the rows that are not
-  processed to the linting threadpool. This is the number of the delay in seconds between
-  reads.
+  database and adding them to the linting threadpool. Increase this number if
+  you are not dealing with a lot of JavaScript. An extension thread constantly
+  reads from the database and adds the rows that are not processed to the
+  linting threadpool. This is the number of the delay in seconds between reads.
 * `update-table-delay`: Number of seconds to wait before updating the table in
-  the extension tab. Increase this number if you are not processing a lot of JavaScript files.
+  the extension tab. Increase this number if you are not processing a lot of
+  JavaScript files.
 * `threadpool-timeout`: Number of seconds to wait for the threadpool tasks to
   finish before shutdown. The threadpools are shutdown when a new config is
   loaded and when the extension is unloaded. Decrease this number if you are
@@ -196,18 +200,20 @@ files/extensions/content-types/MIME types you can add them here.
 From the extension's perspective, there are three kinds of request/response
 pairs:
 
-* "Pure" JavaScript: All of the content in the body of the response is JavaScript. E,g,, js files.
+* "Pure" JavaScript: All of the content in the body of the response is
+  JavaScript. E.g., js files.
 * Embedded JavaScript: The response contains some JavaScript. E.g., HTML files.
 * No JavaScript: The response does not have any JavaScript.
 
 #### Pure JavaScript
 All files with MIME types included in `js-mime-types` and URLs ending in
-extensions in `javascript-file-extensions` are considered pure JavaScript. The complete body of these responses will be stored in a file and linted.
+extensions in `javascript-file-extensions` are considered pure JavaScript. The
+complete body of these responses will be stored in a file and linted.
 
 Note: This is different from files that have embedded JavaScript like HTML
 files. If your response body is not pure JavaScript, do not include them here.
-Including these files in these settings will only result in parsing errors. For these files
-see the [Embedded JavaScript](#embedded-javascript) section below.
+Including these files in these settings will only result in parsing errors. For
+these files see the [Embedded JavaScript](#embedded-javascript) section below.
 
 Burp has two MIME type detection methods for responses:
 
@@ -215,12 +221,12 @@ Burp has two MIME type detection methods for responses:
 * `getStatedMimeType()`
 
 These methods return `script` if Burp thinks the response is a JavaScript file.
-It's not always accurate but it's usually correct. If you are looking to
-process MIME types (returned by Burp) that are not in the default list (see the
-sample config file). Add them to the end of the list in your extension config file.
+It's not always accurate but it's usually correct. If you are looking to process
+MIME types (returned by Burp) that are not in the default list (see the sample
+config file). Add them to the end of the list in your extension config file.
 
-The following URL lists all JavaScript MIME types (search for `text/javascript` in the page).
-It appears that `text/javascript` is the most common.
+The following URL lists all JavaScript MIME types (search for `text/javascript`
+in the page). It appears that `text/javascript` is the most common.
 
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
 
@@ -285,13 +291,14 @@ usually try to re-use cached assets. If a cached asset is requested and these
 headers are not removed, the response will be a [304 Not Modified][304-docs]
 with no content. Such a response is useless to the extension.
 
-Note: The extension does a good job of detecting duplicate
-resources and reusing lint results. See the [technical-details.md](technical-details.md) file for details.
+Note: The extension does a good job of detecting duplicate resources and reusing
+lint results. See the [technical-details.md](technical-details.md) file for
+details.
 
 [304-docs]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304
 
 ### The Debug Flag
-Setting `debug` to `true` will print diagnostics messages to the extension's console. It's
-intended for troubleshooting and testing. The best way to use it is to isolate a
-single request/response that is causing the error. Enable debug and send the
-request in Repeater.
+Setting `debug` to `true` will print diagnostics messages to the extension's
+console. It's intended for troubleshooting and testing. The best way to use it
+is to isolate a single request/response that is causing the error. Enable debug
+and send the request in Repeater.
