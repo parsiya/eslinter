@@ -191,7 +191,7 @@ public class Config {
         return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(this);
     }
 
-    // No-args constrcutor for Gson.
+    // No-args constructor for Gson.
     public Config() {}
 
     // Creates a config object from the json string.
