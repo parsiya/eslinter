@@ -57,6 +57,8 @@ and lints them with [ESLint][eslint-org].
     provided in the config file for beautified JavaScript and their linting
     results.
 
+![ESLinter in action](.github/eslinter-1.gif)
+
 ## Detailed Configuration
 At a minimum, you need to add the six keys discussed above to the configuration
 file. For in-depth configuration, please see
