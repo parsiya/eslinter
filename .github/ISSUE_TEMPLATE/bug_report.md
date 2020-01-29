@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Please fill the bug repot information as much as you can
+about: Please fill the bug report information as much as you can
 title: ''
 labels: bug
 assignees: ''
@@ -20,8 +20,8 @@ Paste the error message from Burp here.
 Paste your config file here.
 ```
 
-**Screenshots**
+**Screenshots (optional)**
 If applicable, add screenshots to help explain your problem. Not necessary.
 
-**Additional context**
+**Additional context (optional)**
 Add any other context about the problem here.
