@@ -207,22 +207,24 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
             javascript = Extractor.getJS(requestResponse.getResponse());
         }
 
+        if (StringUtils.isEmpty(javascript)) {
+            log.debug("Cound not find any in-line JavaScript, returning.");
+            return;
+        }
+
         // Don't uncomment this unless you are debugging in Repeater. It will
         // fill the debug log with noise.
         // log.debug("Extracted JavaScript:\n%s", javascript);
         // log.debug("End of extracted JavaScript ----------");
 
-        // Set the debug headers.
+        // Set the debug headers. Having this after checking if extracted
+        // JavaScript is empty prevents highlighting requests that do not have
+        // any extracted JavaScript.
         if (extensionConfig.debug) {
             requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Is-Script", scriptHeader);
             requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Contains-Script", containsScriptHeader);
             requestResponse = ReqResp.addHeader(isRequest, requestResponse, "MIMETYPEs",
                 String.format("%s -- %s", respInfo.getInferredMimeType(), respInfo.getStatedMimeType()));
-        }
-
-        if (StringUtils.isEmpty(javascript)) {
-            log.debug("Cound not find any in-line JavaScript, returning.");
-            return;
         }
 
         // Check for jsMaxSize.
