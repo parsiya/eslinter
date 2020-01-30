@@ -82,11 +82,16 @@ public class CheckPaths {
         // Check if the directory with the database is writable. Connect will
         // take care of creating the file.
         String dbDirectory = StringUtils.getParentDirectory(extensionConfig.dbPath);
-        if (!canWrite(dbDirectory)) {
-            err += String.format(
-                "Could not write to the database directory at %s.\n",
-                dbDirectory
-            );
+        if (createDirectory(dbDirectory)) {
+            // dbDirectory is created or exists.
+        } else {
+            // dbDirectory was not created, check if we can write to it.
+            if (!canWrite(dbDirectory)) {
+                err += String.format(
+                    "Could not write to the database directory at %s.\n",
+                    dbDirectory
+                );
+            }   
         }
 
         if (StringUtils.isNotEmpty(err)) {

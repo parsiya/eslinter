@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import javax.swing.AbstractButton;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -195,10 +196,10 @@ public class BurpTab {
             try {
                 configFromFile = FileUtils.readFileToString(sf, StringUtils.UTF8);
                 extensionConfig = Config.loadConfig(configFromFile);
-            } catch (IOException e) {
+            } catch (SQLException | IOException e) {
                 log.alert("Could not open config file %s.", sf.getAbsolutePath());
                 log.error("Could not open config file %s.", sf.getAbsolutePath());
-                log.error(StringUtils.getStackTrace(e));
+                log.error("%s", StringUtils.getStackTrace(e));
             }
 
             log.debug("Loaded extension config from %s and saved it to extension settings",

@@ -3,6 +3,7 @@ package burp;
 import static burp.BurpExtender.callbacks;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -22,14 +23,14 @@ public class Config {
     // This is the extension's tab name.
     final public static transient String tabName = "ESLinter";
     // Table's column names.
-    final public static transient String[] lintTableColumnNames = new String[] {
-        "Host", "URL", "Status", "Number of Findings"
-    };
+    final public static transient String[] lintTableColumnNames =
+            new String[] {"Host", "URL", "Status", "Number of Findings"};
     // Table's column classes.
-    final public static transient Class[] lintTableColumnClasses = new Class[] {
-        java.lang.String.class, java.lang.String.class,
-        java.lang.String.class, java.lang.String.class // Although last column is int, we want it to be left-aligned.
-    };
+    final public static transient Class[] lintTableColumnClasses =
+            new Class[] {java.lang.String.class, java.lang.String.class, java.lang.String.class,
+                    java.lang.String.class // Although last column is int, we want it to be
+                                           // left-aligned.
+            };
     // Maximum number of characters from the URL.
     final public static transient int urlFileNameLimit = 50;
     // Default config file name.
@@ -72,25 +73,21 @@ public class Config {
 
     // Only lint requests made by these tools. The names here must be the same
     // as the getToolName column (case-insensitive):
-    // | ToolFlag       | getToolName |
+    // | ToolFlag | getToolName |
     // |----------------|-------------|
-    // | TOOL_SUITE     | Suite       |
-    // | TOOL_TARGET    | Target      |
-    // | TOOL_PROXY     | Proxy       |
-    // | TOOL_SPIDER    | Scanner     |
-    // | TOOL_SCANNER   | Scanner     |
-    // | TOOL_INTRUDER  | Intruder    |
-    // | TOOL_REPEATER  | Repeater    |
-    // | TOOL_SEQUENCER | Sequencer   |
-    // | TOOL_DECODER   | null        |
-    // | TOOL_COMPARER  | null        |
-    // | TOOL_EXTENDER  | Extender    |
+    // | TOOL_SUITE | Suite |
+    // | TOOL_TARGET | Target |
+    // | TOOL_PROXY | Proxy |
+    // | TOOL_SPIDER | Scanner |
+    // | TOOL_SCANNER | Scanner |
+    // | TOOL_INTRUDER | Intruder |
+    // | TOOL_REPEATER | Repeater |
+    // | TOOL_SEQUENCER | Sequencer |
+    // | TOOL_DECODER | null |
+    // | TOOL_COMPARER | null |
+    // | TOOL_EXTENDER | Extender |
     @SerializedName("process-tool-list")
-    public String[] processToolList = new String[] {
-        "Proxy",
-        "Scanner",
-        "Repeater"
-    };
+    public String[] processToolList = new String[] {"Proxy", "Scanner", "Repeater"};
 
     // If set to true, the extension will print extra information. This can be
     // used for troubleshooting.
@@ -130,61 +127,46 @@ public class Config {
     public int jsMaxSize = 10000;
 
     /**
-     * JavaScript MIME types.
-     * Search for "text/javascript" here
-     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
-     * Only "text/javascript" is supposedly supported but who knows.
-     * Should be entered as lowercase here.
+     * JavaScript MIME types. Search for "text/javascript" here
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types Only
+     * "text/javascript" is supposedly supported but who knows. Should be entered as lowercase here.
      * Burp returns "script" for JavaScript.
      */
     @SerializedName("js-mime-types")
-    public String[] jsTypes = new String[] {
-        "application/javascript",
-        "application/ecmascript",
-        "application/x-ecmascript",
-        "application/x-javascript",
-        "text/javascript",
-        "text/ecmascript",
-        "text/javascript1.0",
-        "text/javascript1.1",
-        "text/javascript1.2",
-        "text/javascript1.3",
-        "text/javascript1.4",
-        "text/javascript1.5",
-        "text/jscript",
-        "text/livescript",
-        "text/x-ecmascript",
-        "text/x-javascript",
-        "script" // This is what Burp returns as the MIMEType if it detects js.
+    public String[] jsTypes = new String[] {"application/javascript", "application/ecmascript",
+            "application/x-ecmascript", "application/x-javascript", "text/javascript",
+            "text/ecmascript", "text/javascript1.0", "text/javascript1.1", "text/javascript1.2",
+            "text/javascript1.3", "text/javascript1.4", "text/javascript1.5", "text/jscript",
+            "text/livescript", "text/x-ecmascript", "text/x-javascript", "script" // This is what
+                                                                                  // Burp returns as
+                                                                                  // the MIMEType if
+                                                                                  // it detects js.
     };
 
     // File extensions that might contain JavaScript.
     @SerializedName("javascript-file-extensions")
-    public String[] fileExtensions = new String[] {
-        "js",
-        "javascript"
-    };
+    public String[] fileExtensions = new String[] {"js", "javascript"};
 
     // Content-Types that might contain scripts, the JavaScript inside these
     // will be extracted and used.
     // Should be entered as lowercase here.
     @SerializedName("contains-javascript")
-    public String[] containsScriptTypes = new String[] {
-        "text/html",
-        "application/xhtml+xml" // XHTML, be sure to remove the CDATA tags.
+    public String[] containsScriptTypes = new String[] {"text/html", "application/xhtml+xml" // XHTML,
+                                                                                             // be
+                                                                                             // sure
+                                                                                             // to
+                                                                                             // remove
+                                                                                             // the
+                                                                                             // CDATA
+                                                                                             // tags.
     };
 
     /**
-     * Removable headers.
-     * These headers will be removed from the requests. The change will not
-     * appear in Burp history but the outgoing request will not have these
-     * headers.
+     * Removable headers. These headers will be removed from the requests. The change will not
+     * appear in Burp history but the outgoing request will not have these headers.
      */
     @SerializedName("removable-headers")
-    public String[] headersToRemove = new String[] {
-        "If-Modified-Since",
-        "If-None-Match"
-    };
+    public String[] headersToRemove = new String[] {"If-Modified-Since", "If-None-Match"};
 
     // Convert the config to JSON.
     public String toString() {
@@ -192,7 +174,8 @@ public class Config {
     }
 
     // No-args constructor for Gson.
-    public Config() {}
+    public Config() {
+    }
 
     // Creates a config object from the json string.
     public static Config configBuilder(String json) throws JsonSyntaxException {
@@ -219,7 +202,7 @@ public class Config {
     // Creates a new config from the json string and returns it. Also waits for
     // the threadpool to shutdown, closes the DB connection and establishes a
     // connection to the new DB set in the new config file.
-    public static Config loadConfig(String json) {
+    public static Config loadConfig(String json) throws SQLException, IOException {
         // Unload the extension, because we are loading a new config.
         BurpExtender.unloadExtension();
         // Read the json string and create a new config.

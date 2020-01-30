@@ -94,7 +94,15 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
         // Connect to the database (or create it if it doesn't exist). If the
         // database connection is not established before the threads start, we
         // might have issues.
-        databaseConnect(extensionConfig.dbPath);
+        try {
+            databaseConnect(extensionConfig.dbPath);
+        } catch (SQLException | IOException e) {
+            log.error("%s", StringUtils.getStackTrace(e));
+            log.alert(
+                "Could not connect to the database: %s",
+                e.getMessage()
+            );
+        }
 
         // Create the table update thread.
         updateThread = new UpdateTableThread(extensionConfig.updateTableDelay);
@@ -296,6 +304,15 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
                 "Default config file '%s' was not found.",
                 Config.defaultConfigName
             );
+        } catch (SQLException e) {
+            // Issue42.
+            // If this happens, it means we have loaded a new config file that
+            // does not have the actual path to the database created. This is
+            // ok, the checkAndCreatePaths will create the path later.
+            log.debug(
+                "Could not create the database file, this is OK. %s", 
+                e.getMessage()
+            );
         } catch (Exception e) {
             // If anything goes wrong here, then something else was wrong other
             // than the file not having the correct content.
@@ -309,15 +326,10 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
     }
 
     // Connects to the database (or creates it if it does not exist).
-    public static void databaseConnect(String dbPath) {
+    public static void databaseConnect(String dbPath) throws SQLException, IOException {
         // Create the database.
-        try {
-            db = new Database(dbPath);
-            log.debug("Created a connection to the database: %s", dbPath);
-        } catch (SQLException | IOException e) {
-            log.alert("Error accessing the database: %s", dbPath);
-            log.error("Error creating database %s", StringUtils.getStackTrace(e));
-        }
+        db = new Database(dbPath);
+        log.debug("Created a connection to the database: %s", dbPath);
     }
 
     // Invoked when the extension is unloaded.
