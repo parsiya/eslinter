@@ -1,54 +1,54 @@
 {
-  "beautified-javascript-path": "EDIT ME",
-  "eslint-output-path": "EDIT ME",
-  "eslint-command-path": "EDIT ME",
-  "eslint-config-path": "EDIT ME",
-  "jsbeautify-command-path": "EDIT ME",
-  "database-path": "EDIT ME",
-  "only-process-in-scope": false,
-  "highlight": false,
-  "process-tool-list": [
-    "Proxy",
-    "Scanner",
-    "Repeater"
-  ],
-  "number-of-linting-threads": 3,
-  "linting-timeout": 60,
-  "number-of-request-threads": 10,
-  "threadpool-timeout": 10,
-  "lint-task-delay": 10,
-  "update-table-delay": 5,
-  "maximum-js-size": 10000,
-  "debug": false,
-  "js-mime-types": [
-    "application/javascript",
-    "application/ecmascript",
-    "application/x-ecmascript",
-    "application/x-javascript",
-    "text/javascript",
-    "text/ecmascript",
-    "text/javascript1.0",
-    "text/javascript1.1",
-    "text/javascript1.2",
-    "text/javascript1.3",
-    "text/javascript1.4",
-    "text/javascript1.5",
-    "text/jscript",
-    "text/livescript",
-    "text/x-ecmascript",
-    "text/x-javascript",
-    "script"
-  ],
-  "javascript-file-extensions": [
-    "js",
-    "javascript"
-  ],
-  "contains-javascript": [
-    "text/html",
-    "application/xhtml+xml"
-  ],
-  "removable-headers": [
-    "If-Modified-Since",
-    "If-None-Match"
-  ]
+    "beautified-javascript-path": "CHANGEME",
+    "eslint-output-path": "CHANGEME",
+    "eslint-command-path": "CHANGEME",
+    "eslint-config-path": "CHANGEME",
+    "jsbeautify-command-path": "CHANGEME",
+    "database-path": "CHANGEME",
+    "only-process-in-scope": false,
+    "highlight": true,
+    "debug": false,
+    "process-tool-list": [
+        "Proxy",
+        "Scanner",
+        "Repeater"
+    ],
+    "number-of-linting-threads": 1,
+    "linting-timeout": 60,
+    "number-of-request-threads": 10,
+    "threadpool-timeout": 10,
+    "lint-task-delay": 10,
+    "update-table-delay": 5,
+    "maximum-js-size": 0,
+    "js-mime-types": [
+        "application/javascript",
+        "application/ecmascript",
+        "application/x-ecmascript",
+        "application/x-javascript",
+        "text/javascript",
+        "text/ecmascript",
+        "text/javascript1.0",
+        "text/javascript1.1",
+        "text/javascript1.2",
+        "text/javascript1.3",
+        "text/javascript1.4",
+        "text/javascript1.5",
+        "text/jscript",
+        "text/livescript",
+        "text/x-ecmascript",
+        "text/x-javascript",
+        "script"
+    ],
+    "javascript-file-extensions": [
+        "js",
+        "javascript"
+    ],
+    "contains-javascript": [
+        "text/html",
+        "application/xhtml+xml"
+    ],
+    "removable-headers": [
+        "If-Modified-Since",
+        "If-None-Match"
+    ]
 }
