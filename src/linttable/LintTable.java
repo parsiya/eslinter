@@ -152,18 +152,23 @@ public class LintTable extends JTable implements MouseListener {
 
         if (selectedDir != null) {
             try {
+                // Get the selected directory as a string.
+                String selectedPath = selectedDir.getPath();
                 // Create the beautified JavaScript file name.
                 String beautifiedFileName = selected.metadata.getFileNameWithoutExtension().concat(".js");
-                String beautifiedFilePath = FilenameUtils.concat(selectedDir.getPath(), beautifiedFileName);
+                String beautifiedFilePath = FilenameUtils.concat(selectedPath, beautifiedFileName);
 
                 String resultsFileName = selected.metadata.getFileNameWithoutExtension().concat("-linted.js");
-                String resultsFilePath = FilenameUtils.concat(selectedDir.getPath(), resultsFileName);
+                String resultsFilePath = FilenameUtils.concat(selectedPath, resultsFileName);
 
                 // Save both files.
                 FileUtils.writeStringToFile(new File(beautifiedFilePath), selected.beautifiedJavaScript, StringUtils.UTF8);
                 FileUtils.writeStringToFile(new File(resultsFilePath), selected.results, StringUtils.UTF8);
                 log.debug("Stored beautified JavaScipt in: %s.", beautifiedFilePath);
                 log.debug("Stored results in: %s.", resultsFilePath);
+
+                // Save the directory as the last working directory.
+                FileChooser.setLastWorkingDirectory(selectedPath);
             } catch (Exception e) {
                 log.error("Could not save results %s.", StringUtils.getStackTrace(e));
             }
