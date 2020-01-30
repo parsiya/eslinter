@@ -458,7 +458,7 @@ public class SystemUtils {
      * @since Java 1.3
      */
     public static final String JAVA_SPECIFICATION_VERSION = getSystemProperty("java.specification.version");
-    private static final JavaVersion JAVA_SPECIFICATION_VERSION_AS_ENUM = JavaVersion.get(JAVA_SPECIFICATION_VERSION);
+    // private static final JavaVersion JAVA_SPECIFICATION_VERSION_AS_ENUM = JavaVersion.get(JAVA_SPECIFICATION_VERSION);
 
     /**
      * <p>
@@ -1765,34 +1765,34 @@ public class SystemUtils {
         return Boolean.TRUE.toString().equals(JAVA_AWT_HEADLESS);
     }
 
-    /**
-     * <p>
-     * Is the Java version at least the requested version.
-     * </p>
-     * <p>
-     *
-     * @param requiredVersion the required version, for example 1.31f
-     * @return {@code true} if the actual version is equal or greater than the required version
-     */
-    public static boolean isJavaVersionAtLeast(final JavaVersion requiredVersion) {
-        return JAVA_SPECIFICATION_VERSION_AS_ENUM.atLeast(requiredVersion);
-    }
+    // /**
+    //  * <p>
+    //  * Is the Java version at least the requested version.
+    //  * </p>
+    //  * <p>
+    //  *
+    //  * @param requiredVersion the required version, for example 1.31f
+    //  * @return {@code true} if the actual version is equal or greater than the required version
+    //  */
+    // public static boolean isJavaVersionAtLeast(final JavaVersion requiredVersion) {
+    //     return JAVA_SPECIFICATION_VERSION_AS_ENUM.atLeast(requiredVersion);
+    // }
 
-    /**
-     * <p>
-     * Is the Java version at most the requested version.
-     * </p>
-     * <p>
-     * Example input:
-     * </p>
-     *
-     * @param requiredVersion the required version, for example 1.31f
-     * @return {@code true} if the actual version is equal or greater than the required version
-     * @since 3.9
-     */
-    public static boolean isJavaVersionAtMost(final JavaVersion requiredVersion) {
-        return JAVA_SPECIFICATION_VERSION_AS_ENUM.atMost(requiredVersion);
-    }
+    // /**
+    //  * <p>
+    //  * Is the Java version at most the requested version.
+    //  * </p>
+    //  * <p>
+    //  * Example input:
+    //  * </p>
+    //  *
+    //  * @param requiredVersion the required version, for example 1.31f
+    //  * @return {@code true} if the actual version is equal or greater than the required version
+    //  * @since 3.9
+    //  */
+    // public static boolean isJavaVersionAtMost(final JavaVersion requiredVersion) {
+    //     return JAVA_SPECIFICATION_VERSION_AS_ENUM.atMost(requiredVersion);
+    // }
 
     /**
      * <p>
