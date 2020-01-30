@@ -1,11 +1,10 @@
 
 /**
- * Copied from Apache Commons Lang SystemUtils.
+ * Copied as-is from Apache Commons Lang SystemUtils.
  * https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/SystemUtils.java
- * Most stuff not needed for OS check are removed.
  */
 
-/*
+ /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -22,6 +21,8 @@
  * limitations under the License.
  */
 package utils;
+
+import java.io.File;
 
 /**
  * <p>
@@ -43,6 +44,328 @@ public class SystemUtils {
      * The prefix String for all Windows OS.
      */
     private static final String OS_NAME_WINDOWS_PREFIX = "Windows";
+
+    // System property constants
+    // -----------------------------------------------------------------------
+    // These MUST be declared first. Other constants depend on this.
+
+    /**
+     * The System property key for the user home directory.
+     */
+    private static final String USER_HOME_KEY = "user.home";
+
+    /**
+     * The System property key for the user name.
+     */
+    private static final String USER_NAME_KEY = "user.name";
+
+    /**
+     * The System property key for the user directory.
+     */
+    private static final String USER_DIR_KEY = "user.dir";
+
+    /**
+     * The System property key for the Java IO temporary directory.
+     */
+    private static final String JAVA_IO_TMPDIR_KEY = "java.io.tmpdir";
+
+    /**
+     * The System property key for the Java home directory.
+     */
+    private static final String JAVA_HOME_KEY = "java.home";
+
+    /**
+     * <p>
+     * The {@code awt.toolkit} System Property.
+     * </p>
+     * <p>
+     * Holds a class name, on Windows XP this is {@code sun.awt.windows.WToolkit}.
+     * </p>
+     * <p>
+     * <b>On platforms without a GUI, this value is {@code null}.</b>
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.1
+     */
+    public static final String AWT_TOOLKIT = getSystemProperty("awt.toolkit");
+
+    /**
+     * <p>
+     * The {@code file.encoding} System Property.
+     * </p>
+     * <p>
+     * File encoding, such as {@code Cp1252}.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.0
+     * @since Java 1.2
+     */
+    public static final String FILE_ENCODING = getSystemProperty("file.encoding");
+
+    /**
+     * <p>
+     * The {@code file.separator} System Property.
+     * The file separator is:
+     * </p>
+     * <ul>
+     * <li>{@code "/"} on UNIX</li>
+     * <li>{@code "\"} on Windows.</li>
+     * </ul>
+     *
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @deprecated Use {@link File#separator}, since it is guaranteed to be a
+     *             string containing a single character and it does not require a privilege check.
+     * @since Java 1.1
+     */
+    @Deprecated
+    public static final String FILE_SEPARATOR = getSystemProperty("file.separator");
+
+    /**
+     * <p>
+     * The {@code java.awt.fonts} System Property.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.1
+     */
+    public static final String JAVA_AWT_FONTS = getSystemProperty("java.awt.fonts");
+
+    /**
+     * <p>
+     * The {@code java.awt.graphicsenv} System Property.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.1
+     */
+    public static final String JAVA_AWT_GRAPHICSENV = getSystemProperty("java.awt.graphicsenv");
+
+    /**
+     * <p>
+     * The {@code java.awt.headless} System Property. The value of this property is the String {@code "true"} or
+     * {@code "false"}.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @see #isJavaAwtHeadless()
+     * @since 2.1
+     * @since Java 1.4
+     */
+    public static final String JAVA_AWT_HEADLESS = getSystemProperty("java.awt.headless");
+
+    /**
+     * <p>
+     * The {@code java.awt.printerjob} System Property.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.1
+     */
+    public static final String JAVA_AWT_PRINTERJOB = getSystemProperty("java.awt.printerjob");
+
+    /**
+     * <p>
+     * The {@code java.class.path} System Property. Java class path.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String JAVA_CLASS_PATH = getSystemProperty("java.class.path");
+
+    /**
+     * <p>
+     * The {@code java.class.version} System Property. Java class format version number.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String JAVA_CLASS_VERSION = getSystemProperty("java.class.version");
+
+    /**
+     * <p>
+     * The {@code java.compiler} System Property. Name of JIT compiler to use. First in JDK version 1.2. Not used in Sun
+     * JDKs after 1.2.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2. Not used in Sun versions after 1.2.
+     */
+    public static final String JAVA_COMPILER = getSystemProperty("java.compiler");
+
+    /**
+     * <p>
+     * The {@code java.endorsed.dirs} System Property. Path of endorsed directory or directories.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.4
+     */
+    public static final String JAVA_ENDORSED_DIRS = getSystemProperty("java.endorsed.dirs");
+
+    /**
+     * <p>
+     * The {@code java.ext.dirs} System Property. Path of extension directory or directories.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.3
+     */
+    public static final String JAVA_EXT_DIRS = getSystemProperty("java.ext.dirs");
+
+    /**
+     * <p>
+     * The {@code java.home} System Property. Java installation directory.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String JAVA_HOME = getSystemProperty(JAVA_HOME_KEY);
+
+    /**
+     * <p>
+     * The {@code java.io.tmpdir} System Property. Default temp file path.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_IO_TMPDIR = getSystemProperty(JAVA_IO_TMPDIR_KEY);
+
+    /**
+     * <p>
+     * The {@code java.library.path} System Property. List of paths to search when loading libraries.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_LIBRARY_PATH = getSystemProperty("java.library.path");
 
     /**
      * <p>
@@ -81,6 +404,262 @@ public class SystemUtils {
      * @since Java 1.3
      */
     public static final String JAVA_RUNTIME_VERSION = getSystemProperty("java.runtime.version");
+
+    /**
+     * <p>
+     * The {@code java.specification.name} System Property. Java Runtime Environment specification name.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_SPECIFICATION_NAME = getSystemProperty("java.specification.name");
+
+    /**
+     * <p>
+     * The {@code java.specification.vendor} System Property. Java Runtime Environment specification vendor.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_SPECIFICATION_VENDOR = getSystemProperty("java.specification.vendor");
+
+    /**
+     * <p>
+     * The {@code java.specification.version} System Property. Java Runtime Environment specification version.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.3
+     */
+    public static final String JAVA_SPECIFICATION_VERSION = getSystemProperty("java.specification.version");
+    private static final JavaVersion JAVA_SPECIFICATION_VERSION_AS_ENUM = JavaVersion.get(JAVA_SPECIFICATION_VERSION);
+
+    /**
+     * <p>
+     * The {@code java.util.prefs.PreferencesFactory} System Property. A class name.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.1
+     * @since Java 1.4
+     */
+    public static final String JAVA_UTIL_PREFS_PREFERENCES_FACTORY =
+        getSystemProperty("java.util.prefs.PreferencesFactory");
+
+    /**
+     * <p>
+     * The {@code java.vendor} System Property. Java vendor-specific string.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String JAVA_VENDOR = getSystemProperty("java.vendor");
+
+    /**
+     * <p>
+     * The {@code java.vendor.url} System Property. Java vendor URL.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String JAVA_VENDOR_URL = getSystemProperty("java.vendor.url");
+
+    /**
+     * <p>
+     * The {@code java.version} System Property. Java version number.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String JAVA_VERSION = getSystemProperty("java.version");
+
+    /**
+     * <p>
+     * The {@code java.vm.info} System Property. Java Virtual Machine implementation info.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.0
+     * @since Java 1.2
+     */
+    public static final String JAVA_VM_INFO = getSystemProperty("java.vm.info");
+
+    /**
+     * <p>
+     * The {@code java.vm.name} System Property. Java Virtual Machine implementation name.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_VM_NAME = getSystemProperty("java.vm.name");
+
+    /**
+     * <p>
+     * The {@code java.vm.specification.name} System Property. Java Virtual Machine specification name.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_VM_SPECIFICATION_NAME = getSystemProperty("java.vm.specification.name");
+
+    /**
+     * <p>
+     * The {@code java.vm.specification.vendor} System Property. Java Virtual Machine specification vendor.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_VM_SPECIFICATION_VENDOR = getSystemProperty("java.vm.specification.vendor");
+
+    /**
+     * <p>
+     * The {@code java.vm.specification.version} System Property. Java Virtual Machine specification version.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_VM_SPECIFICATION_VERSION = getSystemProperty("java.vm.specification.version");
+
+    /**
+     * <p>
+     * The {@code java.vm.vendor} System Property. Java Virtual Machine implementation vendor.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_VM_VENDOR = getSystemProperty("java.vm.vendor");
+
+    /**
+     * <p>
+     * The {@code java.vm.version} System Property. Java Virtual Machine implementation version.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.2
+     */
+    public static final String JAVA_VM_VERSION = getSystemProperty("java.vm.version");
 
     /**
      * <p>
@@ -155,6 +734,327 @@ public class SystemUtils {
      * @since Java 1.1
      */
     public static final String OS_VERSION = getSystemProperty("os.version");
+
+    /**
+     * <p>
+     * The {@code path.separator} System Property. Path separator ({@code &quot;:&quot;} on UNIX).
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @deprecated Use {@link File#pathSeparator}, since it is guaranteed to be a
+     *             string containing a single character and it does not require a privilege check.
+     * @since Java 1.1
+     */
+    @Deprecated
+    public static final String PATH_SEPARATOR = getSystemProperty("path.separator");
+
+    /**
+     * <p>
+     * The {@code user.country} or {@code user.region} System Property. User's country code, such as {@code GB}. First
+     * in Java version 1.2 as {@code user.region}. Renamed to {@code user.country} in 1.4
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.0
+     * @since Java 1.2
+     */
+    public static final String USER_COUNTRY = getSystemProperty("user.country") == null ?
+            getSystemProperty("user.region") : getSystemProperty("user.country");
+
+    /**
+     * <p>
+     * The {@code user.dir} System Property. User's current working directory.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String USER_DIR = getSystemProperty(USER_DIR_KEY);
+
+    /**
+     * <p>
+     * The {@code user.home} System Property. User's home directory.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String USER_HOME = getSystemProperty(USER_HOME_KEY);
+
+    /**
+     * <p>
+     * The {@code user.language} System Property. User's language code, such as {@code "en"}.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.0
+     * @since Java 1.2
+     */
+    public static final String USER_LANGUAGE = getSystemProperty("user.language");
+
+    /**
+     * <p>
+     * The {@code user.name} System Property. User's account name.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since Java 1.1
+     */
+    public static final String USER_NAME = getSystemProperty(USER_NAME_KEY);
+
+    /**
+     * <p>
+     * The {@code user.timezone} System Property. For example: {@code "America/Los_Angeles"}.
+     * </p>
+     * <p>
+     * Defaults to {@code null} if the runtime does not have security access to read this property or the property does
+     * not exist.
+     * </p>
+     * <p>
+     * This value is initialized when the class is loaded. If {@link System#setProperty(String,String)} or
+     * {@link System#setProperties(java.util.Properties)} is called after this class is loaded, the value will be out of
+     * sync with that System property.
+     * </p>
+     *
+     * @since 2.1
+     */
+    public static final String USER_TIMEZONE = getSystemProperty("user.timezone");
+
+    // Java version checks
+    // -----------------------------------------------------------------------
+    // These MUST be declared after those above as they depend on the
+    // values being set up
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.1 (also 1.1.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     */
+    public static final boolean IS_JAVA_1_1 = getJavaVersionMatches("1.1");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.2 (also 1.2.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     */
+    public static final boolean IS_JAVA_1_2 = getJavaVersionMatches("1.2");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.3 (also 1.3.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     */
+    public static final boolean IS_JAVA_1_3 = getJavaVersionMatches("1.3");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.4 (also 1.4.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     */
+    public static final boolean IS_JAVA_1_4 = getJavaVersionMatches("1.4");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.5 (also 1.5.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     */
+    public static final boolean IS_JAVA_1_5 = getJavaVersionMatches("1.5");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.6 (also 1.6.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     */
+    public static final boolean IS_JAVA_1_6 = getJavaVersionMatches("1.6");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.7 (also 1.7.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.0
+     */
+    public static final boolean IS_JAVA_1_7 = getJavaVersionMatches("1.7");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.8 (also 1.8.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.3.2
+     */
+    public static final boolean IS_JAVA_1_8 = getJavaVersionMatches("1.8");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 1.9 (also 1.9.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.4
+     *
+     * @deprecated As of release 3.5, replaced by {@link #IS_JAVA_9}
+     */
+    @Deprecated
+    public static final boolean IS_JAVA_1_9 = getJavaVersionMatches("9");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 9 (also 9.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.5
+     */
+    public static final boolean IS_JAVA_9 = getJavaVersionMatches("9");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 10 (also 10.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.7
+     */
+    public static final boolean IS_JAVA_10 = getJavaVersionMatches("10");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 11 (also 11.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.8
+     */
+    public static final boolean IS_JAVA_11 = getJavaVersionMatches("11");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 12 (also 12.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.9
+     */
+    public static final boolean IS_JAVA_12 = getJavaVersionMatches("12");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 13 (also 13.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.9
+     */
+    public static final boolean IS_JAVA_13 = getJavaVersionMatches("13");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 14 (also 14.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.10
+     */
+    public static final boolean IS_JAVA_14 = getJavaVersionMatches("14");
+
+    /**
+     * <p>
+     * Is {@code true} if this is Java version 15 (also 15.x versions).
+     * </p>
+     * <p>
+     * The field will return {@code false} if {@link #JAVA_VERSION} is {@code null}.
+     * </p>
+     *
+     * @since 3.10
+     */
+    public static final boolean IS_JAVA_15 = getJavaVersionMatches("15");
 
     // Operating system checks
     // -----------------------------------------------------------------------
@@ -664,6 +1564,21 @@ public class SystemUtils {
     public static final boolean IS_OS_ZOS = getOsMatchesName("z/OS");
 
     /**
+     * <p>
+     * Gets the Java home directory as a {@code File}.
+     * </p>
+     *
+     * @return a directory
+     * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
+     * access to the specified system property.
+     * @see System#getProperty(String)
+     * @since 2.1
+     */
+    public static File getJavaHome() {
+        return new File(System.getProperty(JAVA_HOME_KEY));
+    }
+
+    /**
      * Gets the host name from an environment variable
      * (COMPUTERNAME on Windows, HOSTNAME elsewhere).
      *
@@ -676,6 +1591,33 @@ public class SystemUtils {
      */
     public static String getHostName() {
         return IS_OS_WINDOWS ? System.getenv("COMPUTERNAME") : System.getenv("HOSTNAME");
+    }
+
+    /**
+     * <p>
+     * Gets the Java IO temporary directory as a {@code File}.
+     * </p>
+     *
+     * @return a directory
+     * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
+     * access to the specified system property.
+     * @see System#getProperty(String)
+     * @since 2.1
+     */
+    public static File getJavaIoTmpDir() {
+        return new File(System.getProperty(JAVA_IO_TMPDIR_KEY));
+    }
+
+    /**
+     * <p>
+     * Decides if the Java version matches.
+     * </p>
+     *
+     * @param versionPrefix the prefix for the java version
+     * @return true if matches, or false if not or can't determine
+     */
+    private static boolean getJavaVersionMatches(final String versionPrefix) {
+        return isJavaVersionMatch(JAVA_SPECIFICATION_VERSION, versionPrefix);
     }
 
     /**
@@ -721,6 +1663,154 @@ public class SystemUtils {
             // + "'; the SystemUtils property value will default to null.");
             return null;
         }
+    }
+
+    /**
+     * <p>
+     * Gets an environment variable, defaulting to {@code defaultValue} if the variable cannot be read.
+     * </p>
+     * <p>
+     * If a {@code SecurityException} is caught, the return value is {@code defaultValue} and a message is written to
+     * {@code System.err}.
+     * </p>
+     *
+     * @param name
+     *            the environment variable name
+     * @param defaultValue
+     *            the default value
+     * @return the environment variable value or {@code defaultValue} if a security problem occurs
+     * @since 3.8
+     */
+    public static String getEnvironmentVariable(final String name, final String defaultValue) {
+        try {
+            final String value = System.getenv(name);
+            return value == null ? defaultValue : value;
+        } catch (final SecurityException ex) {
+            // we are not allowed to look at this property
+            // System.err.println("Caught a SecurityException reading the environment variable '" + name + "'.");
+            return defaultValue;
+        }
+    }
+
+    /**
+     * <p>
+     * Gets the user directory as a {@code File}.
+     * </p>
+     *
+     * @return a directory
+     * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
+     * access to the specified system property.
+     * @see System#getProperty(String)
+     * @since 2.1
+     */
+    public static File getUserDir() {
+        return new File(System.getProperty(USER_DIR_KEY));
+    }
+
+    /**
+     * <p>
+     * Gets the user home directory as a {@code File}.
+     * </p>
+     *
+     * @return a directory
+     * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
+     * access to the specified system property.
+     * @see System#getProperty(String)
+     * @since 2.1
+     */
+    public static File getUserHome() {
+        return new File(System.getProperty(USER_HOME_KEY));
+    }
+
+    /**
+     * <p>
+     * Gets the user name.
+     * </p>
+     *
+     * @return a name
+     * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
+     * access to the specified system property.
+     * @see System#getProperty(String)
+     * @since 3.10
+     */
+    public static String getUserName() {
+        return System.getProperty(USER_NAME_KEY);
+    }
+
+    /**
+     * <p>
+     * Gets the user name.
+     * </p>
+     *
+     * @param defaultValue A default value.
+     * @return a name
+     * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
+     * access to the specified system property.
+     * @see System#getProperty(String)
+     * @since 3.10
+     */
+    public static String getUserName(final String defaultValue) {
+        return System.getProperty(USER_NAME_KEY, defaultValue);
+    }
+
+    /**
+     * Returns whether the {@link #JAVA_AWT_HEADLESS} value is {@code true}.
+     *
+     * @return {@code true} if {@code JAVA_AWT_HEADLESS} is {@code "true"}, {@code false} otherwise.
+     * @see #JAVA_AWT_HEADLESS
+     * @since 2.1
+     * @since Java 1.4
+     */
+    public static boolean isJavaAwtHeadless() {
+        return Boolean.TRUE.toString().equals(JAVA_AWT_HEADLESS);
+    }
+
+    /**
+     * <p>
+     * Is the Java version at least the requested version.
+     * </p>
+     * <p>
+     *
+     * @param requiredVersion the required version, for example 1.31f
+     * @return {@code true} if the actual version is equal or greater than the required version
+     */
+    public static boolean isJavaVersionAtLeast(final JavaVersion requiredVersion) {
+        return JAVA_SPECIFICATION_VERSION_AS_ENUM.atLeast(requiredVersion);
+    }
+
+    /**
+     * <p>
+     * Is the Java version at most the requested version.
+     * </p>
+     * <p>
+     * Example input:
+     * </p>
+     *
+     * @param requiredVersion the required version, for example 1.31f
+     * @return {@code true} if the actual version is equal or greater than the required version
+     * @since 3.9
+     */
+    public static boolean isJavaVersionAtMost(final JavaVersion requiredVersion) {
+        return JAVA_SPECIFICATION_VERSION_AS_ENUM.atMost(requiredVersion);
+    }
+
+    /**
+     * <p>
+     * Decides if the Java version matches.
+     * </p>
+     * <p>
+     * This method is package private instead of private to support unit test invocation.
+     * </p>
+     *
+     * @param version the actual Java version
+     * @param versionPrefix the prefix for the expected Java version
+     * @return true if matches, or false if not or can't determine
+     */
+    static boolean isJavaVersionMatch(final String version, final String versionPrefix) {
+        if (version == null) {
+            return false;
+        }
+        return version.startsWith(versionPrefix);
     }
 
     /**
@@ -783,6 +1873,20 @@ public class SystemUtils {
             }
         }
         return true;
+    }
+
+    // -----------------------------------------------------------------------
+    /**
+     * <p>
+     * SystemUtils instances should NOT be constructed in standard programming. Instead, the class should be used as
+     * {@code SystemUtils.FILE_SEPARATOR}.
+     * </p>
+     * <p>
+     * This constructor is public to permit tools that require a JavaBean instance to operate.
+     * </p>
+     */
+    public SystemUtils() {
+        super();
     }
 
 }
