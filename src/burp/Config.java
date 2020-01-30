@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import utils.StringUtils;
 
 
@@ -212,5 +213,17 @@ public class Config {
         // Save the config file in extension settings.
         cfg.saveConfigToExtensionSettings();
         return cfg;
+    }
+
+    // Returns the full path to the default config file.
+    public static String getDefaultConfigFullPath(){
+        // Get the extension jar path.
+        String jarPath = callbacks.getExtensionFilename();
+        // Get the parent directory of the jar path.
+        String jarDirectory = StringUtils.getParentDirectory(jarPath);
+
+        // Create the full path for the default config file.
+        // jarDirectory/Config.defaultConfigName.
+        return FilenameUtils.concat(jarDirectory, defaultConfigName);
     }
 }

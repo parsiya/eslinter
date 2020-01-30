@@ -59,18 +59,27 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
         // saved or there is no default config file.
         extensionConfig = getDefaultConfig();
 
-        // Search for the default config file and load it if it exists.
-        loadDefaultConfigFile(Config.defaultConfigName);
+        // Check if the default config file exists.
+        String defaultConfigFile = Config.getDefaultConfigFullPath();
 
-        // Load saved config from extension settings (if any).
-        loadSavedConfig();
+        // This means that if the default config file contains a bad config, we
+        // will not silenty fallback to the saved extension settings.
+        if (CheckPaths.fileExists(defaultConfigFile)) {
+            // Search for the default config file and load it if it exists.
+            loadDefaultConfigFile(Config.defaultConfigName);
+        } else {
+            // Load the saved config file from the extension settings (if any).
+            loadSavedConfig();
+        }
 
         // Check and create paths. We might get errors if we are loading a new
         // config but users should be able diagnose that.
         try {
             CheckPaths.checkAndCreatePaths(extensionConfig);
-        } catch (CustomException e) {
-            log.error(e.getMessage());
+        } catch (Exception e) {
+            // Issue41 - catch everything here.
+            log.error("%s", StringUtils.getStackTrace(e));
+            log.alert("Bad config file, check the extension's error tab");
         }
         log.debug("Finished path check.");
 
@@ -286,14 +295,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
         // Check if there is a file named extensionConfig.defaultConfigName in
         // the current directory, if so, load it and overwrite the extension.
         try {
-            // Get the extension jar path.
-            String jarPath = callbacks.getExtensionFilename();
-            // Get the parent directory of the jar path.
-            String jarDirectory = StringUtils.getParentDirectory(jarPath);
-
-            // Create the full path for the default config file.
-            // jarDirectory/Config.defaultConfigName.
-            String defaultConfigFullPath = FilenameUtils.concat(jarDirectory, cfgFileName);
+            String defaultConfigFullPath = Config.getDefaultConfigFullPath();
             File f = new File(defaultConfigFullPath);
 
             String cfgFile = FileUtils.readFileToString(f, StringUtils.UTF8);
@@ -306,6 +308,8 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
             );
         } catch (SQLException e) {
             // Issue42.
+            // The Answer to the Ultimate Question of Life, the Universe, and
+            // Everything.
             // If this happens, it means we have loaded a new config file that
             // does not have the actual path to the database created. This is
             // ok, the checkAndCreatePaths will create the path later.

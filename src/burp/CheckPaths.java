@@ -134,7 +134,7 @@ public class CheckPaths {
     }
 
     // Returns true if a file exists.
-    private static boolean fileExists(String file) {
+    public static boolean fileExists(String file) {
         return new File(file).exists();
     }
 }
