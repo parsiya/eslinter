@@ -53,11 +53,12 @@ public class Exec {
         ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         PumpStreamHandler psh = new PumpStreamHandler(stdout, stderr);
         executor.setStreamHandler(psh);
-        executor.setWorkingDirectory(new File(workingDirectory));
+        if (workingDirectory != null)
+            executor.setWorkingDirectory(new File(workingDirectory));
         executor.setExitValues(exitValues);
         int exitValue = executor.execute(cmdLine);
-        stdOut = stdout.toString();
-        stdErr = stderr.toString();
+        stdOut = stdout.toString().trim();
+        stdErr = stderr.toString().trim();
         return exitValue;
     }
 
@@ -75,14 +76,25 @@ public class Exec {
     
     public static String execute(String workingDir, String... commands) throws IOException {
         ArrayList<String> cmd = new ArrayList<String>();
-        String[] cmdPrompt = new String[] {
-            "cmd.exe", "/c"
-        };
-        cmd.addAll(Arrays.asList(cmdPrompt));
+
+        // Issue45.
+        // 1. Detect OS.
+        if (SystemUtils.IS_OS_WINDOWS) {
+            // 2. If Windows, add "cmd.exe /c" to the start of the command.
+            String[] winCmd = new String[] {
+                "cmd.exe", "/c"
+            };
+            cmd.addAll(Arrays.asList(winCmd));
+        }
+        // 3. If *Nix and Mac, do nothing.
+
+        // Add the rest of the command.
         cmd.addAll(Arrays.asList(commands));
-        // cmd.add("cd"); // This helps us figure out where we are.
         ProcessBuilder pb = new ProcessBuilder(cmd);
-        pb.directory(new File(workingDir));
+        // If the working directory is null, it uses the one from the current
+        // Java runtime.
+        if (workingDir != null)
+            pb.directory(new File(workingDir));
         Process p = pb.start();
         String output = IOUtils.toString(p.getInputStream(), StringUtils.UTF8);
         String error = IOUtils.toString(p.getErrorStream(), StringUtils.UTF8);
@@ -95,6 +107,5 @@ public class Exec {
         if (StringUtils.isNotEmpty(error)) result += "---" + output;
         
         return result;
-
     }
 }

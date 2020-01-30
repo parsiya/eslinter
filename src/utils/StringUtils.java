@@ -15,7 +15,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class StringUtils {
 
-    public static String UTF8 = StringUtils.UTF8;
+    public static String UTF8 = "UTF-8";
 
     // Print to extension output.
     public static void print(String data) {
