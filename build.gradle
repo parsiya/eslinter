@@ -114,9 +114,17 @@ import java.nio.file.Paths
 import java.io.File
 
 task config() {
-    // Check if target was provided.
-    // 1. Read a command-line parameter. This will be the project path.
-    if (project.hasProperty('target')) {
+    doLast {
+        // Check if target was provided.
+        // 1. Read a command-line parameter. This will be the project path.
+        if (!project.hasProperty('target')) {
+            // Return an error if target is not provided.
+            println 'Please provide the target path in this format'
+            println 'Relative path: `gradlew config -Ptarget=/relative/path/to/target'
+            println 'Absolute path: `gradlew config -Ptarget=c:/absolute/path/to/target' 
+            throw new GradleException('target parameter not provided')
+        }
+
 
         String currentDir = System.properties['user.dir']
         // 2. Check if install has been called by checking for the existence of
@@ -125,7 +133,7 @@ task config() {
         if (Files.isDirectory(Paths.get(currentDir, 'eslint-security/node_modules'))) {
             println 'eslint-security/node_modules exists'
         } else {
-            throw new GradleException('eslint-security/node_modules does not exist')
+            throw new GradleException('`eslint-security/node_modules` does not exist, have you run `gradlew install')
         }
 
         // 3. Check if target is an absolute path.
@@ -222,10 +230,10 @@ task config() {
         File configFile = new File(Paths.get(currentDir, 'release/config.json').toString())
         configFile.write(cfgStr)
 
-        // println "eslint = $eslint"
+        println "Configuration finished."
+        println "Results will be stored in ${targetDir.toString().toString().replace("\\", "/")}."
+        println "Config file is stored at ${Paths.get(currentDir,'release/config.json').toString().replace("\\", "/")}."
+        println "Add the extension jar file to Burp and start linting."
 
-    } else {
-        // Return an error if target is not provided.
-        println 'please provide the target path like this `gradlew config -Ptarget=/path/to/target'
     }
 }

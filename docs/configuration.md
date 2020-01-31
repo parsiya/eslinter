@@ -2,20 +2,21 @@
 `ESLinter` uses a config file in json format.
 
 - [Loading and Storing Configurations](#loading-and-storing-configurations)
-  - [The Default Configuration File](#the-default-configuration-file)
-  - [Saving and Loading Configuration Files](#saving-and-loading-configuration-files)
+    - [The Default Configuration File](#the-default-configuration-file)
+    - [Saving and Loading Configuration Files](#saving-and-loading-configuration-files)
+- [Manual Configuration Steps](#manual-configuration-steps)
 - [Configuration File Elements](#configuration-file-elements)
-  - [Storage Paths](#storage-paths)
-  - [Command Paths](#command-paths)
-  - [Highlight Requests](#highlight-requests)
-  - [Process Requests Created by Specific Burp Tools](#process-requests-created-by-specific-burp-tools)
-  - [Only Process Requests in Scope](#only-process-requests-in-scope)
-  - [Performance](#performance)
-  - [Configuring JavaScript Detection](#configuring-javascript-detection)
-    - [Pure JavaScript](#pure-javascript)
-    - [Embedded JavaScript](#embedded-javascript)
-  - [Removing Request Headers](#removing-request-headers)
-  - [The Debug Flag](#the-debug-flag)
+    - [Storage Paths](#storage-paths)
+    - [Command Paths](#command-paths)
+    - [Highlight Requests](#highlight-requests)
+    - [Process Requests Created by Specific Burp Tools](#process-requests-created-by-specific-burp-tools)
+    - [Only Process Requests in Scope](#only-process-requests-in-scope)
+    - [Performance](#performance)
+    - [Configuring JavaScript Detection](#configuring-javascript-detection)
+        - [Pure JavaScript](#pure-javascript)
+        - [Embedded JavaScript](#embedded-javascript)
+    - [Removing Request Headers](#removing-request-headers)
+    - [The Debug Flag](#the-debug-flag)
 
 ## Loading and Storing Configurations
 
@@ -41,10 +42,35 @@ need to load the configuration file every time the extension starts. After a
 config is loaded, it will be reused (absent the existence of `config.json`
 explained above).
 
+## Manual Configuration Steps
+It's recommended to use the `config` Gradle task. But you can also create your
+own artisanal handcrafted config files.
+
+1. Create a sample config file. This could be an existing one or a new one
+   created by the config.
+2. Edit the config file in your favorite editor.
+3. At a minimum, you need to provide paths to (see
+   [docs/configuration.md](docs/configuration.md) for more information):
+    * `beautified-javascript-path`: Path to store extracted JavaScript files.
+    * `eslint-output-path`: Path to store ESLint results.
+    * `database-path`: Location of the target database (it will be created if it
+      does not exist).
+    * `eslint-config-path`: Path to the ESLint configuration file.
+    * `eslint-command-path`: Path to the `eslint` command.
+    * `jsbeautify-command-path`:  Path to the `js-beautify` command.
+4. Modify any other settings. See the
+   [Configuration File Elements](#configuration-file-elements) section.
+5. Put the config file in the `release` directory or where the jar
+   file is located.
+
+Note that Windows accepts paths with forward slashes. So
+`c:/eslint-security/node_modules/.bin/eslint.cmd` is a valid path. If you are
+providing paths with backslashes be sure to escape them. E.g.,
+`c:\\eslint-security\\nod_modules\\.bin\\eslint.cmd`.
+
 ## Configuration File Elements
 The configuration file provides several options to control the behavior of the
-extension. For most users, providing the top six elements discussed in the
-Quickstart section is enough.
+extension.
 
 ### Storage Paths
 The extension stores every extracted JavaScript and every ESLint result on
@@ -63,7 +89,7 @@ having to export it from the database.
   it will be created.
 
 Inside each JavaScript file (and ESLint result file), there is a comment that
-identifies the URL and the referer. Using this two information you can figure
+identifies the URL and the referer. Using this information you can figure
 out where this JavaScript came from and how to apply the results.
 
 ### Command Paths
@@ -79,11 +105,6 @@ in `eslint-security/node_modules/.bin/`.
 
 On Windows be sure to point these to `eslint.cmd` and `js-beautify.cmd` and not
 just `eslint` and `js-beautify`.
-
-Note that Windows accepts paths with forward slashes. So
-`c:/eslint-security/node_modules/.bin/eslint.cmd` is a valid path. If you are
-providing paths with backslashes be sure to escape them. E.g.,
-`c:\\eslint-security\\nod_modules\\.bin\\eslint.cmd`.
 
 [eslint-security]: https://github.com/parsiya/eslint-security
 
@@ -166,9 +187,9 @@ middle of processing nothing is lost. Items can be processed when the
 extension is loaded again.
 
 * `number-of-linting-threads`: Number of concurrent thread beautifying and
-  linting JavaScript. This is the most expensive operation. By
-  default the value of this key is `3`. Note that you can also stop
-  processing using the `Process` toggle button in the extension interface.
+  linting JavaScript. This is the most expensive operation. By default, the
+  value of this key is `3`. Note that you can also stop processing using the
+  `Process` toggle button in the extension interface.
 * `number-of-request-threads`: Every request and response is processed in a
   separate thread. This element controls the number of concurrent request and
   response processing threads.
