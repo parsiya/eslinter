@@ -7,7 +7,8 @@ assignees: ''
 
 ---
 
-**If the feature is already mentioned in the FAQ. (e.g., "Creating Burp issues from ESLint results."), it will be closed without comment.**
+**If the feature is already mentioned in the FAQ. (e.g., "Creating Burp issues from ESLint results."), why is it important?**
+Please tell me why you need this feature and why it's important.
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
