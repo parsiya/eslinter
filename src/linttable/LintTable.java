@@ -162,9 +162,17 @@ public class LintTable extends JTable implements MouseListener {
                 String resultsFilePath = FilenameUtils.concat(selectedPath, resultsFileName);
 
                 // Save both files.
-                FileUtils.writeStringToFile(new File(beautifiedFilePath), selected.beautifiedJavaScript, StringUtils.UTF8);
-                FileUtils.writeStringToFile(new File(resultsFilePath), selected.results, StringUtils.UTF8);
+
+                // Issue 37.
+                // Add the metadata strings to file before saving them.
+                StringBuilder sbJS = new StringBuilder(selected.metadata.toCommentString());
+                sbJS.append(selected.beautifiedJavaScript);
+                FileUtils.writeStringToFile(new File(beautifiedFilePath), sbJS.toString(), StringUtils.UTF8);
                 log.debug("Stored beautified JavaScipt in: %s.", beautifiedFilePath);
+                
+                StringBuilder sbRes = new StringBuilder(selected.metadata.toCommentString());
+                sbRes.append(selected.results);
+                FileUtils.writeStringToFile(new File(resultsFilePath), sbRes.toString(), StringUtils.UTF8);
                 log.debug("Stored results in: %s.", resultsFilePath);
 
                 // Save the directory as the last working directory.
