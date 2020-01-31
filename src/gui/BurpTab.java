@@ -196,7 +196,7 @@ public class BurpTab {
             try {
                 configFromFile = FileUtils.readFileToString(sf, StringUtils.UTF8);
                 extensionConfig = Config.loadConfig(configFromFile);
-            } catch (SQLException | IOException e) {
+            } catch (IOException e) {
                 log.alert("Could not open config file %s.", sf.getAbsolutePath());
                 log.error("Could not open config file %s.", sf.getAbsolutePath());
                 log.error("%s", StringUtils.getStackTrace(e));
