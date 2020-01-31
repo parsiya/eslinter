@@ -1,6 +1,7 @@
 package burp;
 
 import static burp.BurpExtender.callbacks;
+import static burp.BurpExtender.log;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -203,13 +204,20 @@ public class Config {
     // Creates a new config from the json string and returns it. Also waits for
     // the threadpool to shutdown, closes the DB connection and establishes a
     // connection to the new DB set in the new config file.
-    public static Config loadConfig(String json) throws SQLException, IOException {
+    public static Config loadConfig(String json) throws IOException {
         // Unload the extension, because we are loading a new config.
         BurpExtender.unloadExtension();
         // Read the json string and create a new config.
         Config cfg = configBuilder(json);
-        // Connect to the new database file.
-        BurpExtender.databaseConnect(cfg.dbPath);
+        try {
+            // Connect to the new database file.
+            BurpExtender.databaseConnect(cfg.dbPath);
+        } catch (SQLException e) {
+            log.debug(
+                "Could not create the database file: %s", 
+                e.getMessage()
+            );
+        }
         // Save the config file in extension settings.
         cfg.saveConfigToExtensionSettings();
         return cfg;

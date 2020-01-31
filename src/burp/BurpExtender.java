@@ -306,17 +306,6 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
                 "Default config file '%s' was not found.",
                 Config.defaultConfigName
             );
-        } catch (SQLException e) {
-            // Issue42.
-            // The Answer to the Ultimate Question of Life, the Universe, and
-            // Everything.
-            // If this happens, it means we have loaded a new config file that
-            // does not have the actual path to the database created. This is
-            // ok, the checkAndCreatePaths will create the path later.
-            log.debug(
-                "Could not create the database file, this is OK. %s", 
-                e.getMessage()
-            );
         } catch (Exception e) {
             // If anything goes wrong here, then something else was wrong other
             // than the file not having the correct content.
