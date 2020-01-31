@@ -17,8 +17,6 @@ import org.apache.commons.io.IOUtils;
  */
 public class Exec {
 
-    private String command;
-    private String[] arguments;
     private String workingDirectory;
     private String stdOut = "";
     private String stdErr = "";
@@ -30,17 +28,21 @@ public class Exec {
     // set anything other than 0, be sure to include 0 because 0 will then be
     // treated like an error.
     public Exec(String cmd, String[] args, String workDir, int ...exitValues) {
-        command = cmd;
-        arguments = args;
         workingDirectory = workDir;
         this.exitValues = exitValues;
 
-        // Add main command.
-        cmdLine = new CommandLine(command);
-        // Add arguments.
-        for (String arg : arguments) {
-            cmdLine.addArgument(arg);
+        // On Windows Commons-Exec needs the first item to be "cmd.exe" and then
+        // "/c" and the rest of arguments.
+        if (SystemUtils.IS_OS_WINDOWS) {
+            cmdLine = new CommandLine("cmd.exe");
+            cmdLine.addArgument("/c");
+            // Add the original command.
+            cmdLine.addArgument(cmd);
+        } else {
+            cmdLine = new CommandLine(cmd);
         }
+        // Add the rest of the arguments.
+        cmdLine.addArguments(args);
     }
 
     public int exec() throws ExecuteException, IOException {
@@ -74,38 +76,13 @@ public class Exec {
         return stdErr;
     }
     
-    public static String execute(String workingDir, String... commands) throws IOException {
-        ArrayList<String> cmd = new ArrayList<String>();
-
-        // Issue45.
-        // 1. Detect OS.
-        if (SystemUtils.IS_OS_WINDOWS) {
-            // 2. If Windows, add "cmd.exe /c" to the start of the command.
-            String[] winCmd = new String[] {
-                "cmd.exe", "/c"
-            };
-            cmd.addAll(Arrays.asList(winCmd));
-        }
-        // 3. If *Nix and Mac, do nothing.
-
-        // Add the rest of the command.
-        cmd.addAll(Arrays.asList(commands));
-        ProcessBuilder pb = new ProcessBuilder(cmd);
-        // If the working directory is null, it uses the one from the current
-        // Java runtime.
-        if (workingDir != null)
-            pb.directory(new File(workingDir));
-        Process p = pb.start();
-        String output = IOUtils.toString(p.getInputStream(), StringUtils.UTF8);
-        String error = IOUtils.toString(p.getErrorStream(), StringUtils.UTF8);
-
-        // TODO Find a better way of propagating the error results. Should we
-        // throw an exception instead?
-        // Make a custom exception and throw it with the message from error?
-        String result = "";
-        if (StringUtils.isNotEmpty(output)) result += output;
-        if (StringUtils.isNotEmpty(error)) result += "---" + output;
-        
-        return result;
+    // Executes the Exec object but does not redirect stdout and stderr.
+    public int execCmd() throws ExecuteException, IOException {
+        DefaultExecutor executor = new DefaultExecutor();
+        if (workingDirectory != null)
+            executor.setWorkingDirectory(new File(workingDirectory));
+        executor.setExitValues(exitValues);
+        int exitValue = executor.execute(cmdLine);
+        return exitValue; 
     }
 }
