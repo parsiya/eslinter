@@ -45,25 +45,25 @@ public class Config {
     public String storagePath = "";
 
     // Where ESLint results are stored.
-    @SerializedName("eslint-output-path")
+    @SerializedName("eslint-result-path")
     public String eslintOutputPath = "";
-
-    // ESLint binary full path. [path]/node_modules/.bin/eslint
-    @SerializedName("eslint-command-path")
-    public String eslintCommandPath = "";
-
-    // Path to the ESLint configuration file.
-    @SerializedName("eslint-config-path")
-    public String eslintConfigPath = "";
-
-    // Full path to the js-beautify binary/command. [path]/node_modules/.bin/eslint
-    @SerializedName("jsbeautify-command-path")
-    public String jsBeautifyCommandPath = "";
 
     // Full path to the sqlite database file. It will be created if it does not
     // exist.
     @SerializedName("database-path")
     public String dbPath = "";
+
+    // Path to the ESLint configuration file.
+    @SerializedName("eslint-config-path")
+    public String eslintConfigPath = "";
+
+    // ESLint binary full path. [path]/node_modules/.bin/eslint
+    @SerializedName("eslint-command-path")
+    public String eslintCommandPath = "";
+
+    // Full path to the js-beautify binary/command. [path]/node_modules/.bin/eslint
+    @SerializedName("jsbeautify-command-path")
+    public String jsBeautifyCommandPath = "";
 
     // If true, only in-scope requests will be processed.
     @SerializedName("only-process-in-scope")
@@ -73,27 +73,31 @@ public class Config {
     @SerializedName("highlight")
     public boolean highlight = false;
 
-    // Only lint requests made by these tools. The names here must be the same
-    // as the getToolName column (case-insensitive):
-    // | ToolFlag | getToolName |
-    // |----------------|-------------|
-    // | TOOL_SUITE | Suite |
-    // | TOOL_TARGET | Target |
-    // | TOOL_PROXY | Proxy |
-    // | TOOL_SPIDER | Scanner |
-    // | TOOL_SCANNER | Scanner |
-    // | TOOL_INTRUDER | Intruder |
-    // | TOOL_REPEATER | Repeater |
-    // | TOOL_SEQUENCER | Sequencer |
-    // | TOOL_DECODER | null |
-    // | TOOL_COMPARER | null |
-    // | TOOL_EXTENDER | Extender |
-    @SerializedName("process-tool-list")
-    public String[] processToolList = new String[] {"Proxy", "Scanner", "Repeater"};
-
     // If set to true, the extension will print extra information. This can be
     // used for troubleshooting.
     public boolean debug = true;
+
+    // Only lint requests made by these tools. The names here must be the same
+    // as the getToolName column (case-insensitive):
+    // | ToolFlag       | getToolName |
+    // |----------------|-------------|
+    // | TOOL_SUITE     | Suite       |
+    // | TOOL_TARGET    | Target      |
+    // | TOOL_PROXY     | Proxy       |
+    // | TOOL_SPIDER    | Scanner     |
+    // | TOOL_SCANNER   | Scanner     |
+    // | TOOL_INTRUDER  | Intruder    |
+    // | TOOL_REPEATER  | Repeater    |
+    // | TOOL_SEQUENCER | Sequencer   |
+    // | TOOL_DECODER   | null        |
+    // | TOOL_COMPARER  | null        |
+    // | TOOL_EXTENDER  | Extender    |
+    @SerializedName("process-tool-list")
+    public String[] processToolList = new String[] {
+        "Proxy",
+        "Scanner",
+        "Repeater"
+    };
 
     // Maximum number of linting threads.
     @SerializedName("number-of-linting-threads")
@@ -101,7 +105,7 @@ public class Config {
 
     // How many seconds to wait for a linting task to complete. Increase this if
     // you are beautifying and linting huge files.
-    @SerializedName("linting-timeout")
+    @SerializedName("lint-timeout")
     public int lintTimeout = 60;
 
     // Maximum number of request/response processing threads.
@@ -124,9 +128,9 @@ public class Config {
     @SerializedName("update-table-delay")
     public int updateTableDelay = 5;
 
-    // Maximum size of JavaScript to process in KBs.
+    // Maximum size of JavaScript to process in KBs. 0 == unlimited.
     @SerializedName("maximum-js-size")
-    public int jsMaxSize = 10000;
+    public int jsMaxSize = 0;
 
     /**
      * JavaScript MIME types. Search for "text/javascript" here
@@ -135,40 +139,52 @@ public class Config {
      * Burp returns "script" for JavaScript.
      */
     @SerializedName("js-mime-types")
-    public String[] jsTypes = new String[] {"application/javascript", "application/ecmascript",
-            "application/x-ecmascript", "application/x-javascript", "text/javascript",
-            "text/ecmascript", "text/javascript1.0", "text/javascript1.1", "text/javascript1.2",
-            "text/javascript1.3", "text/javascript1.4", "text/javascript1.5", "text/jscript",
-            "text/livescript", "text/x-ecmascript", "text/x-javascript", "script" // This is what
-                                                                                  // Burp returns as
-                                                                                  // the MIMEType if
-                                                                                  // it detects js.
+    public String[] jsTypes = new String[] {
+        "application/javascript",
+        "application/ecmascript",
+        "application/x-ecmascript",
+        "application/x-javascript",
+        "text/javascript",
+        "text/ecmascript",
+        "text/javascript1.0",
+        "text/javascript1.1",
+        "text/javascript1.2",
+        "text/javascript1.3",
+        "text/javascript1.4",
+        "text/javascript1.5",
+        "text/jscript",
+        "text/livescript",
+        "text/x-ecmascript",
+        "text/x-javascript",
+        "script" // This is what Burp returns as the MIMEType if it detects js.
     };
 
     // File extensions that might contain JavaScript.
     @SerializedName("javascript-file-extensions")
-    public String[] fileExtensions = new String[] {"js", "javascript"};
+    public String[] fileExtensions = new String[] {
+        "js",
+        "javascript"
+    };
 
     // Content-Types that might contain scripts, the JavaScript inside these
     // will be extracted and used.
     // Should be entered as lowercase here.
     @SerializedName("contains-javascript")
-    public String[] containsScriptTypes = new String[] {"text/html", "application/xhtml+xml" // XHTML,
-                                                                                             // be
-                                                                                             // sure
-                                                                                             // to
-                                                                                             // remove
-                                                                                             // the
-                                                                                             // CDATA
-                                                                                             // tags.
+    public String[] containsScriptTypes = new String[] {
+        "text/html",
+        "application/xhtml+xml" // XHTML, be sure to remove the CDATA tags.
     };
 
     /**
-     * Removable headers. These headers will be removed from the requests. The change will not
-     * appear in Burp history but the outgoing request will not have these headers.
+     * Removable headers. These headers will be removed from the requests. The
+     * change will not appear in Burp history but the outgoing request will not
+     * have these headers.
      */
     @SerializedName("removable-headers")
-    public String[] headersToRemove = new String[] {"If-Modified-Since", "If-None-Match"};
+    public String[] headersToRemove = new String[] {
+        "If-Modified-Since",
+        "If-None-Match"
+    };
 
     // Convert the config to JSON.
     public String toString() {
@@ -229,7 +245,6 @@ public class Config {
         String jarPath = callbacks.getExtensionFilename();
         // Get the parent directory of the jar path.
         String jarDirectory = StringUtils.getParentDirectory(jarPath);
-
         // Create the full path for the default config file.
         // jarDirectory/Config.defaultConfigName.
         return FilenameUtils.concat(jarDirectory, defaultConfigName);

@@ -1,6 +1,6 @@
 {
     "beautified-javascript-path": "CHANGEME",
-    "eslint-output-path": "CHANGEME",
+    "eslint-result-path": "CHANGEME",
     "eslint-command-path": "CHANGEME",
     "eslint-config-path": "CHANGEME",
     "jsbeautify-command-path": "CHANGEME",
@@ -14,7 +14,7 @@
         "Repeater"
     ],
     "number-of-linting-threads": 1,
-    "linting-timeout": 60,
+    "lint-timeout": 60,
     "number-of-request-threads": 10,
     "threadpool-timeout": 10,
     "lint-task-delay": 10,

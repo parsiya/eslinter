@@ -173,7 +173,7 @@ task config() {
         """
 {
     "beautified-javascript-path": "${beautified}",
-    "eslint-output-path": "${linted}",
+    "eslint-result-path": "${linted}",
     "database-path": "${db}",
     "eslint-config-path": "${cfgFile}",
     "eslint-command-path": "${eslint}",
@@ -187,7 +187,7 @@ task config() {
         "Repeater"
     ],
     "number-of-linting-threads": 1,
-    "linting-timeout": 60,
+    "lint-timeout": 60,
     "number-of-request-threads": 10,
     "threadpool-timeout": 10,
     "lint-task-delay": 10,
