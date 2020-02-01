@@ -5,12 +5,29 @@ testing flow.
 
 [eslint-org]: https://eslint.org/
 
-## JavaScript Analysis For All
+## Features
+The following list makes jokes about Burp Pro. Burp Pro is awesome and you
+should get it if you have the disposable income.
 
-1. Burp's JavaScript static and dynamic analysis is great but not customizable.
-    1. You can write your own custom ESLint rules to analyze JavaScript.
-2. Burp's JavaScript analysis is a Pro version feature.
-    1. This is a free version feature.
+1. Use custom ESLint rules.
+    * Uncustomizable Burp's JavaScript analysis vs. your own rules? Such a hard decision.
+2. Zero microtransactions.
+    * $400 for Burp Pro vs. free extension that does 80% of the job.
+3. Pain-free configuration.
+    * Provide a path and your config file is automagically created. Gradle tasks FTW!
+4. Everything is stored in two places.
+    * SQLite is forever.
+5. It doesn't interrupt your work flow.
+    * Let the extension lint while you do your testing.
+6. It's hella configurable.
+    * Running Burp on a slow machine? Reduce the number of threads.
+    * Don't want to lint now? CLick that shiny `Process` button to pause it. JavaScript will still be captured.
+    * Want to only process requests from certain hosts? Add it to the scope and
+      set the associated key in the config file to `true`.
+    * Don't like large JavaScript files? Set the max size in the config.
+    * Want to process requests from another extension? See [Process Requests from Other Extensions](#process-requests-from-other-extensions).
+7. Search.
+    * Filter requests by host. Just start typing in the text field.
 
 ## Quickstart
 
@@ -34,7 +51,7 @@ testing flow.
 
 ## Table of Content <!-- omit in toc -->
 
-- [JavaScript Analysis For All](#javascript-analysis-for-all)
+- [Features](#features)
 - [Quickstart](#quickstart)
 - [Detailed Configuration](#detailed-configuration)
 - [Technical Details](#technical-details)

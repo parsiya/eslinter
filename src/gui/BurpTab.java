@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import javax.swing.AbstractButton;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -60,14 +59,6 @@ public class BurpTab {
                 saveConfigAction();
             }
         });
-
-        configButton = new JButton("Create Configuration");
-        configButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                createConfigAction();
-            }
-        });
-
 
         processToggleButton = new JToggleButton("Process");
         processToggleButton.addActionListener(new ActionListener() {
@@ -134,9 +125,7 @@ public class BurpTab {
                                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(loadConfigButton)
                                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(saveConfigButton)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(configButton))
+                                        .addComponent(saveConfigButton))
                                 .addGroup(topPanelLayout.createSequentialGroup()
                                         .addComponent(searchTextField, GroupLayout.PREFERRED_SIZE,
                                                 400, GroupLayout.PREFERRED_SIZE)
@@ -154,8 +143,7 @@ public class BurpTab {
                                         .addGroup(topPanelLayout
                                                 .createParallelGroup(GroupLayout.Alignment.BASELINE)
                                                 .addComponent(loadConfigButton)
-                                                .addComponent(saveConfigButton)
-                                                .addComponent(configButton))
+                                                .addComponent(saveConfigButton))
                                         .addComponent(topSeparator)))
                                 .addGroup(topPanelLayout.createSequentialGroup()
                                         .addComponent(processToggleButton)
@@ -168,8 +156,7 @@ public class BurpTab {
                         .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         // Link size of buttons.
-        topPanelLayout.linkSize(SwingConstants.HORIZONTAL, loadConfigButton, saveConfigButton,
-                configButton);
+        topPanelLayout.linkSize(SwingConstants.HORIZONTAL, loadConfigButton, saveConfigButton);
         // topPanelLayout.linkSize(SwingConstants.HORIZONTAL, searchButton, resetButton);
 
         /**
@@ -227,25 +214,6 @@ public class BurpTab {
         }
     }
 
-    // Create a sample config and store it in a file.
-    private void createConfigAction() {
-        File sf = FileChooser.saveFile(panel, FileChooser.getLastWorkingDirectory(),
-                "Create sample config", "json");
-
-        if (sf != null) {
-            try {
-                // Create a temporary config and write it to file.
-                Config tmpConfig = new Config();
-                tmpConfig.writeToFile(sf);
-            } catch (Exception e) {
-                String errMsg =
-                        String.format("Could not write to file: %s", StringUtils.getStackTrace(e));
-                log.alert(errMsg);
-                log.error(errMsg);
-            }
-        }
-    }
-
     // Called when the toggle button state changes.
     private void processToggleAction(ActionEvent evt) {
         // http://www.java2s.com/Tutorials/Java/Java_Swing/0880__Java_Swing_JToggleButton.htm
@@ -268,10 +236,8 @@ public class BurpTab {
     private JButton loadConfigButton;
     private JButton saveConfigButton;
     private JTextField searchTextField;
-    // private JButton searchButton;
     private JButton resetButton;
     private JPanel topPanel;
-    private JButton configButton;
     private JToggleButton processToggleButton;
     private JSeparator topSeparator;
     private JScrollPane tableScrollPane;

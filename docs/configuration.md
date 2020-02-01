@@ -2,21 +2,21 @@
 `ESLinter` uses a config file in json format.
 
 - [Loading and Storing Configurations](#loading-and-storing-configurations)
-    - [The Default Configuration File](#the-default-configuration-file)
-    - [Saving and Loading Configuration Files](#saving-and-loading-configuration-files)
+  - [The Default Configuration File](#the-default-configuration-file)
+  - [Saving and Loading Configuration Files](#saving-and-loading-configuration-files)
 - [Manual Configuration Steps](#manual-configuration-steps)
 - [Configuration File Elements](#configuration-file-elements)
-    - [Storage Paths](#storage-paths)
-    - [Command Paths](#command-paths)
-    - [Highlight Requests](#highlight-requests)
-    - [Process Requests Created by Specific Burp Tools](#process-requests-created-by-specific-burp-tools)
-    - [Only Process Requests in Scope](#only-process-requests-in-scope)
-    - [Performance](#performance)
-    - [Configuring JavaScript Detection](#configuring-javascript-detection)
-        - [Pure JavaScript](#pure-javascript)
-        - [Embedded JavaScript](#embedded-javascript)
-    - [Removing Request Headers](#removing-request-headers)
-    - [The Debug Flag](#the-debug-flag)
+  - [Storage Paths](#storage-paths)
+  - [Command Paths](#command-paths)
+  - [Highlight Requests](#highlight-requests)
+  - [Process Requests Created by Specific Burp Tools](#process-requests-created-by-specific-burp-tools)
+  - [Only Process Requests in Scope](#only-process-requests-in-scope)
+  - [Performance](#performance)
+  - [Configuring JavaScript Detection](#configuring-javascript-detection)
+    - [Pure JavaScript](#pure-javascript)
+    - [Embedded JavaScript](#embedded-javascript)
+  - [Removing Request Headers](#removing-request-headers)
+  - [The Debug Flag](#the-debug-flag)
 
 ## Loading and Storing Configurations
 
@@ -31,8 +31,7 @@ the jar file. This will ensure that you are always using a configuration that
 you have set.
 
 ### Saving and Loading Configuration Files
-To create a sample config file, use the `Create Configuration` button. The top
-six elements (the paths) must be populated.
+To create a prepopulated config file, use the `gradlew config` task.
 
 To load a config file, use the `Load Config` button. `Save Config` saves the
 current configuration to a file.
