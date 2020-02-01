@@ -31,21 +31,23 @@ should get it if you have the disposable income.
 
 ## Quickstart
 
-1. You need `git` and `npm` installed as global commands.
+1. Install `git` and `npm`.
 2. Clone the repository.
-3. Run `gradlew install`
+3. `gradlew -q clean`. Not needed for a fresh installation.
+4. `gradlew -q install`
     1. Clones the `eslint-security` git submodule.
     2. Runs `npm install` in `eslint-security`.
-4. Run `gradlew config -Ptarget=testproject`
-    1. Creates a directory names `testproject` inside the `eslinter` directory.
-    2. Creates `config.json` in `release` with a sane configuration.
-5. Add the jar file to Burp.
-6. Navigate to the `ESLinter` tab and click on the `Process` button.
-7. Browse the target website normally with Burp as proxy.
-8. Observe the extracted JavaScript being linted.
-9. Double-click on any result to open a dialog box. Choose a path to save both
+5. `gradlew -q config -Ptarget=/relative/or/absolute/path/to/your/desired/project/location`
+    1. E.g., `gradlew -q config -Ptarget=testproject` creates a directory named
+       `testproject` inside the `eslinter` directory.
+    2. Creates `config.json` in the `release` directory with a sane configuration.
+6. Add the jar file to Burp.
+7. Navigate to the `ESLinter` tab and click on the `Process` button.
+8. Browse the target website normally with Burp as proxy.
+9. Observe the extracted JavaScript being linted.
+10. Double-click on any result to open a dialog box. Choose a path to save both
    the beautified JavaScript and lint results.
-10. Look in the project directory to view all extracted and linted files.
+11. Look in the project directory to view all extracted and linted files.
 
 ![ESLinter in action](.github/eslinter-1.gif)
 
