@@ -74,7 +74,7 @@ public class CheckPaths {
         // Check if eslintConfigPath exists.
         if (!fileExists(extensionConfig.eslintConfigPath)) {
             err += String.format(
-                "Could not find the ESLint config file at %s.\n",
+                "Could not find the ESLint rule file at %s.\n",
                 extensionConfig.eslintConfigPath
             );
         }

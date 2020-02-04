@@ -30,7 +30,9 @@ them with [ESLint][eslint-org] while you do your manual testing.
 
 ## Quickstart
 
-1. Install `git` and `npm`.
+1. Install `git`, `npm` and `JDK 11`.
+    1. [AdoptOpenJDK 11][adoptopenjdk11] is recommended. Make sure `JAVA_HOME`
+       is set.
 2. Clone the repository.
 3. `gradlew -q clean`. Not needed for a fresh installation.
 4. `gradlew -q install`
@@ -40,24 +42,38 @@ them with [ESLint][eslint-org] while you do your manual testing.
     1. E.g., `gradlew -q config -Ptarget=testproject` creates a directory named
        `testproject` inside the `eslinter` directory.
     2. Creates `config.json` in the `release` directory with a sane configuration.
-6. Add the jar file to Burp.
+6. Add the extension jar at `release/eslint-all.jar` to Burp.
+    1. The first time a new config is loaded, you might get an error not being
+       able to connect to the database, this is OK.
 7. Navigate to the `ESLinter` tab and click on the `Process` button.
 8. Browse the target website normally with Burp as proxy.
-9. Observe the extracted JavaScript being linted.
+9.  Observe the extracted JavaScript being linted.
 10. Look in the project directory to view all extracted and linted files.
 11. Double-click on any result to open a dialog box. Choose a path to save both
     the beautified JavaScript and lint results.
 
+* For build troubleshooting please see [Building the
+  Extension](#building-the-extension) below.
+
+**Double click in action**
+
 ![Doubleclick](.github/doubleclick.gif)
+
+[adoptopenjdk11]: https://adoptopenjdk.net/?variant=openjdk11&jvmVariant=hotspot
 
 ## Table of Content <!-- omit in toc -->
 
 - [Features](#features)
 - [Quickstart](#quickstart)
-- [Detailed Configuration](#detailed-configuration)
-- [Technical Details](#technical-details)
+- [Extension Configuration](#extension-configuration)
+    - [Change the ESLint Rules](#change-the-eslint-rules)
+    - [Change the ESLint Rule File](#change-the-eslint-rule-file)
+    - [Change the Number of Linting Threads](#change-the-number-of-linting-threads)
+    - [Process Requests Made by Other Extensions](#process-requests-made-by-other-extensions)
+    - [Process Requests Made by Other Burp Tools](#process-requests-made-by-other-burp-tools)
     - [Customize ESLint Rules](#customize-eslint-rules)
-    - [Process Requests From Other Extensions](#process-requests-from-other-extensions)
+- [Triage The results](#triage-the-results)
+- [Technical Details](#technical-details)
 - [Common Bugs](#common-bugs)
     - [Supported Platforms](#supported-platforms)
     - [The Connection to the Database Is Not Closed](#the-connection-to-the-database-is-not-closed)
@@ -65,7 +81,6 @@ them with [ESLint][eslint-org] while you do your manual testing.
 - [FAQ](#faq)
     - [Why Doesn't the Extension Create Burp Issues?](#why-doesnt-the-extension-create-burp-issues)
     - [SHA-1 Is Broken](#sha-1-is-broken)
-- [Triaging The results](#triaging-the-results)
 - [Development](#development)
     - [Building the Extension](#building-the-extension)
     - [Development](#development-1)
@@ -80,18 +95,55 @@ them with [ESLint][eslint-org] while you do your manual testing.
 - [Future Work and Feedback](#future-work-and-feedback)
 - [License](#license)
 
-## Detailed Configuration
+## Extension Configuration
 It's recommended to use the `config` Gradle task. You can also create your own
 extension configs. Open the config file in any text editor and change the
 values. For in-depth configuration, please see
 [docs/configuration.md](docs/configuration.md).
 
-## Technical Details
-The innerworkings of the extension are discussed in
-[docs/technical-details.md](docs/technical-details.md).
+### Change the ESLint Rules
+
+**Option 1:** If you used the config Gradle task.
+
+1. Edit the `eslint-security/eslintrc-parsia.js` file and add/remove rules.
+    1. Make a copy first if you want to use it as a guideline.
+2. Reload the extension.
+
+**Option 2:** If you want to keep your ESLint rules in a different path.
+
+1. Create your own rules and store them at any path.
+2. Edit the `release/config.json` file.
+3. Change the `eslint-config-path` to the ESLint rule path from step 1.
+4. Reload the extension.
+
+### Change the ESLint Rule File
+Edit the `eslint-config-path` key in the `release/config.json` file and point it
+to your custom ESLint rule file.
+
+### Change the Number of Linting Threads
+The number of linting threads can be configured. For slower machines, it might
+need to be reduced.
+
+1. Edit the extension config file.
+2. Change the value of `number-of-linting-threads`.
+
+### Process Requests Made by Other Extensions
+
+1. Add `extender` to the `process-tool-list` in the config file.
+2. Move ESLinter to the bottom of your extension list in the Extender tab.
+3. Reload the extension.
+4. ESLinter should be able to see requests created by other extensions.
+
+### Process Requests Made by Other Burp Tools
+
+1. Add the tool name to the `process-tool-list` in the config file. E.g.,
+   `Scanner`.
+2. Move ESLinter to the bottom of your extension list in the Extender tab.
+3. Reload the extension.
+4. ESLinter should be able to see requests created by other Burp tools.
 
 ### Customize ESLint Rules
-Start by modifying one of the ESLint config files in the
+Start by modifying one of the ESLint rule files in the
 [eslint-security][eslint-security] repository.
 
 To disable a rule either comment it out or change the numeric value of its key
@@ -108,11 +160,28 @@ For more information on configuring ESLint and writing custom rules please see:
 * https://eslint.org/docs/user-guide/configuring
 * https://eslint.org/docs/developer-guide/working-with-rules
 
-### Process Requests From Other Extensions
+## Triage The results
 
-1. Add `extender` to the `process-tool-list`.
-2. Move ESLinter to the bottom of your extension list in the Extender tab.
-3. ESLinter should be able to see requests created by other extensions.
+1. Open the project directory in your editor (set in the config command).
+2. Open any file in the `linted` sub-directory. These files contain the results.
+3. Alternatively, double-click any row in the extension's tab to select a
+   directory to save both the original JavaScript and lint results for an
+   individual request.
+4. The extension uses the ESLint [codeframe][eslint-codeframe] output format.
+   This format includes a few lines of code before and after what was flagged by
+   ESLint. You can use these results to understand the context. This is usually
+   not enough.
+5. To view the corresponding JavaScript file, open the file with the same name
+   (minus `-linted`) in the `beautified` sub-directory.
+6. The json object at the top of every file contains the URL and the referer of
+   the request that contained the JavaScript. Use this information to figure out
+   where this JavaScript was located.
+
+[eslint-codeframe]: https://eslint.org/docs/user-guide/formatters/#codeframe
+
+## Technical Details
+The innerworkings of the extension are discussed in
+[docs/technical-details.md](docs/technical-details.md).
 
 ## Common Bugs
 Make a Github issue if you encounter a bug. Please use the Bug issue template
@@ -153,28 +222,11 @@ Yes, but the extension uses SHA-1 to create a hash of JavaScript text. This hash
 is an identifier to detect duplicates. Adversarial collisions are not important
 here.
 
-## Triaging The results
-
-1. Open the project directory set in the config command in your editor.
-2. Open any file in the `linted` sub-directory. These files contain the results.
-3. Alternatively, double-click any row in the extension's tab to select a
-   directory to save both the original JavaScript and lint results or any
-   individual request.
-4. The extension uses the [codeframe][eslint-codeframe] format. This format
-   includes a few lines of code before and after what was flagged by ESLint. You
-   can use these results to understand the context.
-5. To view the corresponding JavaScript file, open a file with the same name
-   (minus `-linted`) in the `beautified` sub-directory.
-6. The json object at the top of every file contains the URL and the refer of
-   the request that contained the JavaScript. Use this information to figure out
-   where this JavaScript was located.
-
-[eslint-codeframe]: https://eslint.org/docs/user-guide/formatters/#codeframe
-
 ## Development
 
 ### Building the Extension
 
+1. Install [AdoptOpenJDK 11][adoptopenjdk11]
 1. Run `gradlew bigjar`.
 2. The jar file will be stored inside the `release` directory.
 
@@ -203,7 +255,7 @@ other IDEs/editors.
 ## Credits
 
 ### Lewis Ardern
-For being the [Solid 5/7 JavaScript guy][lewis-twitter] he is.
+For being a [Solid 5/7 JavaScript guy][lewis-twitter].
 
 See his presentation [Manual JavaScript Analysis is a Bug][lewis-slides].
 

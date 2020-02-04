@@ -186,7 +186,7 @@ task config() {
         "Scanner",
         "Repeater"
     ],
-    "number-of-linting-threads": 1,
+    "number-of-linting-threads": 3,
     "lint-timeout": 60,
     "number-of-request-threads": 10,
     "threadpool-timeout": 10,
