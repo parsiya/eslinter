@@ -21,7 +21,7 @@ public class Config {
 
     // Transient fields are not serialized or deserialized.
     // This appears in Extender.
-    final public static transient String extensionName = "ESLint for Burp";
+    final public static transient String extensionName = "ESLinter";
     // This is the extension's tab name.
     final public static transient String tabName = "ESLinter";
     // Table's column names.
@@ -30,8 +30,7 @@ public class Config {
     // Table's column classes.
     final public static transient Class[] lintTableColumnClasses =
             new Class[] {java.lang.String.class, java.lang.String.class, java.lang.String.class,
-                    java.lang.String.class // Although last column is int, we want it to be
-                                           // left-aligned.
+                    java.lang.String.class // Although last column is int, we want it to be left-aligned.
             };
     // Maximum number of characters from the URL.
     final public static transient int urlFileNameLimit = 50;

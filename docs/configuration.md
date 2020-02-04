@@ -43,7 +43,7 @@ explained above).
 
 ## Manual Configuration Steps
 It's recommended to use the `config` Gradle task. But you can also create your
-own artisanal handcrafted config files.
+own config files.
 
 1. Create a sample config file. This could be an existing one or a new one
    created by the config.

@@ -1,33 +1,32 @@
 # Manual JavaScript Linting is a Bug  <!-- omit in toc -->
-`ESLinter` is a Burp Suite extension that extracts JavaScript from responses and
-lints them with [ESLint][eslint-org]. It does not interrupt your web application
-testing flow.
+`ESLinter` is a Burp extension that extracts JavaScript from responses and lints
+them with [ESLint][eslint-org] while you do your manual testing.
 
 [eslint-org]: https://eslint.org/
 
 ## Features
-The following list makes jokes about Burp Pro. Burp Pro is awesome and you
-should get it if you have the disposable income.
 
-1. Use custom ESLint rules.
-    * Uncustomizable Burp's JavaScript analysis vs. your own rules? Such a hard decision.
-2. Zero microtransactions.
-    * $400 for Burp Pro vs. free extension that does 80% of the job.
-3. Pain-free configuration.
-    * Provide a path and your config file is automagically created. Gradle tasks FTW!
-4. Everything is stored in two places.
+1. Use your own artisanal hand-crafted ESLint rules.
+    * Extend Burp's JavaScript analysis engine.
+2. Pain-free setup.
+    * Get up and running with three commands.
+3. Results Are stored in two different places.
     * SQLite is forever.
-5. It doesn't interrupt your work flow.
-    * Let the extension lint while you do your testing.
-6. It's hella configurable.
+4. It doesn't interrupt your work flow.
+    * Let the extension lint while you do your magic.
+5. It's hella configurable.
     * Running Burp on a slow machine? Reduce the number of threads.
-    * Don't want to lint now? CLick that shiny `Process` button to pause it. JavaScript will still be captured.
+    * Don't want to lint now? Click that shiny `Process` button to pause it.
+    * Want to close Burp? No problem. Unfinished tasks will be read from the
+      database and executed when the extension is loaded again.
     * Want to only process requests from certain hosts? Add it to the scope and
       set the associated key in the config file to `true`.
     * Don't like large JavaScript files? Set the max size in the config.
     * Want to process requests from another extension? See [Process Requests from Other Extensions](#process-requests-from-other-extensions).
-7. Search.
-    * Filter requests by host. Just start typing in the text field.
+6. Filter results by host.
+    * Start typing in the text field in the extension tab.
+
+![ESLinter in action](.github/google.gif)
 
 ## Quickstart
 
@@ -45,11 +44,11 @@ should get it if you have the disposable income.
 7. Navigate to the `ESLinter` tab and click on the `Process` button.
 8. Browse the target website normally with Burp as proxy.
 9. Observe the extracted JavaScript being linted.
-10. Double-click on any result to open a dialog box. Choose a path to save both
-   the beautified JavaScript and lint results.
-11. Look in the project directory to view all extracted and linted files.
+10. Look in the project directory to view all extracted and linted files.
+11. Double-click on any result to open a dialog box. Choose a path to save both
+    the beautified JavaScript and lint results.
 
-![ESLinter in action](.github/eslinter-1.gif)
+![Doubleclick](.github/doubleclick.gif)
 
 ## Table of Content <!-- omit in toc -->
 
@@ -57,10 +56,9 @@ should get it if you have the disposable income.
 - [Quickstart](#quickstart)
 - [Detailed Configuration](#detailed-configuration)
 - [Technical Details](#technical-details)
-- [Tips and Tricks](#tips-and-tricks)
     - [Customize ESLint Rules](#customize-eslint-rules)
     - [Process Requests From Other Extensions](#process-requests-from-other-extensions)
-- [Bugs](#bugs)
+- [Common Bugs](#common-bugs)
     - [Supported Platforms](#supported-platforms)
     - [The Connection to the Database Is Not Closed](#the-connection-to-the-database-is-not-closed)
     - [My Selected Row is Gone](#my-selected-row-is-gone)
@@ -71,32 +69,36 @@ should get it if you have the disposable income.
 - [Development](#development)
     - [Building the Extension](#building-the-extension)
     - [Development](#development-1)
+    - [Diagnostics](#diagnostics)
     - [Debugging](#debugging)
 - [Credits](#credits)
     - [Lewis Ardern](#lewis-ardern)
-    - [ESLinting JavaScript](#eslinting-javascript)
-    - [Automation](#automation)
-    - [Similar Unreleased Extension](#similar-unreleased-extension)
-    - [Source Code](#source-code)
+    - [Jacob Wilkin](#jacob-wilkin)
+    - [Tom Limoncelli](#tom-limoncelli)
+    - [Similar Unreleased Extension by David Rook](#similar-unreleased-extension-by-david-rook)
+    - [Source Code Credit](#source-code-credit)
 - [Future Work and Feedback](#future-work-and-feedback)
 - [License](#license)
 
 ## Detailed Configuration
-At a minimum, you need to add the six keys discussed above to the configuration
-file. For in-depth configuration, please see
+It's recommended to use the `config` Gradle task. You can also create your own
+extension configs. Open the config file in any text editor and change the
+values. For in-depth configuration, please see
 [docs/configuration.md](docs/configuration.md).
 
 ## Technical Details
-Please read [docs/technical-details.md](docs/technical-details.md) for the
-innerworkings of the extension.
-
-## Tips and Tricks
+The innerworkings of the extension are discussed in
+[docs/technical-details.md](docs/technical-details.md).
 
 ### Customize ESLint Rules
 Start by modifying one of the ESLint config files in the
-[eslint-security][eslint-security] repository. If you are adding a rule that
-needs a new plugin/package you have to add it manually (usually via npm) to the
-location of your `eslint` and `js-beautify` commands.
+[eslint-security][eslint-security] repository.
+
+To disable a rule either comment it out or change the numeric value of its key
+to `0`.
+
+If you are adding a rule that needs a new plugin you have to add it manually
+(usually via npm) to the location of your `eslint` and `js-beautify` commands.
 
 If you want to contribute your custom ESLint rules please feel free to create
 pull requests in [eslint-security][eslint-security].
@@ -112,18 +114,17 @@ For more information on configuring ESLint and writing custom rules please see:
 2. Move ESLinter to the bottom of your extension list in the Extender tab.
 3. ESLinter should be able to see requests created by other extensions.
 
-## Bugs
-The extension is currently in Beta and has bugs. Make a Github issue if you
-encounter a bug. Please use the Bug issue template and fill it as much as you
-can. Be sure to remove any identifying information from the paths in the config
-file.
+## Common Bugs
+Make a Github issue if you encounter a bug. Please use the Bug issue template
+and fill it as much as you can. Be sure to remove any identifying information
+from the config file.
 
 ### Supported Platforms
-ESLinter was developed and testing on Windows and Burp 2.1. It should work on
-most platforms.
+ESLinter was developed and tested on Windows and Burp 2.1. It should work on
+most platforms. If it does not please make a Github issue.
 
 ### The Connection to the Database Is Not Closed
-In other words, you cannot delete the database if you unload the extension.
+You cannot delete the database if you unload the extension.
 
 Workaround:
 
@@ -131,19 +132,20 @@ Workaround:
 
 ### My Selected Row is Gone
 The table in the extension tab is updated every few seconds (controlled via the
-`update-table-delay` key in the config file). This means your selected row
-will be unselected when the table updates. This is not an issue.
+`update-table-delay` key in the config file). This means your selected row will
+be unselected when the table updates. This is not an issue.
 
 This might look odd when double-clicking a row. The FileChooser dialog pops up
 to select a path. When the table is updated, the selection is visually gone.
-This is not an issue. The data in the row are retrieved when you double-click
+This is not an issue. The data in the row is retrieved when you double-click
 and is not interrupted when the row is deselected after the table update.
 
 ## FAQ
 
 ### Why Doesn't the Extension Create Burp Issues?
 
-1. This is not a Burp pro extension. Burp Issues work in the pro version.
+1. This is not a Burp pro extension. Burp Issues are supported in the pro
+   version.
 2. Depending on the ESLint rules, this will create a lot of noise.
 
 ### SHA-1 Is Broken
@@ -152,12 +154,20 @@ is an identifier to detect duplicates. Adversarial collisions are not important
 here.
 
 ## Triaging The results
-The extension uses the [codeframe][eslint-codeframe] format. This format has a
-few lines of code before and after what was flagged by ESLint. The extension
-keeps a copy of the original JavaScript file after it's beautified.
 
-Double-clicking on any result row will open a FileChooser dialog to save both
-the ESLint results and the original JavaScript.
+1. Open the project directory set in the config command in your editor.
+2. Open any file in the `linted` sub-directory. These files contain the results.
+3. Alternatively, double-click any row in the extension's tab to select a
+   directory to save both the original JavaScript and lint results or any
+   individual request.
+4. The extension uses the [codeframe][eslint-codeframe] format. This format
+   includes a few lines of code before and after what was flagged by ESLint. You
+   can use these results to understand the context.
+5. To view the corresponding JavaScript file, open a file with the same name
+   (minus `-linted`) in the `beautified` sub-directory.
+6. The json object at the top of every file contains the URL and the refer of
+   the request that contained the JavaScript. Use this information to figure out
+   where this JavaScript was located.
 
 [eslint-codeframe]: https://eslint.org/docs/user-guide/formatters/#codeframe
 
@@ -176,13 +186,15 @@ the ESLint results and the original JavaScript.
 4. Run `gradlew bigjar` to build it. Then test it in Burp.
 5. Create a pull request. Please mention what has been modified.
 
-### Debugging
+### Diagnostics
 Set `"debug": true` in the config file to see debug messages. These messages are
-useful when you are testing a single file in Burp Repeater.
+useful when you are testing a single file in Burp Repeater. This is different
+from debugging the extension explained below.
 
-See the following blog post to see how you can debug Java burp extensions in
-[Visual Studio Code][vscode-website]. The instructions can be adapted to other
-IDE/editors.
+### Debugging
+See the following blog post to see how you can debug Java Burp extensions in
+[Visual Studio Code][vscode-website]. The instructions can be adapted to use in
+other IDEs/editors.
 
 * https://parsiya.net/blog/2019-12-02-developing-and-debugging-java-burp-extensions-with-visual-studio-code/
 
@@ -198,7 +210,7 @@ See his presentation [Manual JavaScript Analysis is a Bug][lewis-slides].
 [lewis-twitter]: https://twitter.com/lewisardern
 [lewis-slides]: https://www.slideshare.net/LewisArdern/manual-javascript-anaylsis-is-a-bug-176308491
 
-### ESLinting JavaScript
+### Jacob Wilkin
 The original idea for the ESLinting JavaScript received in Burp was from the
 following blog post by [Jacob Wilkin][jacob-wilkin-twitter]:
 
@@ -216,7 +228,7 @@ Summary:
 
 [jacob-wilkin-twitter]: https://twitter.com/jacob_wilkin
 
-### Automation
+### Tom Limoncelli
 My main drive for automation comes from reading the amazing article named
 [Manual Work is a Bug][manual-work] by [Thomas Limoncelli][tom-twitter].
 **READ IT**.
@@ -226,17 +238,17 @@ The article defines four levels of automation:
 1. Document the steps.
     * Jacob's post above. 
 2. Create automation equivalents.
-    * At my day job, I create a prototype that linted JavaScript files after I
-      extracted them from Burp manually.
+    * I created a prototype that linted JavaScript files after I extracted them
+      from Burp manually.
 3. Create automation.
-    * We are here.
+    * This extension.
 4. Self-service and autonomous systems.
     * Almost there in future work.
  
 [manual-work]: https://queue.acm.org/detail.cfm?id=3197520
 [tom-twitter]: https://twitter.com/yesthattom
 
-### Similar Unreleased Extension
+### Similar Unreleased Extension by David Rook
 Searching for ["eslint burp" on Twitter][eslint-burp-twitter] returns a series
 of tweets from 2015 by [David Rook][david-rook-twitter]. It appears that he was
 working on a Burp extension that used ESLint to create issues. The extension was
@@ -245,21 +257,22 @@ never released.
 [eslint-burp-twitter]: https://twitter.com/search?q=eslint%20burp&src=typed_query
 [david-rook-twitter]: https://twitter.com/davidrook
 
-### Source Code
+### Source Code Credit
 This extension uses a few open source libraries. You can see them in the
 `dependencies` section of the [build.gradle](build.gradle) file.
 
-In addition, it uses code copied from Apache Commons libraries.
+In addition, it uses code copied from Apache Commons libraries. I copied
+individual files instead of the complete Apache Commons-Lang library.
 
 * [src/utils/StringUtils.java](src/utils/StringUtils.java) uses code from the
   Apache commons-lang.StringUtils.
 * [src/utils/SystemUtils](src/utils/SystemUtils.java) is an almost exact copy of
-  Apache Commons Lang SystemUtils.
+  Apache commons-lang.SystemUtils.
 
 ## Future Work and Feedback
 Please see the Github issues. If you have an idea, please make a Github issue
 and use the `Feature request` template.
 
 ## License
-Opensourced under "GNU General Public License v3.0". Please see
+Opensourced under "GNU General Public License v3.0" and later. Please see
 [LICENSE](LICENSE) for details.
