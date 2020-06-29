@@ -22,7 +22,7 @@ them with [ESLint][eslint-org] while you do your manual testing.
     * Want to only process requests from certain hosts? Add it to the scope and
       set the associated key in the config file to `true`.
     * Don't like large JavaScript files? Set the max size in the config.
-    * Want to process requests from another extension? See [Process Requests from Other Extensions](#process-requests-from-other-extensions).
+    * Want to process requests from another extension? See [Process Requests Made by Other Extensions](#process-requests-made-by-other-extensions).
 6. Filter results by host.
     * Start typing in the text field in the extension tab.
 
@@ -72,7 +72,7 @@ them with [ESLint][eslint-org] while you do your manual testing.
     - [Process Requests Made by Other Extensions](#process-requests-made-by-other-extensions)
     - [Process Requests Made by Other Burp Tools](#process-requests-made-by-other-burp-tools)
     - [Customize ESLint Rules](#customize-eslint-rules)
-- [Triage The results](#triage-the-results)
+- [Triage The Results](#triage-the-results)
 - [Technical Details](#technical-details)
 - [Common Bugs](#common-bugs)
     - [Supported Platforms](#supported-platforms)
@@ -155,12 +155,14 @@ If you are adding a rule that needs a new plugin you have to add it manually
 If you want to contribute your custom ESLint rules please feel free to create
 pull requests in [eslint-security][eslint-security].
 
+[eslint-security]: https://github.com/parsiya/eslint-security
+
 For more information on configuring ESLint and writing custom rules please see:
 
 * https://eslint.org/docs/user-guide/configuring
 * https://eslint.org/docs/developer-guide/working-with-rules
 
-## Triage The results
+## Triage The Results
 
 1. Open the project directory in your editor (set in the config command).
 2. Open any file in the `linted` sub-directory. These files contain the results.
@@ -326,5 +328,5 @@ Please see the Github issues. If you have an idea, please make a Github issue
 and use the `Feature request` template.
 
 ## License
-Opensourced under "GNU General Public License v3.0" and later. Please see
+Opensourced under the "GNU General Public License v3.0" and later. Please see
 [LICENSE](LICENSE) for details.
