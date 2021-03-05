@@ -206,7 +206,7 @@ task config() {
     "jsbeautifier-command": "${jsbeautifyCmd}",
     "only-process-in-scope": false,
     "highlight": true,
-    "debug": false,
+    "diagnostics": false,
     "process-tool-list": [
         "Proxy",
         "Scanner",

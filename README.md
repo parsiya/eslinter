@@ -241,9 +241,10 @@ here.
 5. Create a pull request. Please mention what has been modified.
 
 ### Diagnostics
-Set `"debug": true` in the config file to see debug messages. These messages are
-useful when you are testing a single file in Burp Repeater. This is different
-from debugging the extension explained below.
+Set `"diagnostics": true` in the config file to see debug messages. These
+messages are useful when you are testing a single file in Burp Repeater. For
+more information, please see the `The Diagnostics Flag` section in
+[docs/configuration.md](docs/configuration.md).
 
 ### Debugging
 See the following blog post to see how you can debug Java Burp extensions in

@@ -74,7 +74,8 @@ public class Config {
 
     // If set to true, the extension will print extra information. This can be
     // used for troubleshooting.
-    public boolean debug = true;
+    @SerializedName("diagnostics")
+    public boolean diagnostics = true;
 
     // Only lint requests made by these tools. The names here must be the same
     // as the getToolName column (case-insensitive):

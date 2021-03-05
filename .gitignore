@@ -33,5 +33,10 @@ console-output.txt
 error-output.txt
 *.exe
 
+<<<<<<< HEAD
 # the semgrep-rules directory
 semgrep-rules
+=======
+# test directories
+nem
+>>>>>>> master

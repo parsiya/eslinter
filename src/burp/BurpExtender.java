@@ -84,7 +84,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
         log.debug("Finished path check.");
 
         // Set the debug flag from the loaded config.
-        log.setDebugMode(extensionConfig.debug);
+        log.setDebugMode(extensionConfig.diagnostics);
 
         // Configure the process request and response threadpools.
         requestPool = Executors.newFixedThreadPool(extensionConfig.numRequestThreads);
@@ -237,7 +237,7 @@ public class BurpExtender implements IBurpExtender, ITab, IHttpListener, IExtens
         // Set the debug headers. Having this after checking if extracted
         // JavaScript is empty prevents highlighting requests that do not have
         // any extracted JavaScript.
-        if (extensionConfig.debug) {
+        if (extensionConfig.diagnostics) {
             requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Is-Script", scriptHeader);
             requestResponse = ReqResp.addHeader(isRequest, requestResponse, "Contains-Script", containsScriptHeader);
             requestResponse = ReqResp.addHeader(isRequest, requestResponse, "MIMETYPEs",
