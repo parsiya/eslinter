@@ -180,7 +180,7 @@ task config() {
     "jsbeautify-command-path": "${jsbeautify}",
     "only-process-in-scope": false,
     "highlight": true,
-    "debug": false,
+    "diagnostics": false,
     "process-tool-list": [
         "Proxy",
         "Scanner",

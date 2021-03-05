@@ -16,7 +16,7 @@
     - [Pure JavaScript](#pure-javascript)
     - [Embedded JavaScript](#embedded-javascript)
   - [Removing Request Headers](#removing-request-headers)
-  - [The Debug Flag](#the-debug-flag)
+  - [The Diagnostics Flag](#the-diagnostics-flag)
 
 ## Loading and Storing Configurations
 
@@ -317,8 +317,13 @@ details.
 
 [304-docs]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304
 
-### The Debug Flag
-Setting `debug` to `true` will print diagnostics messages to the extension's
-console. It's intended for troubleshooting and testing. The best way to use it
-is to isolate a single request/response that is causing the error. Enable debug
-and send the request in Repeater.
+### The Diagnostics Flag
+Setting `diagnostics` to `true` will print diagnostics messages to the
+extension's console and add headers to the responses.
+
+These headers are `Is-Script`, `Contains-Script` and `MIMETYPEs` and can be used
+to see how the JavaScript detection works on responses.
+
+It is intended for troubleshooting and testing. The best way to use it is to
+isolate a single request/response that is causing the error. Enable diagnostics
+and send the request in Repeater to see how it is processed.

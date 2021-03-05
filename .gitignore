@@ -32,3 +32,6 @@ release/config.json
 console-output.txt
 error-output.txt
 *.exe
+
+# test directories
+nem
