@@ -113,11 +113,11 @@ values. For in-depth configuration, please see
 
 1. Create your own rules and store them at any path.
 2. Edit the `release/config.json` file.
-3. Change the `eslint-config-path` to the ESLint rule path from step 1.
+3. Change the `rules-path` to the ESLint rule path from step 1.
 4. Reload the extension.
 
 ### Change the ESLint Rule File
-Edit the `eslint-config-path` key in the `release/config.json` file and point it
+Edit the `rules-path` key in the `release/config.json` file and point it
 to your custom ESLint rule file.
 
 ### Change the Number of Linting Threads

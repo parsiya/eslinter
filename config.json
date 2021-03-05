@@ -1,9 +1,9 @@
 {
     "beautified-javascript-path": "CHANGEME",
-    "eslint-result-path": "CHANGEME",
-    "eslint-command-path": "CHANGEME",
-    "eslint-config-path": "CHANGEME",
-    "jsbeautify-command-path": "CHANGEME",
+    "lint-result-path": "CHANGEME",
+    "linter-command": "CHANGEME",
+    "rules-path": "CHANGEME",
+    "jsbeautifier-command": "CHANGEME",
     "database-path": "CHANGEME",
     "only-process-in-scope": false,
     "highlight": true,

@@ -32,3 +32,6 @@ release/config.json
 console-output.txt
 error-output.txt
 *.exe
+
+# the semgrep-rules directory
+semgrep-rules

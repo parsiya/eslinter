@@ -44,7 +44,7 @@ public class Config {
     public String storagePath = "";
 
     // Where ESLint results are stored.
-    @SerializedName("eslint-result-path")
+    @SerializedName("lint-result-path")
     public String eslintOutputPath = "";
 
     // Full path to the sqlite database file. It will be created if it does not
@@ -53,15 +53,15 @@ public class Config {
     public String dbPath = "";
 
     // Path to the ESLint configuration file.
-    @SerializedName("eslint-config-path")
+    @SerializedName("rules-path")
     public String eslintConfigPath = "";
 
     // ESLint binary full path. [path]/node_modules/.bin/eslint
-    @SerializedName("eslint-command-path")
+    @SerializedName("linter-command")
     public String eslintCommandPath = "";
 
     // Full path to the js-beautify binary/command. [path]/node_modules/.bin/eslint
-    @SerializedName("jsbeautify-command-path")
+    @SerializedName("jsbeautifier-command")
     public String jsBeautifyCommandPath = "";
 
     // If true, only in-scope requests will be processed.

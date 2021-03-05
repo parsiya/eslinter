@@ -42,33 +42,19 @@ sourceSets {
     }
 }
 
-// Put the final jar file in a different location
-libsDirName = '../release'
+// Constants
+libsDirName = '../release' // Put the final jar file in a different location
+final browserSecurityURL = "https://semgrep.dev/c/r/javascript.browser.security"
+final rulesDirectory = "semgrep-rules"
+final browserSecurityFileName = "javascript.browser.security.yml"
+final pipInstallCmd = ['python3', '-m', 'pip', 'install', 'semgrep', 'jsbeautifier']
+final semgrepCmd = 'semgrep'
+final jsbeautifyCmd = 'js-beautify'
 
-// Create a task for bundling all dependencies into a jar file.
-task bigJar(type: Jar) {
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-// Extend clean to delete eslint-security
-clean.doFirst {
-    println 'Deleting eslint-security'
-    delete 'eslint-security'
-    println 'Deleting release'
-    delete 'release'
-}
-
-// Create the install task here.
+// Helper functions
 
 // OS Detection. Source: https://stackoverflow.com/a/54315477
 import org.apache.tools.ant.taskdefs.condition.Os       
-
-// How to use example.
-// task executeCommand(type: Exec) {    
-//     commandLine osAdaptiveCommand('aws', 'ecr', 'get-login', '--no-include-email')
-// }
 
 private static Iterable<String> osAdaptiveCommand(String... commands) {
     def newCommands = []
@@ -79,39 +65,92 @@ private static Iterable<String> osAdaptiveCommand(String... commands) {
     newCommands.addAll(commands)
     return newCommands
 }
+
+// ZZZ modified for Semgrep, run as WSL if on Windows
+private static Iterable<String> runInWsl(String... commands) {
+    def newCommands = []
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        newCommands = ['wsl']
+    }
+
+    newCommands.addAll(commands)
+    return newCommands
+}
 // End of OS detection.
 
+// Create a directory.
+private static void createDir(String dirName) {
+    File directory = new File(dirName)
+    directory.mkdirs()
+}
 
+// Download a file from url and store it in path.
+private static void downloadFile(String url, String path) {
+    URL downloadURL = new URL(url)
+    ReadableByteChannel chnl = Channels.newChannel(downloadURL.openStream())
+    FileOutputStream fos = new FileOutputStream(path)
+    fos.getChannel().transferFrom(chnl, 0, Long.MAX_VALUE)
+    chnl.close()
+    fos.close()
+}
+
+// End of Helper functions
+
+// Tasks
+
+// Create a task for bundling all dependencies into a jar file.
+task bigJar(type: Jar) {
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+// Extend clean to delete release and the rules directory.
+clean.doFirst {
+    println 'Deleting the release directory'
+    delete 'release'
+    println 'Deleting the rules directory'
+    delete rulesDirectory
+}
+
+// The install task.
 
 // The install task will:
 // 1. Build the extension jar.
-// 2. Get the git submodule in `eslint-security`.
-// 3. Runs `npm-install` in `eslint-security`.
+// 2. Download the javascript.browser.security ruleset and store it in
+//    `rulesDirectory/browserSecurityFileName`.
+// 3. Install semgrep and jsbeautifier.
+
+import java.net.URL
+import java.io.File
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel
+
 task install() {
 
-    // 2. Build the project via gradle.
+    // 1. Build the project via gradle.
     dependsOn 'bigJar'
 
     // If these are not in doLast, they will be executed in the configuration
     // phase. AKA every time any task is run.
+    // 2. Download and store the ruleset.
     doLast {
-        println '\ngit submodule update --init --recursive --remote'
-        exec {
-            // 2. Get the eslint-security git submodule.
-            commandLine osAdaptiveCommand('git', 'submodule', 'update', '--init', '--recursive', '--remote')
-        }
+        // 2.1 Create the semgrep-rules directory.
+        createDir(rulesDirectory)
 
-        println '\ncd eslint-security & npm install'
+        // 2.2 Download the javascript.browser.security ruleset and store it.
+        downloadFile(browserSecurityURL, rulesDirectory + "/" + browserSecurityFileName)
+
+        // 3.1 Install semgrep and jsbeautifer with pip.
+        println 'Installing semgrep and jsbeautifier with pip.'
         exec {
-            // 3. Navigate to eslint-security and run npm install.
-            commandLine osAdaptiveCommand('cd', 'eslint-security', '&&', 'npm', 'install')
+            commandLine runInWsl(*pipInstallCmd)
         }
     }
 }
 
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.io.File
 
 task config() {
     doLast {
@@ -128,12 +167,11 @@ task config() {
 
         String currentDir = System.properties['user.dir']
         // 2. Check if install has been called by checking for the existence of
-        //    currentDir/eslint-security/node_modules. If it's not there, return
-        //    an error.
-        if (Files.isDirectory(Paths.get(currentDir, 'eslint-security/node_modules'))) {
-            println 'eslint-security/node_modules exists'
+        //    currentDir/rulesDirectory. If it's not there, return an error.
+        if (Files.isDirectory(Paths.get(currentDir, rulesDirectory))) {
+            println String.format('%s exists.', rulesDirectory)
         } else {
-            throw new GradleException('`eslint-security/node_modules` does not exist, have you run `gradlew install')
+            throw new GradleException(String.format('`%s` does not exist, have you run `gradlew install`?', rulesDirectory))
         }
 
         // 3. Check if target is an absolute path.
@@ -147,37 +185,25 @@ task config() {
         // 4.1 Path to store extracted JavaScript files: `target/beautified`
         String beautified = Paths.get(targetDir, "beautified").toString().replace("\\", "/")
 
-        // 4.2 Path to store ESLint results: `target/linted`
+        // 4.2 Path to store the results: `target/linted`
         String linted = Paths.get(targetDir, "linted").toString().replace("\\", "/")
 
         // 4.3 Location of the target database: `target/eslinter.sqlite`
         String db = Paths.get(targetDir, "eslinter.sqlite").toString().replace("\\", "/")
 
-        // 4.4 Path to the eslint command: `currentDir/eslint-security/node_modules/.bin/eslint`
-        String eslint = Paths.get(currentDir, 'eslint-security/node_modules/.bin/eslint').toString().replace("\\", "/")
-
-        // 4.5 Path to the js-beautify command: `currentDir/eslint-security/node_modules/.bin/js-beautify`
-        String jsbeautify = Paths.get(currentDir, 'eslint-security/node_modules/.bin/js-beautify').toString().replace("\\", "/")
-
-        // 4.6 Detect OS. If Windows, add ".cmd" to the end of commands.
-        if (System.properties['os.name'].toLowerCase().contains('windows')) {
-            eslint += ".cmd"
-            jsbeautify += ".cmd"
-        }
-
-        // 4.7 Path to the ESLint configuration file: `currentDir/eslint-security/configs/eslintrc-light.js`
-        String cfgFile = Paths.get(currentDir, 'eslint-security/configs/eslintrc-parsia.js').toString().replace("\\", "/")
+        // 4.4 Path to the rules directory: `currentDir/rulesDirectory`
+        String rulesDir = Paths.get(currentDir, rulesDirectory).toString().replace("\\", "/")
 
         // 5.0 Create the json file.
         String cfgStr = 
         """
 {
     "beautified-javascript-path": "${beautified}",
-    "eslint-result-path": "${linted}",
+    "lint-result-path": "${linted}",
     "database-path": "${db}",
-    "eslint-config-path": "${cfgFile}",
-    "eslint-command-path": "${eslint}",
-    "jsbeautify-command-path": "${jsbeautify}",
+    "rules-path": "${rulesDir}",
+    "linter-command": "${semgrepCmd}",
+    "jsbeautifier-command": "${jsbeautifyCmd}",
     "only-process-in-scope": false,
     "highlight": true,
     "debug": false,
