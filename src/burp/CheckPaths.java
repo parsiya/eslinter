@@ -34,15 +34,15 @@ public class CheckPaths {
         }
 
         // Create eslintOutputPath and check access.
-        if (createDirectory(extensionConfig.eslintOutputPath)) {
+        if (createDirectory(extensionConfig.lintOutputPath)) {
             // eslintOutputPath is created or exists.
         } else {
             // eslintOutputPath was not created.
             // Check if we can write to it.
-            if (!canWrite(extensionConfig.eslintOutputPath)) {
+            if (!canWrite(extensionConfig.lintOutputPath)) {
                 err += String.format(
                     "Could not create or write to eslintOutputPath at %s.\n",
-                    extensionConfig.eslintOutputPath
+                    extensionConfig.lintOutputPath
                 );
             }
         }

@@ -43,9 +43,15 @@ public class Config {
     @SerializedName("beautified-javascript-path")
     public String storagePath = "";
 
+<<<<<<< HEAD
     // Where ESLint results are stored.
     @SerializedName("lint-result-path")
     public String eslintOutputPath = "";
+=======
+    // Where lint results are stored.
+    @SerializedName("lint-result-path")
+    public String lintOutputPath = "";
+>>>>>>> master
 
     // Full path to the sqlite database file. It will be created if it does not
     // exist.

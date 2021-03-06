@@ -46,7 +46,7 @@ public class Lint {
         // Create the output filename for this data.
         String eslintResultFileName = metadata.getFileNameWithoutExtension().concat("-linted.js");
         // Create the full path for the output file.
-        String eslintResultFilePath = FilenameUtils.concat(extensionConfig.eslintOutputPath, eslintResultFileName);
+        String eslintResultFilePath = FilenameUtils.concat(extensionConfig.lintOutputPath, eslintResultFileName);
 
         // Create linter args to run ESLint.
         String[] linterArgs = new String[] { "-c", extensionConfig.eslintConfigPath, "-f", "codeframe",
