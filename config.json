@@ -1,6 +1,6 @@
 {
     "beautified-javascript-path": "CHANGEME",
-    "eslint-result-path": "CHANGEME",
+    "lint-result-path": "CHANGEME",
     "eslint-command-path": "CHANGEME",
     "eslint-config-path": "CHANGEME",
     "jsbeautify-command-path": "CHANGEME",

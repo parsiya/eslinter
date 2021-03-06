@@ -173,7 +173,7 @@ task config() {
         """
 {
     "beautified-javascript-path": "${beautified}",
-    "eslint-result-path": "${linted}",
+    "lint-result-path": "${linted}",
     "database-path": "${db}",
     "eslint-config-path": "${cfgFile}",
     "eslint-command-path": "${eslint}",

@@ -51,7 +51,7 @@ own config files.
 3. At a minimum, you need to provide paths to (see
    [docs/configuration.md](docs/configuration.md) for more information):
     * `beautified-javascript-path`: Path to store extracted JavaScript files.
-    * `eslint-result-path`: Path to store ESLint results.
+    * `lint-result-path`: Path to store ESLint results.
     * `database-path`: Location of the target database (it will be created if it
       does not exist).
     * `eslint-config-path`: Path to the ESLint configuration file.
@@ -79,7 +79,7 @@ having to export it from the database.
 * `beautified-javascript-path`: Where all beautified JavaScripts are stored.
   Each file contains the extracted JavaScript for one request. It will be
   created (including any parent directories) if it does not exist.
-* `eslint-result-path`: Where all ESLint results are stored. Each file contains
+* `lint-result-path`: Where all ESLint results are stored. Each file contains
   the results for one file from above. These files have the same name as their
   JavaScript counterparts with `-linted` appended. For example, the results for
   `google.com-whatever.js` will be in `google.com-whatever-linted.js`.  It will
